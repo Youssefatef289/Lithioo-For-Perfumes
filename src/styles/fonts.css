@@ -1,0 +1,225 @@
+/* Cocon Next Arabic Font */
+@font-face {
+  font-family: 'Cocon Next Arabic';
+  src: url('/fonts/CoconNextArabic-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cocon Next Arabic';
+  src: url('/fonts/CoconNextArabic-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Apply Arabic font when language is Arabic */
+[dir='rtl'],
+[lang='ar'],
+html[dir='rtl'],
+html[lang='ar'] {
+  font-family: 'Cocon Next Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Apply to body when RTL */
+body[dir='rtl'],
+body[lang='ar'] {
+  font-family: 'Cocon Next Arabic', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+/* Ensure all text elements use the font when RTL */
+[dir='rtl'] *,
+[lang='ar'] *,
+html[dir='rtl'] *,
+html[lang='ar'] * {
+  font-family: inherit;
+}
+
+/* Specific font weights for Arabic headings */
+[dir='rtl'] h1,
+[dir='rtl'] h2,
+[dir='rtl'] h3,
+[dir='rtl'] h4,
+[dir='rtl'] h5,
+[dir='rtl'] h6,
+[lang='ar'] h1,
+[lang='ar'] h2,
+[lang='ar'] h3,
+[lang='ar'] h4,
+[lang='ar'] h5,
+[lang='ar'] h6,
+html[dir='rtl'] h1,
+html[dir='rtl'] h2,
+html[dir='rtl'] h3,
+html[dir='rtl'] h4,
+html[dir='rtl'] h5,
+html[dir='rtl'] h6,
+html[lang='ar'] h1,
+html[lang='ar'] h2,
+html[lang='ar'] h3,
+html[lang='ar'] h4,
+html[lang='ar'] h5,
+html[lang='ar'] h6 {
+  font-weight: 700;
+  font-family: 'Cocon Next Arabic', sans-serif;
+}
+
+/* Apply font to all text elements when RTL */
+[dir='rtl'] p,
+[dir='rtl'] span,
+[dir='rtl'] a,
+[dir='rtl'] button,
+[dir='rtl'] input,
+[dir='rtl'] textarea,
+[dir='rtl'] label,
+[dir='rtl'] li,
+[dir='rtl'] td,
+[dir='rtl'] th,
+[lang='ar'] p,
+[lang='ar'] span,
+[lang='ar'] a,
+[lang='ar'] button,
+[lang='ar'] input,
+[lang='ar'] textarea,
+[lang='ar'] label,
+[lang='ar'] li,
+[lang='ar'] td,
+[lang='ar'] th,
+html[dir='rtl'] p,
+html[dir='rtl'] span,
+html[dir='rtl'] a,
+html[dir='rtl'] button,
+html[dir='rtl'] input,
+html[dir='rtl'] textarea,
+html[dir='rtl'] label,
+html[dir='rtl'] li,
+html[dir='rtl'] td,
+html[dir='rtl'] th,
+html[lang='ar'] p,
+html[lang='ar'] span,
+html[lang='ar'] a,
+html[lang='ar'] button,
+html[lang='ar'] input,
+html[lang='ar'] textarea,
+html[lang='ar'] label,
+html[lang='ar'] li,
+html[lang='ar'] td,
+html[lang='ar'] th {
+  font-family: 'Cocon Next Arabic', sans-serif;
+}
+
+/* Better line height for Arabic text */
+[dir='rtl'] p,
+[lang='ar'] p,
+html[dir='rtl'] p,
+html[lang='ar'] p {
+  line-height: 1.8;
+}
+
+/* Better letter spacing for Arabic */
+[dir='rtl'],
+[lang='ar'],
+html[dir='rtl'],
+html[lang='ar'] {
+  letter-spacing: 0;
+}
+
+/* English Font - Josefin Sans */
+/* Apply Josefin Sans font when language is English */
+html:not([dir='rtl']):not([lang='ar']),
+html[dir='ltr'],
+html[lang='en'] {
+  font-family: "Josefin Sans", sans-serif;
+}
+
+/* Apply to body when English */
+body:not([dir='rtl']):not([lang='ar']),
+body[dir='ltr'],
+body[lang='en'] {
+  font-family: "Josefin Sans", sans-serif;
+}
+
+/* Ensure all text elements use the font when English */
+html:not([dir='rtl']):not([lang='ar']) *,
+html[dir='ltr'] *,
+html[lang='en'] * {
+  font-family: inherit;
+}
+
+/* Specific font weights for English headings */
+html:not([dir='rtl']):not([lang='ar']) h1,
+html:not([dir='rtl']):not([lang='ar']) h2,
+html:not([dir='rtl']):not([lang='ar']) h3,
+html:not([dir='rtl']):not([lang='ar']) h4,
+html:not([dir='rtl']):not([lang='ar']) h5,
+html:not([dir='rtl']):not([lang='ar']) h6,
+html[dir='ltr'] h1,
+html[dir='ltr'] h2,
+html[dir='ltr'] h3,
+html[dir='ltr'] h4,
+html[dir='ltr'] h5,
+html[dir='ltr'] h6,
+html[lang='en'] h1,
+html[lang='en'] h2,
+html[lang='en'] h3,
+html[lang='en'] h4,
+html[lang='en'] h5,
+html[lang='en'] h6 {
+  font-weight: 700;
+  font-family: "Josefin Sans", sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Apply Josefin Sans font to all text elements when English */
+html:not([dir='rtl']):not([lang='ar']) p,
+html:not([dir='rtl']):not([lang='ar']) span,
+html:not([dir='rtl']):not([lang='ar']) a,
+html:not([dir='rtl']):not([lang='ar']) button,
+html:not([dir='rtl']):not([lang='ar']) input,
+html:not([dir='rtl']):not([lang='ar']) textarea,
+html:not([dir='rtl']):not([lang='ar']) label,
+html:not([dir='rtl']):not([lang='ar']) li,
+html:not([dir='rtl']):not([lang='ar']) td,
+html:not([dir='rtl']):not([lang='ar']) th,
+html[dir='ltr'] p,
+html[dir='ltr'] span,
+html[dir='ltr'] a,
+html[dir='ltr'] button,
+html[dir='ltr'] input,
+html[dir='ltr'] textarea,
+html[dir='ltr'] label,
+html[dir='ltr'] li,
+html[dir='ltr'] td,
+html[dir='ltr'] th,
+html[lang='en'] p,
+html[lang='en'] span,
+html[lang='en'] a,
+html[lang='en'] button,
+html[lang='en'] input,
+html[lang='en'] textarea,
+html[lang='en'] label,
+html[lang='en'] li,
+html[lang='en'] td,
+html[lang='en'] th {
+  font-family: "Josefin Sans", sans-serif;
+}
+
+/* Better letter spacing for English text */
+html:not([dir='rtl']):not([lang='ar']),
+html[dir='ltr'],
+html[lang='en'] {
+  letter-spacing: -0.01em;
+}
+
+/* Optimize font rendering for English */
+html:not([dir='rtl']):not([lang='ar']) *,
+html[dir='ltr'] *,
+html[lang='en'] * {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+

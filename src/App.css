@@ -1,0 +1,83 @@
+@import './styles/animations.css';
+@import './styles/dark-theme.css';
+@import './styles/rtl.css';
+@import './styles/fonts.css';
+
+.App {
+  min-height: 100vh;
+  background: #fff;
+  overflow-x: hidden;
+  transition: background 0.3s ease, color 0.3s ease;
+  width: 100%;
+}
+
+main {
+  width: 100%;
+  min-height: calc(100vh - 80px);
+}
+
+/* Responsive Container */
+@media (max-width: 1399px) {
+  main {
+    width: 100%;
+  }
+}
+
+@media (max-width: 991px) {
+  main {
+    padding: 0;
+  }
+}
+
+/* Global Responsive Improvements */
+* {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Prevent horizontal scroll */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Smooth scrolling for all browsers */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Dark Theme Global */
+.dark-theme .App {
+  background: #1a1a1a;
+  color: #e0e0e0;
+}
+
+.dark-theme main {
+  background: #1a1a1a;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #7fb069;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6a9a5a;
+}
+

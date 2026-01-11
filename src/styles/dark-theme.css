@@ -1,0 +1,110 @@
+[data-theme='dark'] {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --accent-color: #7fb069;
+  --card-bg: #2d2d2d;
+  --border-color: #404040;
+}
+
+.dark-theme {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Dark theme styles are handled in Header.css with .header.dark class */
+
+.dark-theme .hero,
+.dark-theme .new-collection,
+.dark-theme .why-choose-us,
+.dark-theme .our-store,
+.dark-theme .promotional-banner,
+.dark-theme .testimonials,
+.dark-theme .blog {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.dark-theme .hero-title,
+.dark-theme .collection-title,
+.dark-theme .why-title,
+.dark-theme .store-title,
+.dark-theme .blog-title,
+.dark-theme .testimonials-title,
+.dark-theme .banner-title {
+  color: var(--text-primary);
+}
+
+.dark-theme .hero-description,
+.dark-theme .collection-description,
+.dark-theme .why-description,
+.dark-theme .blog-subtitle,
+.dark-theme .testimonials-subtitle,
+.dark-theme .banner-description {
+  color: var(--text-secondary);
+}
+
+.dark-theme .product-card,
+.dark-theme .store-product-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+.dark-theme .product-name,
+.dark-theme .store-product-name,
+.dark-theme .blog-card-title,
+.dark-theme .testimonial-name {
+  color: var(--text-primary);
+}
+
+.dark-theme .blog-card,
+.dark-theme .testimonial-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+.dark-theme .testimonial-avatar {
+  background: var(--bg-secondary);
+}
+
+.dark-theme .filter-btn {
+  color: var(--text-secondary);
+}
+
+.dark-theme .filter-btn:hover,
+.dark-theme .filter-btn.active {
+  color: var(--text-primary);
+}
+
+.dark-theme .pagination-btn {
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.dark-theme .pagination-btn:hover:not(:disabled) {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.dark-theme .pagination-btn.active {
+  background: var(--accent-color);
+  color: white;
+}
+
+.dark-theme .mobile-menu {
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--border-color);
+}
+
+.dark-theme .mobile-menu a {
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.dark-theme .mobile-menu a:hover {
+  background: var(--bg-primary);
+  color: var(--accent-color);
+}
+
