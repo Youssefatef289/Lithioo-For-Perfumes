@@ -1,7 +1,7 @@
 {
-  "name": "lithioo-perfumes",
+  "name": "lithioo-for-perfumes",
   "version": "1.0.0",
-  "description": "ELIXIR Perfumes E-commerce Website",
+  "description": "Lithioo For Perfumes E-commerce Website",
   "private": true,
   "dependencies": {
     "react": "^18.2.0",

@@ -1,6 +1,6 @@
-# ELIXIR Perfumes - E-commerce Website
+# Lithioo For Perfumes - E-commerce Website
 
-A modern, responsive e-commerce website for ELIXIR perfumes built with React.
+A modern, responsive e-commerce website for Lithioo For Perfumes built with React.
 
 ## Features
 

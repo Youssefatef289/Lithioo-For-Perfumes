@@ -70,7 +70,7 @@ const Header = () => {
               alt="Lithioo Logo" 
               className="logo-img"
             />
-            <span className="logo-text">ELIXIR</span>
+            <span className="logo-text">Lithioo</span>
           </Link>
           
           <nav className={`nav ${mobileMenuOpen ? 'nav-open' : ''}`}>
@@ -121,7 +121,7 @@ const Header = () => {
               alt="Lithioo Logo"
               className="logo-img"
             />
-            <span className="logo-text">ELIXIR</span>
+            <span className="logo-text">Lithioo</span>
           </Link>
           <button 
             className="mobile-menu-close"
