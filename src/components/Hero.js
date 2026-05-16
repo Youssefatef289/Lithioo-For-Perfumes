@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useLanguage } from '../contexts/LanguageContext';
 import { HERO_SLIDER_IMAGES } from '../data/heroSlider';
@@ -9,7 +9,6 @@ const SLIDE_INTERVAL_MS = 5500;
 const Hero = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const location = useLocation();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
 
@@ -27,14 +26,6 @@ const Hero = () => {
     const id = window.setInterval(() => setIndex((i) => (i + 1) % len), SLIDE_INTERVAL_MS);
     return () => window.clearInterval(id);
   }, [paused, len]);
-
-  const goHome = () => {
-    if (location.pathname === '/') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      navigate('/');
-    }
-  };
 
   return (
     <section
@@ -61,9 +52,6 @@ const Hero = () => {
                 {t.hero.tagline}
               </p>
               <div className="mt-8 flex w-full max-w-[340px] flex-col gap-3 self-center sm:flex-row sm:justify-center md:mx-0 md:max-w-none md:self-start md:justify-start">
-                {/* <button type="button" onClick={goHome} className="btn-outline w-full sm:w-auto sm:min-w-[8rem]">
-                  {t.hero.buttonHome}
-                </button> */}
                 <button type="button" onClick={() => navigate('/products')} className="btn-accent w-full shadow-xl sm:w-auto sm:min-w-[10rem]">
                   {t.hero.buttonShop}
                 </button>
