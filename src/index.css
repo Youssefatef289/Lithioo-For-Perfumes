@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import './styles/fonts.css';
+@import './styles/dark-theme.css';
+@import './styles/animations.css';
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+    scroll-padding-top: 7rem;
+  }
+
+  body {
+    @apply min-h-screen overflow-x-hidden bg-white text-neutral-800 antialiased transition-colors duration-300;
+  }
+
+  [data-theme='dark'] body {
+    @apply bg-neutral-950 text-neutral-200;
+  }
+
+  img,
+  video,
+  iframe {
+    @apply block h-auto max-w-full;
+  }
+
+  ::selection {
+    @apply bg-brand/25 text-neutral-900;
+  }
+
+  [data-theme='dark'] ::selection {
+    @apply bg-brand/35 text-white;
+  }
+}
+
+@layer components {
+  .app-shell {
+    @apply min-h-screen w-full overflow-x-hidden bg-white transition-colors duration-300;
+  }
+
+  [data-theme='dark'] .app-shell {
+    @apply bg-neutral-950 text-neutral-200;
+  }
+
+  /* صفحات داخلية: هوامش آمنة تحت الهيدر الثابت */
+  .page-main {
+    @apply w-full min-w-0;
+  }
+
+  .section-inner {
+    @apply mx-auto w-full px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-inner-wide {
+    @apply mx-auto w-full max-w-wide px-4 sm:px-6 lg:px-8;
+  }
+
+  /* أزرار أساسية متسقة */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-brand-dark hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950;
+  }
+
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-6 py-3.5 text-base font-semibold text-white shadow-md transition hover:bg-accent-dark hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 dark:ring-offset-neutral-950;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border-2 border-brand bg-transparent px-6 py-3 text-sm font-semibold text-brand transition hover:bg-brand hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:ring-offset-neutral-950;
+  }
+
+  .card-elevated {
+    @apply rounded-2xl border border-neutral-100/80 bg-white shadow-card transition-shadow duration-300 hover:shadow-card-hover dark:border-neutral-700 dark:bg-neutral-800/80 dark:shadow-black/30;
+  }
+
+  .heading-section {
+    @apply text-3xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-4xl md:text-5xl;
+  }
+
+  .text-muted-section {
+    @apply text-base leading-relaxed text-neutral-600 dark:text-neutral-400 sm:text-lg;
+  }
+}
+
+@layer utilities {
+  /* شريط تمرير — فاتح */
+  ::-webkit-scrollbar {
+    @apply w-2.5;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-neutral-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-brand/70 hover:bg-brand;
+  }
+
+  [data-theme='dark'] ::-webkit-scrollbar-track {
+    @apply bg-neutral-800;
+  }
+
+  [data-theme='dark'] ::-webkit-scrollbar-thumb {
+    @apply bg-brand;
+  }
+}

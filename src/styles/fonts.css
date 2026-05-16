@@ -1,0 +1,43 @@
+/* English UI — Josefin Sans (loaded from public/index.html) */
+html,
+body {
+  font-family: 'Josefin Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+html *,
+body * {
+  font-family: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 700;
+  font-family: 'Josefin Sans', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+p,
+span,
+a,
+button,
+input,
+textarea,
+label,
+li,
+td,
+th {
+  font-family: 'Josefin Sans', sans-serif;
+}
+
+html {
+  letter-spacing: -0.01em;
+}
+
+html * {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
