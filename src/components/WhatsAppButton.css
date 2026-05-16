@@ -1,0 +1,201 @@
+.whatsapp-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 997;
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: visible;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  animation: whatsappPulse 2s infinite 0.6s, whatsappEntrance 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.whatsapp-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 30px rgba(37, 211, 102, 0.6);
+  background: linear-gradient(135deg, #128C7E 0%, #25D366 100%);
+}
+
+.whatsapp-button:active {
+  transform: scale(0.95);
+}
+
+.whatsapp-button.dark {
+  box-shadow: 0 4px 20px rgba(37, 211, 102, 0.5);
+}
+
+.whatsapp-button.dark:hover {
+  box-shadow: 0 6px 30px rgba(37, 211, 102, 0.7);
+}
+
+@keyframes whatsappPulse {
+  0% {
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 30px rgba(37, 211, 102, 0.6), 0 0 0 10px rgba(37, 211, 102, 0.1);
+  }
+  100% {
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+  }
+}
+
+.whatsapp-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+
+.whatsapp-icon {
+  width: 100%;
+  height: 100%;
+  color: white;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.whatsapp-button:hover .whatsapp-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.whatsapp-tooltip {
+  position: absolute;
+  right: 75px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 0.625rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  font-family: "Josefin Sans", sans-serif;
+  letter-spacing: -0.01em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.whatsapp-tooltip::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 8px solid transparent;
+  border-left-color: rgba(0, 0, 0, 0.85);
+}
+
+[dir='rtl'] .whatsapp-tooltip {
+  right: auto;
+  left: 75px;
+}
+
+[dir='rtl'] .whatsapp-tooltip::after {
+  left: auto;
+  right: 100%;
+  border-left-color: transparent;
+  border-right-color: rgba(0, 0, 0, 0.85);
+}
+
+.whatsapp-tooltip.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) translateX(0);
+}
+
+[dir='rtl'] .whatsapp-tooltip.show {
+  transform: translateY(-50%) translateX(0);
+}
+
+.whatsapp-button.dark .whatsapp-tooltip {
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.whatsapp-button.dark .whatsapp-tooltip::after {
+  border-left-color: rgba(255, 255, 255, 0.95);
+}
+
+[dir='rtl'] .whatsapp-button.dark .whatsapp-tooltip::after {
+  border-left-color: transparent;
+  border-right-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .whatsapp-button {
+    width: 56px;
+    height: 56px;
+    bottom: 1.5rem;
+    right: 1.5rem;
+  }
+
+  .whatsapp-icon-wrapper {
+    width: 28px;
+    height: 28px;
+  }
+
+  .whatsapp-tooltip {
+    right: 70px;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.875rem;
+  }
+
+  [dir='rtl'] .whatsapp-tooltip {
+    left: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .whatsapp-button {
+    width: 52px;
+    height: 52px;
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  .whatsapp-icon-wrapper {
+    width: 26px;
+    height: 26px;
+  }
+
+  .whatsapp-tooltip {
+    right: 65px;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  [dir='rtl'] .whatsapp-tooltip {
+    left: 65px;
+  }
+}
+
+/* Smooth entrance animation */
+@keyframes whatsappEntrance {
+  from {
+    opacity: 0;
+    transform: scale(0) rotate(-180deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
