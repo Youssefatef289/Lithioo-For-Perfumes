@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { BOTTLE_SIZES, DEFAULT_SIZE_ID, getSizeById, getCartKey } from '../data/sizes';
+import { parsePrice } from '../utils/price';
 
 const CartContext = createContext();
 
@@ -10,57 +12,85 @@ export const useCart = () => {
   return context;
 };
 
+const normalizeCartItem = (item) => {
+  const size = item.size || DEFAULT_SIZE_ID;
+  const sizeMeta = getSizeById(size);
+  const cartKey = item.cartKey || getCartKey(item.id, size);
+  const price =
+    typeof item.price === 'number' && !Number.isNaN(item.price) ? item.price : sizeMeta.price;
+
+  return {
+    ...item,
+    size,
+    sizeLabel: item.sizeLabel || sizeMeta.label,
+    price,
+    cartKey,
+  };
+};
+
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartNotice, setCartNotice] = useState(null);
 
-  // Load cart from localStorage on mount
   useEffect(() => {
     const savedCart = localStorage.getItem('cartItems');
     if (savedCart) {
       try {
-        setCartItems(JSON.parse(savedCart));
+        const parsed = JSON.parse(savedCart);
+        setCartItems(Array.isArray(parsed) ? parsed.map(normalizeCartItem) : []);
       } catch (error) {
         console.error('Error loading cart from localStorage:', error);
       }
     }
   }, []);
 
-  // Save cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product, quantity = 1) => {
-    setCartItems(prevItems => {
-      const existingItem = prevItems.find(item => item.id === product.id);
-      
-      if (existingItem) {
-        return prevItems.map(item =>
-          item.id === product.id
+  const clearCartNotice = useCallback(() => setCartNotice(null), []);
+
+  const addToCart = (product, quantity = 1, { openCart = false } = {}) => {
+    const size = product.size || DEFAULT_SIZE_ID;
+    const sizeMeta = getSizeById(size);
+    const lineItem = normalizeCartItem({
+      ...product,
+      size,
+      sizeLabel: product.sizeLabel || sizeMeta.label,
+      price: product.price ?? sizeMeta.price,
+      quantity: 0,
+    });
+
+    setCartItems((prevItems) => {
+      const existing = prevItems.find((item) => item.cartKey === lineItem.cartKey);
+      if (existing) {
+        return prevItems.map((item) =>
+          item.cartKey === lineItem.cartKey
             ? { ...item, quantity: item.quantity + quantity }
             : item
         );
-      } else {
-        return [...prevItems, { ...product, quantity }];
       }
+      return [...prevItems, { ...lineItem, quantity }];
     });
+
+    setCartNotice('تم إضافته في السلة');
+    if (openCart) {
+      setIsCartOpen(true);
+    }
   };
 
-  const removeFromCart = (productId) => {
-    setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
+  const removeFromCart = (cartKey) => {
+    setCartItems((prevItems) => prevItems.filter((item) => item.cartKey !== cartKey));
   };
 
-  const updateQuantity = (productId, quantity) => {
+  const updateQuantity = (cartKey, quantity) => {
     if (quantity <= 0) {
-      removeFromCart(productId);
+      removeFromCart(cartKey);
       return;
     }
-    
-    setCartItems(prevItems =>
-      prevItems.map(item =>
-        item.id === productId ? { ...item, quantity } : item
-      )
+    setCartItems((prevItems) =>
+      prevItems.map((item) => (item.cartKey === cartKey ? { ...item, quantity } : item))
     );
   };
 
@@ -68,19 +98,13 @@ export const CartProvider = ({ children }) => {
     setCartItems([]);
   };
 
-  const getCartTotal = () => {
-    return cartItems.reduce((total, item) => {
-      const price = parseFloat(item.price.replace('$', '')) || 0;
-      return total + price * item.quantity;
-    }, 0);
-  };
+  const getCartTotal = () =>
+    cartItems.reduce((total, item) => total + parsePrice(item.price) * item.quantity, 0);
 
-  const getCartItemsCount = () => {
-    return cartItems.reduce((count, item) => count + item.quantity, 0);
-  };
+  const getCartItemsCount = () => cartItems.reduce((count, item) => count + item.quantity, 0);
 
   const toggleCart = () => {
-    setIsCartOpen(prev => !prev);
+    setIsCartOpen((prev) => !prev);
   };
 
   const value = {
@@ -94,6 +118,9 @@ export const CartProvider = ({ children }) => {
     isCartOpen,
     setIsCartOpen,
     toggleCart,
+    cartNotice,
+    clearCartNotice,
+    bottleSizes: BOTTLE_SIZES,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

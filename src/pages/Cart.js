@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiShoppingCart, FiTrash2, FiPlus, FiMinus, FiArrowLeft } from 'react-icons/fi';
 import { useCart } from '../contexts/CartContext';
+import OrderWhatsAppButton from '../components/OrderWhatsAppButton';
+import { formatEGP, parsePrice } from '../utils/price';
 
 const Cart = () => {
   const { cartItems, removeFromCart, updateQuantity, clearCart, getCartTotal } = useCart();
@@ -11,11 +13,11 @@ const Cart = () => {
     window.scrollTo(0, 0);
   }, []);
 
-  const handleQuantityChange = (productId, newQuantity) => {
+  const handleQuantityChange = (cartKey, newQuantity) => {
     if (newQuantity < 1) {
-      removeFromCart(productId);
+      removeFromCart(cartKey);
     } else {
-      updateQuantity(productId, newQuantity);
+      updateQuantity(cartKey, newQuantity);
     }
   };
 
@@ -54,7 +56,8 @@ const Cart = () => {
           </button>
           <h1 className="heading-section">Shopping Cart</h1>
           <p className="text-muted-section !mt-0">
-            {cartItems.length} item{cartItems.length !== 1 ? 's' : ''} in your cart
+            {cartItems.reduce((n, i) => n + i.quantity, 0)} item
+            {cartItems.reduce((n, i) => n + i.quantity, 0) !== 1 ? 's' : ''} in your cart
           </p>
         </div>
 
@@ -62,7 +65,7 @@ const Cart = () => {
           <div className="space-y-4 lg:col-span-2">
             {cartItems.map((item) => (
               <div
-                key={item.id}
+                key={item.cartKey}
                 className="card-elevated flex flex-col gap-4 p-4 sm:flex-row sm:items-center"
               >
                 <div className="h-28 w-full shrink-0 overflow-hidden rounded-xl bg-white dark:bg-neutral-800 sm:h-24 sm:w-24">
@@ -70,14 +73,16 @@ const Cart = () => {
                 </div>
                 <div className="min-w-0 flex-1">
                   <h3 className="font-semibold text-neutral-900 dark:text-white">{item.name}</h3>
-                  <p className="text-sm font-bold text-brand">${Number(item.price).toFixed(2)}</p>
+                  {item.brand && <p className="text-xs text-neutral-500 dark:text-neutral-400">{item.brand}</p>}
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">{item.sizeLabel || item.size}</p>
+                  <p className="text-sm font-bold text-brand">{formatEGP(item.price)}</p>
                 </div>
                 <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end">
                   <div className="flex items-center gap-1 rounded-lg border border-neutral-200 dark:border-neutral-600">
                     <button
                       type="button"
                       className={qtyBtn}
-                      onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                      onClick={() => handleQuantityChange(item.cartKey, item.quantity - 1)}
                       aria-label="Decrease quantity"
                     >
                       <FiMinus className="h-4 w-4" />
@@ -86,18 +91,20 @@ const Cart = () => {
                     <button
                       type="button"
                       className={qtyBtn}
-                      onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                      onClick={() => handleQuantityChange(item.cartKey, item.quantity + 1)}
                       aria-label="Increase quantity"
                     >
                       <FiPlus className="h-4 w-4" />
                     </button>
                   </div>
                   <div className="text-end">
-                    <p className="text-sm font-bold text-neutral-800 dark:text-white">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="text-sm font-bold text-neutral-800 dark:text-white">
+                      {formatEGP(parsePrice(item.price) * item.quantity)}
+                    </p>
                     <button
                       type="button"
                       className="mt-1 text-red-500 transition hover:opacity-80"
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeFromCart(item.cartKey)}
                       aria-label="Remove item"
                     >
                       <FiTrash2 className="inline h-4 w-4" />
@@ -113,7 +120,7 @@ const Cart = () => {
             <div className="mt-4 space-y-3 border-b border-neutral-200 pb-4 dark:border-neutral-700">
               <div className="flex justify-between text-sm text-neutral-600 dark:text-neutral-400">
                 <span>Subtotal</span>
-                <span>${total.toFixed(2)}</span>
+                <span>{formatEGP(total)}</span>
               </div>
               <div className="flex justify-between text-sm text-neutral-600 dark:text-neutral-400">
                 <span>Shipping</span>
@@ -122,11 +129,9 @@ const Cart = () => {
             </div>
             <div className="mt-4 flex justify-between text-lg font-bold text-neutral-900 dark:text-white">
               <span>Total</span>
-              <span className="text-brand">${total.toFixed(2)}</span>
+              <span className="text-brand">{formatEGP(total)}</span>
             </div>
-            <button type="button" className="btn-primary mt-6 w-full">
-              Proceed to Checkout
-            </button>
+            <OrderWhatsAppButton className="mt-6" />
             <button type="button" className="btn-outline mt-3 w-full" onClick={clearCart}>
               Clear Cart
             </button>

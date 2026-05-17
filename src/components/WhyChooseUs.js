@@ -1,9 +1,27 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { FiCheck } from 'react-icons/fi';
+import { FiAward, FiDroplet, FiClock } from 'react-icons/fi';
 
 const WhyChooseUs = () => {
   const { t } = useLanguage();
+
+  const features = [
+    {
+      Icon: FiAward,
+      title: t.whyChoose.features.quality,
+      description: t.whyChoose.features.qualityDesc,
+    },
+    {
+      Icon: FiDroplet,
+      title: t.whyChoose.features.ingredients,
+      description: t.whyChoose.features.ingredientsDesc,
+    },
+    {
+      Icon: FiClock,
+      title: t.whyChoose.features.experience,
+      description: t.whyChoose.features.experienceDesc,
+    },
+  ];
 
   return (
     <section className="why-choose-us w-full bg-white py-12 dark:bg-neutral-950 sm:py-16 md:py-20">
@@ -29,23 +47,23 @@ const WhyChooseUs = () => {
               />
             </div>
           </div>
+
           <div className="slide-left flex flex-col gap-6 text-center lg:text-start">
             <h2 className="heading-section">{t.whyChoose.title}</h2>
-            <p className="text-muted-section">{t.whyChoose.description}</p>
-            <ul className="mt-2 flex flex-col gap-4 text-start">
-              {[
-                t.whyChoose.features.unique,
-                t.whyChoose.features.delivery,
-                t.whyChoose.features.service,
-              ].map((label) => (
+            <p className="text-muted-section leading-relaxed">{t.whyChoose.description}</p>
+            <ul className="mt-2 flex flex-col gap-5 text-start">
+              {features.map(({ Icon, title, description }) => (
                 <li
-                  key={label}
-                  className="flex items-center gap-4 text-base font-medium text-neutral-800 transition hover:-translate-x-1 dark:text-neutral-100"
+                  key={title}
+                  className="flex items-start gap-4 rounded-xl border border-neutral-100 bg-surface-muted/40 p-4 transition hover:border-brand/30 hover:shadow-sm dark:border-neutral-700 dark:bg-neutral-800/40"
                 >
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand text-white">
-                    <FiCheck className="h-4 w-4" />
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand/15 text-brand">
+                    <Icon className="h-6 w-6" strokeWidth={1.75} />
                   </span>
-                  <span>{label}</span>
+                  <div>
+                    <h3 className="m-0 text-base font-bold text-neutral-900 dark:text-white">{title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">{description}</p>
+                  </div>
                 </li>
               ))}
             </ul>

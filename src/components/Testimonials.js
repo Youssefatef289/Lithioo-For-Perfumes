@@ -56,16 +56,6 @@ const Testimonials = () => {
             </div>
           ))}
         </div>
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-6 border-t border-neutral-200 pt-10 text-sm font-semibold tracking-wide text-neutral-400 dark:border-neutral-700 dark:text-neutral-500">
-          {['LOGOIPSUM', 'LOGOIPSUM', 'LOGO IPSUM', 'LOGOIPSUM', 'LOGOIPSUM'].map((label, i) => (
-            <div
-              key={label + i}
-              className={`rounded-lg px-3 py-2 ${i === 2 ? 'text-brand ring-2 ring-brand/30' : ''}`}
-            >
-              {label}
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   );

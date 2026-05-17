@@ -1,18 +1,12 @@
 import React, { useState } from 'react';
-import { FaComments, FaTimes, FaPhoneAlt, FaWhatsapp, FaTelegramPlane, FaFacebookMessenger } from 'react-icons/fa';
+import { FaComments, FaTimes, FaPhoneAlt, FaWhatsapp, FaFacebookF, FaInstagram } from 'react-icons/fa';
+import { SOCIAL_LINKS, PHONE_TEL } from '../data/contact';
+import { getWhatsAppUrl } from '../utils/whatsapp';
 
 const FloatingContactButton = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const whatsappNumber = '201064307053';
-  const whatsappMessage = 'Hello! I would like to know more about your products.';
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
-
-  const phoneNumber = '01064307053';
-  const telUrl = `tel:${phoneNumber}`;
-
-  const telegramUrl = '#';
-  const messengerUrl = '#';
+  const whatsappUrl = getWhatsAppUrl();
 
   return (
     <div className="pointer-events-none fixed bottom-5 end-5 z-[997] flex flex-col-reverse items-end gap-3 sm:bottom-6 sm:end-6">
@@ -31,13 +25,22 @@ const FloatingContactButton = () => {
       {isOpen && (
         <>
           <a
-            href={messengerUrl}
+            href={SOCIAL_LINKS.facebook}
             target="_blank"
             rel="noopener noreferrer"
-            className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-b from-[#0078FF] to-[#00C6FF] text-white shadow-lg transition hover:scale-105 sm:h-12 sm:w-12"
-            aria-label="Messenger"
+            className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#1877F2] text-white shadow-lg transition hover:scale-105 sm:h-12 sm:w-12"
+            aria-label="Facebook"
           >
-            <FaFacebookMessenger className="h-5 w-5" />
+            <FaFacebookF className="h-5 w-5" />
+          </a>
+          <a
+            href={SOCIAL_LINKS.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#bc1888] text-white shadow-lg transition hover:scale-105 sm:h-12 sm:w-12"
+            aria-label="Instagram"
+          >
+            <FaInstagram className="h-5 w-5" />
           </a>
           <a
             href={whatsappUrl}
@@ -49,24 +52,12 @@ const FloatingContactButton = () => {
             <FaWhatsapp className="h-5 w-5" />
           </a>
           <a
-            href={telegramUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="pointer-events-auto flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-b from-[#017AB1] to-[#01ABE6] text-white shadow-lg transition hover:scale-105 sm:h-12 sm:w-12"
-            aria-label="Telegram"
-          >
-            <FaTelegramPlane className="h-5 w-5" />
-          </a>
-          <button
-            type="button"
-            onClick={() => {
-              window.location.href = telUrl;
-            }}
+            href={PHONE_TEL}
             className="pointer-events-auto flex h-11 items-center gap-2 rounded-md bg-gradient-to-r from-[#00a1f5] to-[#0064f3] px-4 text-sm font-semibold text-white shadow-lg transition hover:scale-[1.02] sm:h-12 sm:px-5"
           >
             <FaPhoneAlt className="h-4 w-4" />
-            <span className="hidden sm:inline">Free Consultation</span>
-          </button>
+            <span className="hidden sm:inline">Call us</span>
+          </a>
         </>
       )}
     </div>

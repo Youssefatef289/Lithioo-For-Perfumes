@@ -97,9 +97,6 @@ const Header = () => {
             <NavLink to="/products" onClick={(e) => handleNavClick(e, '/products')} className={navLinkClass}>
               {t.nav.product}
             </NavLink>
-            <NavLink to="/blog" onClick={(e) => handleNavClick(e, '/blog')} className={navLinkClass}>
-              {t.nav.blog}
-            </NavLink>
             <NavLink to="/contact" onClick={(e) => handleNavClick(e, '/contact')} className={navLinkClass}>
               {t.nav.contact}
             </NavLink>
@@ -204,17 +201,6 @@ const Header = () => {
             }
           >
             {t.nav.product}
-          </NavLink>
-          <NavLink
-            to="/blog"
-            onClick={(e) => handleNavClick(e, '/blog')}
-            className={({ isActive }) =>
-              `block border-b border-neutral-200 px-5 py-4 text-lg font-medium text-neutral-800 transition hover:bg-brand/10 hover:text-brand dark:border-white/10 dark:text-neutral-100 ${
-                isActive ? 'bg-brand/10 font-semibold text-brand' : ''
-              }`
-            }
-          >
-            {t.nav.blog}
           </NavLink>
           <NavLink
             to="/contact"

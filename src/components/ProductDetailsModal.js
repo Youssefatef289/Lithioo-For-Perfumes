@@ -1,19 +1,20 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { FiX, FiShoppingCart, FiStar, FiHeart } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
+import SizeSelector from './SizeSelector';
+import { DEFAULT_SIZE_ID, getSizeById } from '../data/sizes';
+import { formatEGP } from '../utils/price';
+import { buildSingleProductMessage, openWhatsApp } from '../utils/whatsapp';
 
-const formatPrice = (price) => {
-  if (typeof price === 'number') return `$${price.toFixed(2)}`;
-  return price;
-};
-
-const ProductDetailsModal = ({ product, isOpen, onClose }) => {
+const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_SIZE_ID }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const [selectedSize, setSelectedSize] = useState(initialSize);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -28,17 +29,31 @@ const ProductDetailsModal = ({ product, isOpen, onClose }) => {
     };
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (isOpen) setSelectedSize(initialSize);
+  }, [isOpen, initialSize]);
+
   if (!isOpen || !product) return null;
 
-  const priceNum =
-    typeof product.price === 'number'
-      ? product.price
-      : parseFloat(String(product.price).replace('$', ''));
+  const sizeMeta = getSizeById(selectedSize);
+  const price = sizeMeta.price;
+  const lineItem = {
+    ...product,
+    size: selectedSize,
+    sizeLabel: sizeMeta.label,
+    price,
+  };
 
   const displayImage = product.imageHover || product.image;
   const inWishlist = isInWishlist(product.id);
   const rating = product.rating ?? 4.5;
   const reviews = product.reviews ?? 0;
+  const ingredients = product.ingredients ?? [];
+  const benefits = product.benefits ?? [];
+
+  const handleAddToCart = () => {
+    addToCart(lineItem, 1);
+  };
 
   return createPortal(
     <div
@@ -69,14 +84,17 @@ const ProductDetailsModal = ({ product, isOpen, onClose }) => {
             <img src={displayImage} alt={product.name} className="h-full w-full object-contain drop-shadow-xl" />
           </div>
 
-          <div className="flex flex-col gap-5 p-6 sm:p-8">
+          <div className="flex flex-col gap-4 p-6 sm:gap-5 sm:p-8">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">Lithioo Perfume</p>
               <h2 id="product-modal-title" className="mt-1 text-2xl font-bold text-neutral-900 dark:text-white sm:text-3xl">
                 {product.name}
               </h2>
+              {product.brand && (
+                <p className="mt-1 text-sm font-medium text-neutral-600 dark:text-neutral-400">{product.brand}</p>
+              )}
               {product.category && (
-                <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">{product.category}</p>
+                <p className="mt-0.5 text-xs text-neutral-500 dark:text-neutral-500">{product.category}</p>
               )}
             </div>
 
@@ -91,20 +109,53 @@ const ProductDetailsModal = ({ product, isOpen, onClose }) => {
               </span>
             </div>
 
-            <p className="text-2xl font-bold text-brand">{formatPrice(product.price)}</p>
+            <SizeSelector selectedSize={selectedSize} onChange={setSelectedSize} className="mt-1" />
+            <p className="text-2xl font-bold text-brand">{formatEGP(price)}</p>
 
             {product.description && (
-              <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{product.description}</p>
+              <div>
+                <h3 className="text-sm font-bold uppercase tracking-wide text-neutral-800 dark:text-neutral-200">
+                  Product details
+                </h3>
+                <p className="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">{product.description}</p>
+              </div>
+            )}
+
+            {ingredients.length > 0 && (
+              <div>
+                <h3 className="text-sm font-bold uppercase tracking-wide text-neutral-800 dark:text-neutral-200">
+                  Ingredients / Notes
+                </h3>
+                <ul className="mt-2 flex flex-wrap gap-2">
+                  {ingredients.map((note) => (
+                    <li
+                      key={note}
+                      className="rounded-full border border-brand/25 bg-brand/10 px-3 py-1 text-xs font-medium text-brand dark:border-brand/30"
+                    >
+                      {note}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {benefits.length > 0 && (
+              <div>
+                <h3 className="text-sm font-bold uppercase tracking-wide text-neutral-800 dark:text-neutral-200">
+                  How you benefit
+                </h3>
+                <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-neutral-600 dark:text-neutral-300">
+                  {benefits.map((benefit) => (
+                    <li key={benefit}>{benefit}</li>
+                  ))}
+                </ul>
+              </div>
             )}
 
             <ul className="space-y-2 rounded-xl border border-neutral-100 bg-neutral-50/80 p-4 text-sm dark:border-neutral-700 dark:bg-neutral-800/50">
               <li className="flex justify-between gap-4">
                 <span className="text-neutral-500 dark:text-neutral-400">Type</span>
                 <span className="font-medium text-neutral-800 dark:text-neutral-100">Eau de Parfum</span>
-              </li>
-              <li className="flex justify-between gap-4">
-                <span className="text-neutral-500 dark:text-neutral-400">Collection</span>
-                <span className="font-medium text-neutral-800 dark:text-neutral-100">Luxury Recaptured</span>
               </li>
               <li className="flex justify-between gap-4">
                 <span className="text-neutral-500 dark:text-neutral-400">Availability</span>
@@ -114,24 +165,34 @@ const ProductDetailsModal = ({ product, isOpen, onClose }) => {
               </li>
             </ul>
 
-            <div className="mt-auto flex flex-col gap-3 pt-2 sm:flex-row">
+            <div className="mt-auto flex flex-col gap-3 pt-2">
               <button
                 type="button"
-                onClick={() => addToCart({ ...product, price: priceNum })}
-                disabled={product.inStock === false}
-                className="btn-primary flex-1"
+                onClick={() => openWhatsApp(buildSingleProductMessage(lineItem, price))}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[#20bd5a]"
               >
-                <FiShoppingCart className="h-5 w-5" />
-                Add to cart
+                <FaWhatsapp className="h-5 w-5" />
+                Order Now
               </button>
-              <button
-                type="button"
-                onClick={() => toggleWishlist({ ...product, price: priceNum })}
-                className={`btn-outline flex-1 ${inWishlist ? 'border-red-400 text-red-500' : ''}`}
-              >
-                <FiHeart className={`h-5 w-5 ${inWishlist ? 'fill-current' : ''}`} />
-                {inWishlist ? 'Saved' : 'Wishlist'}
-              </button>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={handleAddToCart}
+                  disabled={product.inStock === false}
+                  className="btn-primary flex-1"
+                >
+                  <FiShoppingCart className="h-5 w-5" />
+                  Add to cart
+                </button>
+                <button
+                  type="button"
+                  onClick={() => toggleWishlist({ ...product, price })}
+                  className={`btn-outline flex-1 ${inWishlist ? 'border-red-400 text-red-500' : ''}`}
+                >
+                  <FiHeart className={`h-5 w-5 ${inWishlist ? 'fill-current' : ''}`} />
+                  {inWishlist ? 'Saved' : 'Wishlist'}
+                </button>
+              </div>
             </div>
 
             <button

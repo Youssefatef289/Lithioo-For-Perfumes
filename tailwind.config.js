@@ -84,6 +84,20 @@ module.exports = {
           '0%': { opacity: '0', transform: 'translateY(24px) scale(0.96)' },
           '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
         },
+        'toast-in': {
+          '0%': { opacity: '0', transform: 'translate(-50%, -12px) scale(0.9)' },
+          '15%': { opacity: '1', transform: 'translate(-50%, 0) scale(1)' },
+          '85%': { opacity: '1', transform: 'translate(-50%, 0) scale(1)' },
+          '100%': { opacity: '0', transform: 'translate(-50%, -8px) scale(0.95)' },
+        },
+        'card-btn-in': {
+          '0%': { opacity: '0', transform: 'translateY(12px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'catalog-fade': {
+          '0%': { opacity: '0', transform: 'translateY(16px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         'cart-bounce': 'cart-bounce 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -93,6 +107,9 @@ module.exports = {
         'soft-pulse': 'soft-pulse 3s ease-in-out infinite',
         wave: 'wave 1s linear infinite',
         'modal-in': 'modal-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+        'toast-in': 'toast-in 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+        'card-btn-in': 'card-btn-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both',
+        'catalog-fade': 'catalog-fade 0.45s cubic-bezier(0.22, 1, 0.36, 1) both',
       },
     },
   },

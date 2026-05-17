@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FiShoppingCart, FiHeart, FiStar, FiArrowLeft } from 'react-icons/fi';
+import { FaWhatsapp } from 'react-icons/fa';
+import SizeSelector from '../components/SizeSelector';
+import { DEFAULT_SIZE_ID, getSizeById } from '../data/sizes';
+import { formatEGP } from '../utils/price';
+import { buildSingleProductMessage, openWhatsApp } from '../utils/whatsapp';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { getProductById } from '../data/products';
@@ -14,8 +19,11 @@ const ProductDetails = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedSize, setSelectedSize] = useState(DEFAULT_SIZE_ID);
 
   const product = getProductById(id);
+  const sizeMeta = getSizeById(selectedSize);
+  const price = sizeMeta.price;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -28,9 +36,16 @@ const ProductDetails = () => {
     return null;
   }
 
+  const lineItem = {
+    ...product,
+    size: selectedSize,
+    sizeLabel: sizeMeta.label,
+    price,
+  };
+
   const handleAddToCart = () => {
     setIsAdding(true);
-    addToCart(product, quantity);
+    addToCart(lineItem, quantity);
     setTimeout(() => setIsAdding(false), 500);
   };
 
@@ -86,6 +101,9 @@ const ProductDetails = () => {
 
           <div className="flex flex-col gap-6">
             <div>
+              {product.brand && (
+                <p className="text-sm font-medium uppercase tracking-wider text-brand">{product.brand}</p>
+              )}
               <h1 className="heading-section">{product.name}</h1>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <div className="flex gap-0.5">
@@ -101,8 +119,9 @@ const ProductDetails = () => {
               </div>
             </div>
 
+            <SizeSelector selectedSize={selectedSize} onChange={setSelectedSize} />
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-3xl font-bold text-brand">${product.price.toFixed(2)}</span>
+              <span className="text-3xl font-bold text-brand">{formatEGP(price)}</span>
               {product.inStock && (
                 <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
                   In Stock
@@ -111,9 +130,33 @@ const ProductDetails = () => {
             </div>
 
             <div className="card-elevated p-5">
-              <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Description</h3>
+              <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Product details</h3>
               <p className="text-muted-section !mt-0 leading-relaxed">{product.description}</p>
             </div>
+
+            {product.ingredients?.length > 0 && (
+              <div className="card-elevated p-5">
+                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Ingredients / Notes</h3>
+                <ul className="flex flex-wrap gap-2">
+                  {product.ingredients.map((note) => (
+                    <li key={note} className="rounded-full bg-brand/10 px-3 py-1 text-sm font-medium text-brand">
+                      {note}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {product.benefits?.length > 0 && (
+              <div className="card-elevated p-5">
+                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">How you benefit</h3>
+                <ul className="list-inside list-disc space-y-2 text-muted-section !mt-0">
+                  {product.benefits.map((benefit) => (
+                    <li key={benefit}>{benefit}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
               <div>
@@ -129,6 +172,15 @@ const ProductDetails = () => {
                 </div>
               </div>
             </div>
+
+            <button
+              type="button"
+              onClick={() => openWhatsApp(buildSingleProductMessage(lineItem, price))}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3.5 text-base font-semibold text-white shadow-md transition hover:bg-[#20bd5a]"
+            >
+              <FaWhatsapp className="h-5 w-5" />
+              Order Now
+            </button>
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <button

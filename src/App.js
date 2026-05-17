@@ -3,11 +3,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import CartSidebar from './components/CartSidebar';
+import CartToast from './components/CartToast';
 import FloatingContactButton from './components/FloatingContactButton';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import About from './pages/About';
-import BlogPage from './pages/BlogPage';
 import Contact from './pages/Contact';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
@@ -18,6 +18,7 @@ function App() {
       <div className="app-shell">
         <Header />
         <CartSidebar />
+        <CartToast />
         <FloatingContactButton />
         <Routes>
           <Route path="/" element={<Home />} />
@@ -25,7 +26,6 @@ function App() {
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/about" element={<About />} />
-          <Route path="/blog" element={<BlogPage />} />
           <Route path="/contact" element={<Contact />} />
         </Routes>
         <Footer />

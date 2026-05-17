@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import { FaWhatsapp } from 'react-icons/fa';
+import { getWhatsAppUrl } from '../utils/whatsapp';
 
 const WhatsAppButton = () => {
   const [isHovered, setIsHovered] = useState(false);
 
-  const whatsappNumber = '201064307053';
-  const message = 'Hello! I would like to know more about your products.';
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-
   const handleClick = () => {
-    window.open(whatsappUrl, '_blank');
+    window.open(getWhatsAppUrl(), '_blank', 'noopener,noreferrer');
   };
 
   return (

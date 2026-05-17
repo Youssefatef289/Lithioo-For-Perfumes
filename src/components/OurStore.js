@@ -1,98 +1,91 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
-import { allProducts } from '../data/products';
+import { allProducts, PRODUCT_SECTIONS } from '../data/products';
 import ProductCard from './ProductCard';
+import ProductSectionTabs from './ProductSectionTabs';
+
+const HOME_PRODUCTS_LIMIT = 4;
 
 const OurStore = () => {
   const { t } = useLanguage();
-  const [activeFilter, setActiveFilter] = useState('Featured');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [activeSection, setActiveSection] = useState('men');
 
-  const filters = [
-    { key: 'All', label: t.store.filters.all },
-    { key: 'Featured', label: t.store.filters.featured },
-    { key: 'Top Selling', label: t.store.filters.topSelling },
-    { key: 'Sale', label: t.store.filters.sale },
-    { key: 'New', label: t.store.filters.new },
-  ];
+  const counts = useMemo(
+    () =>
+      PRODUCT_SECTIONS.reduce((acc, section) => {
+        acc[section.id] = allProducts.filter((p) => p.section === section.id).length;
+        return acc;
+      }, {}),
+    []
+  );
 
-  const productsPerPage = 8;
-  const startIndex = (currentPage - 1) * productsPerPage;
-  const displayedProducts = allProducts.slice(startIndex, startIndex + productsPerPage);
-  const totalPages = Math.ceil(allProducts.length / productsPerPage);
+  const sectionProducts = useMemo(
+    () => allProducts.filter((p) => p.section === activeSection),
+    [activeSection]
+  );
 
-  const filterBtn = (active) =>
-    [
-      'rounded-full border border-neutral-200 px-4 py-2 text-sm font-medium transition dark:border-neutral-600',
-      active
-        ? 'border-brand bg-brand text-white shadow-md'
-        : 'bg-white text-neutral-600 hover:border-brand hover:text-brand dark:bg-neutral-800 dark:text-neutral-300 dark:hover:text-brand',
-    ].join(' ');
-
-  const pageBtn = (active, disabled) =>
-    [
-      'min-w-[2.5rem] rounded-lg border px-3 py-2 text-sm font-medium transition',
-      disabled
-        ? 'cursor-not-allowed border-neutral-200 text-neutral-300 dark:border-neutral-700 dark:text-neutral-600'
-        : active
-          ? 'border-brand bg-brand text-white'
-          : 'border-neutral-200 bg-white text-neutral-700 hover:border-brand hover:text-brand dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200',
-    ].join(' ');
+  const displayedProducts = sectionProducts.slice(0, HOME_PRODUCTS_LIMIT);
+  const activeMeta = PRODUCT_SECTIONS.find((s) => s.id === activeSection);
 
   return (
     <section className="our-store w-full bg-white py-12 dark:bg-neutral-950 sm:py-16 md:py-20" id="product">
       <div className="section-inner max-w-wide">
-        <h2 className="heading-section slide-up mb-8 text-center sm:mb-10">{t.store.title}</h2>
-        <div className="slide-up mb-10 flex flex-wrap justify-center gap-2 sm:gap-3">
-          {filters.map((filter) => (
-            <button
-              key={filter.key}
-              type="button"
-              className={filterBtn(activeFilter === filter.key)}
-              onClick={() => setActiveFilter(filter.key)}
-            >
-              {filter.label}
-            </button>
-          ))}
+        <div className="mb-8 text-center sm:mb-10">
+          <h2 className="heading-section">{t.store.title}</h2>
+          <p className="text-muted-section mx-auto mt-3 max-w-xl">
+            Browse our collections — men&apos;s, women&apos;s, and oriental fragrances
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {displayedProducts.map((product, index) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              animationClass={`slide-up stagger-${(index % 4) + 1}`}
-            />
-          ))}
+        <ProductSectionTabs
+          activeSection={activeSection}
+          onChange={setActiveSection}
+          counts={counts}
+          className="mb-8"
+        />
+
+        <div className="mb-8 flex flex-col items-start justify-between gap-3 rounded-2xl border border-neutral-100 bg-surface-muted/50 px-5 py-4 dark:border-neutral-800 dark:bg-neutral-900/50 sm:flex-row sm:items-center">
+          <div>
+            <h3 className="text-lg font-bold text-neutral-900 dark:text-white sm:text-xl">
+              {activeMeta?.label}
+            </h3>
+            <p className="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">{activeMeta?.labelAr}</p>
+          </div>
+          <p className="rounded-full bg-brand/10 px-4 py-1.5 text-sm font-semibold text-brand">
+            {sectionProducts.length} products
+          </p>
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
-          <button
-            type="button"
-            className={pageBtn(false, currentPage === 1)}
-            onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-            disabled={currentPage === 1}
+        {displayedProducts.length === 0 ? (
+          <p className="py-12 text-center text-neutral-500 dark:text-neutral-400">No products in this section.</p>
+        ) : (
+          <div
+            key={activeSection}
+            className="-mx-4 flex flex-nowrap gap-5 overflow-x-auto px-4 pb-2 pt-1 snap-x snap-mandatory md:mx-0 md:gap-6 md:overflow-visible md:px-0"
           >
-            ←
-          </button>
-          {[1, 2, 3].map((page) => (
-            <button
-              key={page}
-              type="button"
-              className={pageBtn(currentPage === page, false)}
-              onClick={() => setCurrentPage(page)}
-            >
-              {page}
-            </button>
-          ))}
-          <button
-            type="button"
-            className={pageBtn(false, currentPage === totalPages)}
-            onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-            disabled={currentPage === totalPages}
-          >
-            →
-          </button>
+            {displayedProducts.map((product, index) => (
+              <div
+                key={`${product.id}-${activeSection}`}
+                className="w-[min(78vw,260px)] shrink-0 snap-start md:w-auto md:min-w-0 md:flex-1 md:basis-0"
+              >
+                <ProductCard
+                  product={product}
+                  animationClass="animate-catalog-fade opacity-0"
+                  style={{ animationDelay: `${index * 45}ms` }}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <Link to={`/products?section=${activeSection}`} className="btn-primary min-w-[200px]">
+            View all — {activeMeta?.labelAr}
+          </Link>
+          <Link to="/products" className="btn-outline min-w-[200px]">
+            Full catalog
+          </Link>
         </div>
       </div>
     </section>
