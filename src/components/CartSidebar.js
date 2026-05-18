@@ -102,7 +102,9 @@ const CartSidebar = () => {
                       {item.brand && (
                         <p className="truncate text-xs text-neutral-500 dark:text-neutral-400">{item.brand}</p>
                       )}
-                      <p className="text-xs text-neutral-500 dark:text-neutral-400">{item.sizeLabel || item.size}</p>
+                      {(item.sizeLabel || item.size) && (
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400">{item.sizeLabel || item.size}</p>
+                      )}
                       <p className="text-sm font-bold text-brand">{formatEGP(item.price)}</p>
                       <div className="mt-2 flex items-center gap-2">
                         <div className="flex items-center gap-1 rounded-lg border border-neutral-200 dark:border-neutral-600">

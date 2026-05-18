@@ -6,6 +6,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import SizeSelector from './SizeSelector';
+import { isOriginalProduct } from '../data/productFactory';
 import { DEFAULT_SIZE_ID, getSizeById } from '../data/sizes';
 import { formatEGP } from '../utils/price';
 import { buildSingleProductMessage, openWhatsApp } from '../utils/whatsapp';
@@ -39,14 +40,23 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
 
   if (!isOpen || !product) return null;
 
+  const hideSizes = isOriginalProduct(product);
   const sizeMeta = getSizeById(selectedSize);
-  const price = sizeMeta.price;
-  const lineItem = {
-    ...product,
-    size: selectedSize,
-    sizeLabel: sizeMeta.label,
-    price,
-  };
+  const price = hideSizes ? product.price : sizeMeta.price;
+  const lineItem = hideSizes
+    ? {
+        ...product,
+        size: null,
+        sizeLabel: '',
+        price: product.price,
+        cartKey: `${product.id}-original`,
+      }
+    : {
+        ...product,
+        size: selectedSize,
+        sizeLabel: sizeMeta.label,
+        price,
+      };
 
   const detailImages =
     product.detailImages?.length > 0
@@ -136,7 +146,7 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
               </span>
             </div>
 
-            <SizeSelector selectedSize={selectedSize} onChange={setSelectedSize} className="mt-1" />
+            {!hideSizes && <SizeSelector selectedSize={selectedSize} onChange={setSelectedSize} className="mt-1" />}
             <p className="text-2xl font-bold text-brand">{formatEGP(price)}</p>
 
             {product.description && (

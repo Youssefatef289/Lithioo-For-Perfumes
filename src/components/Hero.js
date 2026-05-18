@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useLanguage } from '../contexts/LanguageContext';
-import { HERO_SLIDER_IMAGES } from '../data/heroSlider';
+import { HERO_MOBILE_BG, HERO_SLIDES } from '../data/heroSlider';
 
-const SLIDE_INTERVAL_MS = 5500;
+const SLIDE_INTERVAL_MS = 5000;
 
 const Hero = () => {
   const { t } = useLanguage();
@@ -12,7 +12,8 @@ const Hero = () => {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
 
-  const len = HERO_SLIDER_IMAGES.length;
+  const len = HERO_SLIDES.length;
+  const slide = HERO_SLIDES[index];
 
   const go = useCallback(
     (dir) => {
@@ -27,101 +28,136 @@ const Hero = () => {
     return () => window.clearInterval(id);
   }, [paused, len]);
 
+  const textBlock = (
+    <>
+      <span className="mb-3 block text-center text-[0.7rem] font-semibold uppercase tracking-[0.32em] text-brand md:text-start sm:text-xs">
+        Lithioo Perfumes
+      </span>
+      <h1 className="text-center text-[1.5rem] font-bold leading-snug text-neutral-900 drop-shadow-sm dark:text-white md:text-start sm:text-3xl lg:text-[2.15rem] xl:text-4xl">
+        {slide.line1}
+      </h1>
+      {slide.line2 ? (
+        <p className="mt-3 text-center text-base font-medium leading-relaxed text-neutral-700 dark:text-neutral-200 md:text-start sm:mt-4 sm:text-lg">
+          {slide.line2}
+        </p>
+      ) : null}
+      <div className="flex justify-center md:justify-start">
+        <button
+          type="button"
+          onClick={() => navigate('/products')}
+          className="btn-primary mt-5 shadow-md sm:mt-7"
+        >
+          {t.hero.buttonShop}
+        </button>
+      </div>
+    </>
+  );
+
+  const dots = len > 1 && (
+    <div className="mt-6 flex items-center justify-center gap-2 md:justify-start">
+      {HERO_SLIDES.map((s, i) => (
+        <button
+          key={s.id}
+          type="button"
+          onClick={() => setIndex(i)}
+          className={`rounded-full transition-all duration-500 ease-out ${
+            i === index
+              ? 'h-1.5 w-7 bg-brand'
+              : 'h-1.5 w-1.5 bg-neutral-400/90 hover:w-3 hover:bg-brand/70 dark:bg-neutral-500'
+          }`}
+          aria-label={`Slide ${i + 1}`}
+          aria-current={i === index ? 'true' : undefined}
+        />
+      ))}
+    </div>
+  );
+
   return (
     <section
-      className="relative mt-[88px] flex min-h-[calc(100vh-88px)] w-full overflow-hidden bg-gradient-to-b from-white via-surface-cream/30 to-white dark:from-neutral-950 dark:via-neutral-950 dark:to-neutral-900 sm:mt-[96px] sm:min-h-[calc(100vh-96px)] md:mt-[108px] md:min-h-[calc(100vh-108px)]"
+      className="relative mt-0 min-h-[100dvh] w-full overflow-hidden md:min-h-[min(92vh,860px)] lg:min-h-[min(94vh,900px)]"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      aria-label="Hero"
     >
-      <div className="pointer-events-none absolute inset-0 bg-mesh-light opacity-90 dark:bg-mesh-dark dark:opacity-100" aria-hidden />
-      <div className="pointer-events-none absolute -end-32 top-1/4 h-72 w-72 rounded-full bg-brand/10 blur-3xl dark:bg-brand/5" aria-hidden />
-      <div className="pointer-events-none absolute -start-24 bottom-1/4 h-64 w-64 rounded-full bg-accent/10 blur-3xl dark:bg-accent/5" aria-hidden />
+      {/* Mobile background */}
+      <div className="absolute inset-0 md:hidden" aria-hidden>
+        <img
+          src={HERO_MOBILE_BG}
+          alt=""
+          className="h-full w-full object-cover object-bottom"
+          loading="eager"
+          draggable={false}
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/95 via-white/75 to-white/15 dark:from-neutral-950/95 dark:via-neutral-950/70 dark:to-neutral-950/20" />
+      </div>
 
-      <div className="relative z-[1] flex w-full flex-1">
-        <div className="section-inner-wide flex w-full flex-col-reverse items-center gap-10 py-12 md:flex-row md:gap-12 lg:gap-16 lg:py-16">
-          <div className="flex w-full flex-col justify-center md:w-1/2 lg:ps-4">
-            <div className="mx-auto flex max-w-xl flex-col text-center md:mx-0 md:text-start">
-              <span className="mb-3 inline-flex self-center rounded-full border border-brand/25 bg-brand/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-brand dark:border-brand/30 dark:bg-brand/15 md:self-start">
-                Lithioo
-              </span>
-              <h1 className="font-sans text-3xl font-bold leading-[1.15] tracking-tight text-neutral-900 dark:text-white sm:text-4xl md:text-5xl lg:text-[3.15rem]">
-                <span className="block">{t.hero.title}</span>
-                <span className="mt-1 block text-brand">{t.hero.titleLine2}</span>
-              </h1>
-              <p className="mt-5 max-w-md text-base font-medium italic leading-relaxed text-neutral-600 dark:text-neutral-400 sm:text-lg md:mx-0 md:max-w-[26rem]">
-                {t.hero.tagline}
-              </p>
-              <div className="mt-8 flex w-full max-w-[340px] flex-col gap-3 self-center sm:flex-row sm:justify-center md:mx-0 md:max-w-none md:self-start md:justify-start">
-                <button type="button" onClick={() => navigate('/products')} className="btn-accent w-full shadow-xl sm:w-auto sm:min-w-[10rem]">
-                  {t.hero.buttonShop}
-                </button>
-              </div>
-            </div>
+      {/* Desktop background slides */}
+      {HERO_SLIDES.map((s, i) => (
+        <div
+          key={s.id}
+          className={`absolute inset-0 hidden transition-opacity duration-[1400ms] ease-in-out md:block ${
+            i === index ? 'z-[1] opacity-100' : 'z-0 opacity-0'
+          }`}
+          aria-hidden={i !== index}
+        >
+          <img
+            src={s.image}
+            alt=""
+            className={`h-full w-full object-cover ${i === index ? 'animate-hero-ken-burns' : 'scale-105'}`}
+            style={{ objectPosition: s.imagePosition || 'center center' }}
+            loading={i === 0 ? 'eager' : 'lazy'}
+            draggable={false}
+          />
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/85 via-white/40 to-transparent dark:from-neutral-950/88 dark:via-neutral-950/45 dark:to-transparent"
+            aria-hidden
+          />
+        </div>
+      ))}
+
+      {/* Mobile — text at top, auto text slider */}
+      <div className="relative z-[2] flex min-h-[inherit] flex-col md:hidden">
+        <div className="w-full px-4 pb-6 pt-[5.25rem] sm:px-6 sm:pt-[5.75rem]">
+          <div key={slide.id} className="animate-hero-fade-up min-h-[11rem]" aria-live="polite">
+            {textBlock}
           </div>
+          {dots}
+        </div>
+      </div>
 
-          <div className="relative flex w-full min-h-[38vh] items-center justify-center md:w-1/2 md:min-h-0">
-            <div className="pointer-events-none absolute inset-0 bg-hero-glow dark:opacity-40" aria-hidden />
-            <div
-              className="relative w-full max-w-lg px-2"
-              onMouseEnter={() => setPaused(true)}
-              onMouseLeave={() => setPaused(false)}
-            >
-              <div className="pointer-events-none absolute inset-4 rounded-[2rem] bg-gradient-to-br from-brand/20 to-accent/10 blur-2xl dark:from-brand/10 dark:to-accent/5" aria-hidden />
-
-              <div className="relative aspect-[4/5] w-full max-h-[min(72vh,520px)] overflow-hidden rounded-3xl bg-neutral-100 shadow-2xl ring-1 ring-black/5 dark:bg-neutral-900 dark:ring-white/10 md:max-h-[min(80vh,620px)]">
-                {HERO_SLIDER_IMAGES.map((src, i) => (
-                  <img
-                    key={src}
-                    src={src}
-                    alt=""
-                    className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-700 ease-out ${
-                      i === index ? 'z-[1] opacity-100' : 'z-0 opacity-0'
-                    }`}
-                    loading={i === 0 ? 'eager' : 'lazy'}
-                    draggable={false}
-                  />
-                ))}
-
-                <button
-                  type="button"
-                  onClick={() => go(-1)}
-                  className="absolute start-2 top-1/2 z-[2] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-neutral-800 shadow-md backdrop-blur transition hover:bg-white dark:bg-neutral-900/90 dark:text-white dark:hover:bg-neutral-800"
-                  aria-label="Previous slide"
-                >
-                  <FiChevronLeft className="h-6 w-6" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => go(1)}
-                  className="absolute end-2 top-1/2 z-[2] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-neutral-800 shadow-md backdrop-blur transition hover:bg-white dark:bg-neutral-900/90 dark:text-white dark:hover:bg-neutral-800"
-                  aria-label="Next slide"
-                >
-                  <FiChevronRight className="h-6 w-6" />
-                </button>
-
-                <div className="absolute bottom-4 left-0 right-0 z-[2] flex justify-center gap-2">
-                  {HERO_SLIDER_IMAGES.map((_, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setIndex(i)}
-                      className={`h-2 rounded-full transition-all ${
-                        i === index ? 'w-8 bg-brand' : 'w-2 bg-white/70 hover:bg-white dark:bg-neutral-600 dark:hover:bg-neutral-400'
-                      }`}
-                      aria-label={`Go to slide ${i + 1}`}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div
-                className="pointer-events-none absolute -bottom-1 left-1/2 z-0 h-8 w-[50%] -translate-x-1/2 rounded-full bg-gradient-to-b from-neutral-900/15 to-transparent opacity-80 blur-[14px] dark:from-white/15"
-                aria-hidden
-              />
+      {/* Desktop — text left */}
+      <div className="relative z-[2] hidden min-h-[inherit] items-center md:flex md:pt-24 lg:pt-28">
+        <div className="section-inner-wide w-full px-4 pb-14 pt-4 sm:px-6 sm:pb-16 lg:pb-20">
+          <div className="max-w-lg sm:max-w-xl">
+            <div key={slide.id} className="animate-hero-fade-up" aria-live="polite">
+              {textBlock}
             </div>
+            {dots}
           </div>
         </div>
       </div>
+
+      {/* Desktop arrows */}
+      {len > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={() => go(-1)}
+            className="absolute start-2 top-1/2 z-[3] hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/50 bg-white/70 text-neutral-700 backdrop-blur-sm transition hover:border-brand hover:text-brand dark:border-neutral-600 dark:bg-neutral-900/70 dark:text-white md:flex sm:start-4 sm:h-10 sm:w-10"
+            aria-label="Previous slide"
+          >
+            <FiChevronLeft className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => go(1)}
+            className="absolute end-2 top-1/2 z-[3] hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-white/50 bg-white/70 text-neutral-700 backdrop-blur-sm transition hover:border-brand hover:text-brand dark:border-neutral-600 dark:bg-neutral-900/70 dark:text-white md:flex sm:end-4 sm:h-10 sm:w-10"
+            aria-label="Next slide"
+          >
+            <FiChevronRight className="h-5 w-5" />
+          </button>
+        </>
+      )}
     </section>
   );
 };

@@ -24,6 +24,8 @@ const BRAND_BY_SLUG = {
   'musk-collection': { name: 'Musk Collection', brand: 'Arabian Oud' },
   'nude-coral-diamond': { name: 'Nude Coral Diamond', brand: 'Diamond Collection' },
   'prestige-black-perfume': { name: 'Prestige Black', brand: 'Prestige' },
+  'prestige-ruby': { name: 'Prestige Ruby', brand: 'Prestige' },
+  serious: { name: 'Serious', brand: 'Prestige' },
   'ranat-khalkhal-75ml-abdul-samad-alqurashi': { name: 'Ranat Khalkhal', brand: 'Abdul Samad Al Qurashi' },
   'ranet-khalkhal': { name: 'Ranet Khalkhal', brand: 'Abdul Samad Al Qurashi' },
   'rasasi-daarej-pour-homme-eau-de-parfum-edp-spray-for-men-3-4': { name: 'Daarej', brand: 'Rasasi' },
@@ -196,7 +198,64 @@ export const ORIGINAL_IMAGE_CATALOG = [
     slug: 'white-regent-diamond',
     images: ['/image/originals/white-regent-diamond-1.webp', '/image/originals/white-regent-diamond-2.webp'],
   },
+  {
+    slug: 'prestige-ruby',
+    images: [
+      '/image/originals/prestige-ruby-1.jpg',
+      '/image/originals/prestige-ruby-2.jpg',
+      '/image/originals/prestige-ruby-3.jpg',
+    ],
+  },
+  {
+    slug: 'serious',
+    images: [
+      '/image/originals/serious-1.jpg',
+      '/image/originals/serious-2.jpg',
+      '/image/originals/serious-3.jpg',
+      '/image/originals/serious-4.jpg',
+      '/image/originals/serious-5.jpg',
+    ],
+  },
 ];
+
+/** Fixed EGP prices for original products (no size variants) */
+export const ORIGINAL_PRICES_BY_SLUG = {
+  'vintage-tobacco': 3500,
+  'blue-diamond-aqua-eau-de-perfume-150ml': 2300,
+  'emerald-soul': 2300,
+  'ibrahim-al-qurashi-perfume-black-carbon-diamond-200ml-edp-lu': 2300,
+  'nude-coral-diamond': 2300,
+  'white-regent-diamond': 2300,
+  'body-oud-cardamom': 2500,
+  'satin-body-oud': 2500,
+  'tobacoo-body-oud': 2500,
+  'ibraq-diamond-collection-new-collection-mini-10-ml-10-in-1': 3500,
+  'jadayel-hair-length-oil-130ml': 1500,
+  'musk-collection': 4000,
+  'ranet-khalkhal': 2000,
+  'summer-collection-ibraq': 1800,
+  'irth-collection-100-ml': 3500,
+  'tobacco-collection': 4500,
+  'spanish-tobacco-100-ml': 2500,
+  'ibraheem-al-qurashi-brazilian-tobacco-100-ml': 2300,
+  'royale-eau-de-toilette-pour-home': 1500,
+  'rasasi-daarej-pour-homme-eau-de-parfum-edp-spray-for-men-3-4': 1500,
+  'shahra-for-men-eau-de-parfum-by-rasasi-90ml': 1500,
+  'rasasi-eau-de-parfum-for-men-royale-blue-75ml-rasasi-perfume': 1500,
+  'al-khitam-musk': 2000,
+  'ranat-khalkhal-75ml-abdul-samad-alqurashi': 1500,
+  'black-star': 2500,
+  'prestige-black-perfume': 2500,
+  'ibraq-ibrahim-al-qurashi-al-shams-musk-edp75-ml-75': 1500,
+  'candy-musk-al-majed-oud-150': 2500,
+  'cedar-of-lebanon': 2000,
+  'body-musk-arabic-collection': 2000,
+  'lady-sukoon-perfume-100ml': 1800,
+  'prestige-ruby': 2500,
+  serious: 2500,
+};
+
+export const getOriginalPrice = (slug) => ORIGINAL_PRICES_BY_SLUG[slug];
 
 export const getOriginalMeta = (slug) =>
   BRAND_BY_SLUG[slug] || { name: slug, brand: 'Original' };

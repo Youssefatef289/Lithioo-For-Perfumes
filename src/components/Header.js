@@ -15,7 +15,7 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useLanguage();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, setThemeMode } = useTheme();
   const { getCartItemsCount, toggleCart } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,20 +51,39 @@ const Header = () => {
     }
   };
 
+  const isHome = location.pathname === '/';
+  const overHero = isHome && !scrolled && !mobileMenuOpen;
+
   /** Gold brand mark — works on light & dark headers */
   const logoSrc = '/image/logo/leithioo-logo-gold.png';
 
   const headerBar =
-    'fixed inset-x-0 top-0 z-[1000] flex items-center overflow-visible border-b border-transparent transition-all duration-300 ' +
-    (scrolled
-      ? 'min-h-[72px] sm:min-h-[76px] md:min-h-[84px] bg-white/95 shadow-md backdrop-blur-sm dark:bg-neutral-900/95 dark:shadow-black/30 dark:border-white/10'
-      : 'min-h-[88px] sm:min-h-[96px] md:min-h-[108px] bg-white dark:bg-neutral-900/80');
+    'fixed inset-x-0 top-0 z-[1000] flex items-center overflow-visible border-b transition-all duration-300 ' +
+    (overHero
+      ? 'min-h-[72px] border-transparent bg-white/45 shadow-none backdrop-blur-md sm:min-h-[80px] md:min-h-[88px] dark:bg-neutral-950/35'
+      : scrolled
+        ? 'min-h-[72px] border-transparent bg-white/95 shadow-md backdrop-blur-sm sm:min-h-[76px] md:min-h-[84px] dark:border-white/10 dark:bg-neutral-900/95 dark:shadow-black/30'
+        : 'min-h-[88px] border-transparent bg-white sm:min-h-[96px] md:min-h-[108px] dark:bg-neutral-900/95');
 
   const iconBtn =
-    'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-2 border-brand text-brand transition-all hover:-translate-y-0.5 hover:bg-brand hover:text-white hover:shadow-md dark:border-brand dark:text-brand';
+    'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-2 border-brand text-brand transition-all hover:-translate-y-0.5 hover:bg-brand hover:text-white hover:shadow-md dark:border-brand dark:text-brand' +
+    (overHero ? ' bg-white/70 backdrop-blur-sm dark:bg-neutral-900/50' : '');
+
+  const navLinkOverHero = ({ isActive }) =>
+    [
+      'text-[0.95rem] font-normal text-neutral-800 transition-colors hover:text-brand dark:text-neutral-100',
+      isActive ? 'font-semibold text-brand' : '',
+    ].join(' ');
+
+  const themeIconBtn = (active) =>
+    [
+      iconBtn,
+      active ? 'bg-brand text-white shadow-md hover:bg-brand hover:text-white' : '',
+    ].join(' ');
 
   const pillBtn =
-    'flex shrink-0 items-center gap-2 rounded-lg border-2 border-brand px-3 py-2 text-sm font-semibold text-brand transition-all hover:-translate-y-0.5 hover:bg-brand hover:text-white hover:shadow-md dark:text-brand';
+    'flex shrink-0 items-center gap-2 rounded-lg border-2 border-brand px-3 py-2 text-sm font-semibold text-brand transition-all hover:-translate-y-0.5 hover:bg-brand hover:text-white hover:shadow-md dark:text-brand' +
+    (overHero ? ' bg-white/70 backdrop-blur-sm dark:bg-neutral-900/50' : '');
 
   return (
     <>
@@ -79,8 +98,8 @@ const Header = () => {
               src={logoSrc}
               alt="Lithioo Perfume"
               className={`w-auto object-contain drop-shadow-md transition-all duration-300 group-hover:scale-105 ${
-                scrolled
-                  ? 'h-14 sm:h-16 md:h-[4.25rem] lg:h-[4.5rem]'
+                scrolled || overHero
+                  ? 'h-12 sm:h-14 md:h-16 lg:h-[4.25rem]'
                   : 'h-16 sm:h-[4.25rem] md:h-20 lg:h-24'
               } dark:drop-shadow-[0_2px_12px_rgba(212,175,55,0.35)]`}
             />
@@ -88,16 +107,33 @@ const Header = () => {
           </Link>
 
           <nav className="hidden items-center gap-6 md:flex lg:gap-8">
-            <NavLink to="/" end onClick={(e) => handleNavClick(e, '/')} className={navLinkClass}>
+            <NavLink
+              to="/"
+              end
+              onClick={(e) => handleNavClick(e, '/')}
+              className={overHero ? navLinkOverHero : navLinkClass}
+            >
               {t.nav.home}
             </NavLink>
-            <NavLink to="/about" onClick={(e) => handleNavClick(e, '/about')} className={navLinkClass}>
+            <NavLink
+              to="/about"
+              onClick={(e) => handleNavClick(e, '/about')}
+              className={overHero ? navLinkOverHero : navLinkClass}
+            >
               {t.nav.about}
             </NavLink>
-            <NavLink to="/products" onClick={(e) => handleNavClick(e, '/products')} className={navLinkClass}>
+            <NavLink
+              to="/products"
+              onClick={(e) => handleNavClick(e, '/products')}
+              className={overHero ? navLinkOverHero : navLinkClass}
+            >
               {t.nav.product}
             </NavLink>
-            <NavLink to="/contact" onClick={(e) => handleNavClick(e, '/contact')} className={navLinkClass}>
+            <NavLink
+              to="/contact"
+              onClick={(e) => handleNavClick(e, '/contact')}
+              className={overHero ? navLinkOverHero : navLinkClass}
+            >
               {t.nav.contact}
             </NavLink>
           </nav>
@@ -111,6 +147,27 @@ const Header = () => {
                 </span>
               )}
             </button>
+            <div className="flex items-center gap-1.5 md:hidden" role="group" aria-label="Theme">
+              <button
+                type="button"
+                className={themeIconBtn(theme === 'light')}
+                onClick={() => setThemeMode('light')}
+                aria-label="Light mode"
+                aria-pressed={theme === 'light'}
+              >
+                <FiSun className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                className={themeIconBtn(theme === 'dark')}
+                onClick={() => setThemeMode('dark')}
+                aria-label="Dark mode"
+                aria-pressed={theme === 'dark'}
+              >
+                <FiMoon className="h-5 w-5" />
+              </button>
+            </div>
+
             <button type="button" className={`${pillBtn} hidden md:flex`} onClick={toggleTheme} aria-label="Toggle theme">
               {theme === 'light' ? <FiMoon className="h-[18px] w-[18px]" /> : <FiSun className="h-[18px] w-[18px]" />}
             </button>
@@ -122,19 +179,19 @@ const Header = () => {
               aria-label="Toggle menu"
             >
               <span
-                className={`block h-0.5 w-6 rounded-full bg-neutral-800 transition dark:bg-white ${
-                  mobileMenuOpen ? 'translate-y-2 rotate-45' : ''
-                }`}
+                className={`block h-0.5 w-6 rounded-full transition ${
+                  overHero ? 'bg-neutral-800 dark:bg-neutral-100' : 'bg-neutral-800 dark:bg-white'
+                } ${mobileMenuOpen ? 'translate-y-2 rotate-45' : ''}`}
               />
               <span
-                className={`block h-0.5 w-6 rounded-full bg-neutral-800 transition dark:bg-white ${
-                  mobileMenuOpen ? 'opacity-0' : ''
-                }`}
+                className={`block h-0.5 w-6 rounded-full transition ${
+                  overHero ? 'bg-neutral-800 dark:bg-neutral-100' : 'bg-neutral-800 dark:bg-white'
+                } ${mobileMenuOpen ? 'opacity-0' : ''}`}
               />
               <span
-                className={`block h-0.5 w-6 rounded-full bg-neutral-800 transition dark:bg-white ${
-                  mobileMenuOpen ? '-translate-y-2 -rotate-45' : ''
-                }`}
+                className={`block h-0.5 w-6 rounded-full transition ${
+                  overHero ? 'bg-neutral-800 dark:bg-neutral-100' : 'bg-neutral-800 dark:bg-white'
+                } ${mobileMenuOpen ? '-translate-y-2 -rotate-45' : ''}`}
               />
             </button>
           </div>
@@ -215,10 +272,24 @@ const Header = () => {
           </NavLink>
         </nav>
         <div className="flex flex-col gap-2 border-t border-neutral-200 p-4 dark:border-white/10">
-          <button type="button" className={`${pillBtn} w-full justify-center`} onClick={toggleTheme}>
-            {theme === 'light' ? <FiMoon className="h-[18px] w-[18px]" /> : <FiSun className="h-[18px] w-[18px]" />}{' '}
-            {theme === 'light' ? 'Dark mode' : 'Light mode'}
-          </button>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              className={`${pillBtn} justify-center ${theme === 'light' ? 'bg-brand text-white' : ''}`}
+              onClick={() => setThemeMode('light')}
+              aria-pressed={theme === 'light'}
+            >
+              <FiSun className="h-[18px] w-[18px]" /> Light
+            </button>
+            <button
+              type="button"
+              className={`${pillBtn} justify-center ${theme === 'dark' ? 'bg-brand text-white' : ''}`}
+              onClick={() => setThemeMode('dark')}
+              aria-pressed={theme === 'dark'}
+            >
+              <FiMoon className="h-[18px] w-[18px]" /> Dark
+            </button>
+          </div>
         </div>
       </div>
     </>

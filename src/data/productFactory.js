@@ -1,5 +1,5 @@
 import { MEN_LINES, WOMEN_LINES, SPECIAL_LINES } from './productLists';
-import { ORIGINAL_IMAGE_CATALOG, getOriginalMeta } from './originalProducts';
+import { ORIGINAL_IMAGE_CATALOG, getOriginalMeta, getOriginalPrice } from './originalProducts';
 import { DEFAULT_SIZE_ID, getSizeById, BOTTLE_SIZES } from './sizes';
 
 export const PRODUCT_CARD_IMAGE = '/image/products/product.png';
@@ -113,10 +113,13 @@ const buildProduct = (id, { name, brand }, section, imageOverrides = {}) => {
   };
 };
 
+export const isOriginalProduct = (product) =>
+  Boolean(product && (product.hideSizes || product.section === 'original'));
+
 const buildOriginalProduct = (id, entry) => {
   const { name, brand } = getOriginalMeta(entry.slug);
   const [first, second] = entry.images;
-  return buildProduct(
+  const base = buildProduct(
     id,
     { name, brand },
     'original',
@@ -126,6 +129,14 @@ const buildOriginalProduct = (id, entry) => {
       detailImages: entry.images,
     }
   );
+  const price = getOriginalPrice(entry.slug) ?? base.price;
+
+  return {
+    ...base,
+    hideSizes: true,
+    sizes: [],
+    price,
+  };
 };
 
 export const buildAllProducts = () => {

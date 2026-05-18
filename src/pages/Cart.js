@@ -74,7 +74,9 @@ const Cart = () => {
                 <div className="min-w-0 flex-1">
                   <h3 className="font-semibold text-neutral-900 dark:text-white">{item.name}</h3>
                   {item.brand && <p className="text-xs text-neutral-500 dark:text-neutral-400">{item.brand}</p>}
-                  <p className="text-xs text-neutral-500 dark:text-neutral-400">{item.sizeLabel || item.size}</p>
+                  {(item.sizeLabel || item.size) && (
+                    <p className="text-xs text-neutral-500 dark:text-neutral-400">{item.sizeLabel || item.size}</p>
+                  )}
                   <p className="text-sm font-bold text-brand">{formatEGP(item.price)}</p>
                 </div>
                 <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end">

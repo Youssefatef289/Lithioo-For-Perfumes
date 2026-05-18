@@ -60,8 +60,7 @@ const t = {
   },
   testimonials: {
     title: 'What Our Customers Say',
-    subtitle:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+    subtitle: 'Real reviews from our happy customers — thank you for trusting Lithioo Perfumes.',
   },
   aboutPage: {
     title: 'About Lithioo',

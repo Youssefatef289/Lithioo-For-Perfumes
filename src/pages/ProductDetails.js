@@ -8,6 +8,7 @@ import { formatEGP } from '../utils/price';
 import { buildSingleProductMessage, openWhatsApp } from '../utils/whatsapp';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
+import { isOriginalProduct } from '../data/productFactory';
 import { getProductById } from '../data/products';
 
 const ProductDetails = () => {
@@ -22,8 +23,9 @@ const ProductDetails = () => {
   const [selectedSize, setSelectedSize] = useState(DEFAULT_SIZE_ID);
 
   const product = getProductById(id);
+  const hideSizes = isOriginalProduct(product);
   const sizeMeta = getSizeById(selectedSize);
-  const price = sizeMeta.price;
+  const price = hideSizes ? product?.price : sizeMeta.price;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -36,12 +38,20 @@ const ProductDetails = () => {
     return null;
   }
 
-  const lineItem = {
-    ...product,
-    size: selectedSize,
-    sizeLabel: sizeMeta.label,
-    price,
-  };
+  const lineItem = hideSizes
+    ? {
+        ...product,
+        size: null,
+        sizeLabel: '',
+        price: product.price,
+        cartKey: `${product.id}-original`,
+      }
+    : {
+        ...product,
+        size: selectedSize,
+        sizeLabel: sizeMeta.label,
+        price,
+      };
 
   const handleAddToCart = () => {
     setIsAdding(true);
@@ -122,7 +132,7 @@ const ProductDetails = () => {
               </div>
             </div>
 
-            <SizeSelector selectedSize={selectedSize} onChange={setSelectedSize} />
+            {!hideSizes && <SizeSelector selectedSize={selectedSize} onChange={setSelectedSize} />}
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-3xl font-bold text-brand">{formatEGP(price)}</span>
               {product.inStock && (

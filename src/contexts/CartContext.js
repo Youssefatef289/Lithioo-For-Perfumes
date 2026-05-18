@@ -13,6 +13,22 @@ export const useCart = () => {
 };
 
 const normalizeCartItem = (item) => {
+  if (item.hideSizes || item.section === 'original') {
+    const cartKey = item.cartKey || `${item.id}-original`;
+    const price =
+      typeof item.price === 'number' && !Number.isNaN(item.price)
+        ? item.price
+        : getSizeById(DEFAULT_SIZE_ID).price;
+
+    return {
+      ...item,
+      size: null,
+      sizeLabel: '',
+      price,
+      cartKey,
+    };
+  }
+
   const size = item.size || DEFAULT_SIZE_ID;
   const sizeMeta = getSizeById(size);
   const cartKey = item.cartKey || getCartKey(item.id, size);

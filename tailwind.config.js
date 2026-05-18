@@ -98,6 +98,31 @@ module.exports = {
           '0%': { opacity: '0', transform: 'translateY(16px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        'review-marquee': {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        'fab-pop': {
+          '0%': { opacity: '0', transform: 'translateY(20px) scale(0.5)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+        'fab-ring': {
+          '0%': { boxShadow: '0 4px 20px rgba(127, 176, 105, 0.4), 0 0 0 0 rgba(127, 176, 105, 0.45)' },
+          '70%': { boxShadow: '0 4px 20px rgba(127, 176, 105, 0.25), 0 0 0 16px rgba(127, 176, 105, 0)' },
+          '100%': { boxShadow: '0 4px 20px rgba(127, 176, 105, 0.4), 0 0 0 0 rgba(127, 176, 105, 0)' },
+        },
+        'fab-float': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-8px)' },
+        },
+        'hero-fade-up': {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'hero-ken-burns': {
+          '0%': { transform: 'scale(1.08)' },
+          '100%': { transform: 'scale(1)' },
+        },
       },
       animation: {
         'cart-bounce': 'cart-bounce 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -110,6 +135,12 @@ module.exports = {
         'toast-in': 'toast-in 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards',
         'card-btn-in': 'card-btn-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both',
         'catalog-fade': 'catalog-fade 0.45s cubic-bezier(0.22, 1, 0.36, 1) both',
+        'review-marquee': 'review-marquee 45s linear infinite',
+        'fab-pop': 'fab-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both',
+        'fab-ring': 'fab-ring 2s ease-out infinite',
+        'fab-float': 'fab-float 3s ease-in-out infinite',
+        'hero-fade-up': 'hero-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both',
+        'hero-ken-burns': 'hero-ken-burns 6s ease-out forwards',
       },
     },
   },

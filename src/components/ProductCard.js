@@ -4,6 +4,7 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '../contexts/CartContext';
 import ProductDetailsModal from './ProductDetailsModal';
 import SizeSelector from './SizeSelector';
+import { isOriginalProduct } from '../data/productFactory';
 import { DEFAULT_SIZE_ID, getSizeById } from '../data/sizes';
 import { formatEGP } from '../utils/price';
 import { buildSingleProductMessage, openWhatsApp } from '../utils/whatsapp';
@@ -14,17 +15,29 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
   const [isAdding, setIsAdding] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
+  const hideSizes = isOriginalProduct(product);
   const hoverImage = product.imageHover || product.image;
   const mainImage = product.image || hoverImage;
   const sizeMeta = getSizeById(selectedSize);
-  const price = sizeMeta.price;
+  const price = hideSizes ? product.price : sizeMeta.price;
 
-  const buildLineItem = () => ({
-    ...product,
-    size: selectedSize,
-    sizeLabel: sizeMeta.label,
-    price,
-  });
+  const buildLineItem = () => {
+    if (hideSizes) {
+      return {
+        ...product,
+        size: null,
+        sizeLabel: '',
+        price: product.price,
+        cartKey: `${product.id}-original`,
+      };
+    }
+    return {
+      ...product,
+      size: selectedSize,
+      sizeLabel: sizeMeta.label,
+      price,
+    };
+  };
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
@@ -109,7 +122,7 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
             <h3 className="m-0 line-clamp-2 text-base font-semibold leading-snug text-neutral-800 dark:text-neutral-100">
               {product.name}
             </h3>
-            <SizeSelector selectedSize={selectedSize} onChange={setSelectedSize} />
+            {!hideSizes && <SizeSelector selectedSize={selectedSize} onChange={setSelectedSize} />}
             <p className="m-0 text-xl font-bold text-brand">{formatEGP(price)}</p>
           </div>
         </div>
