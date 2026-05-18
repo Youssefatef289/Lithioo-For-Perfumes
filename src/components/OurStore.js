@@ -50,7 +50,6 @@ const OurStore = () => {
             <h3 className="text-lg font-bold text-neutral-900 dark:text-white sm:text-xl">
               {activeMeta?.label}
             </h3>
-            <p className="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">{activeMeta?.labelAr}</p>
           </div>
           <p className="rounded-full bg-brand/10 px-4 py-1.5 text-sm font-semibold text-brand">
             {sectionProducts.length} products
@@ -81,7 +80,7 @@ const OurStore = () => {
 
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <Link to={`/products?section=${activeSection}`} className="btn-primary min-w-[200px]">
-            View all — {activeMeta?.labelAr}
+            View all {activeMeta?.label}
           </Link>
           <Link to="/products" className="btn-outline min-w-[200px]">
             Full catalog

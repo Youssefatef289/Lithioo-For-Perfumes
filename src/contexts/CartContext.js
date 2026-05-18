@@ -90,7 +90,7 @@ export const CartProvider = ({ children }) => {
       return [...prevItems, { ...lineItem, quantity }];
     });
 
-    setCartNotice('تم إضافته في السلة');
+    setCartNotice('Added to cart');
     if (openCart) {
       setIsCartOpen(true);
     }

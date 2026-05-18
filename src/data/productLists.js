@@ -123,8 +123,8 @@ Manifesto|Yves Saint Laurent (YSL)
 `.trim();
 
 export const PRODUCT_SECTIONS = [
-  { id: 'men', label: "Men's Section", labelAr: 'قسم الرجال' },
-  { id: 'women', label: "Women's Section", labelAr: 'قسم النساء' },
-  { id: 'special', label: 'Oriental Collection', labelAr: 'القسم الشرقي' },
-  { id: 'original', label: 'Original Products', labelAr: 'المنتجات الأصلية' },
+  { id: 'men', label: 'Men Section' },
+  { id: 'women', label: 'Women Section' },
+  { id: 'special', label: 'Oriental Section' },
+  { id: 'original', label: 'Original Section' },
 ];

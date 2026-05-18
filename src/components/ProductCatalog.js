@@ -83,7 +83,6 @@ const ProductCatalog = () => {
             <h2 className="text-xl font-bold text-neutral-900 dark:text-white sm:text-2xl">
               {activeMeta?.label}
             </h2>
-            <p className="mt-0.5 text-sm text-neutral-500 dark:text-neutral-400">{activeMeta?.labelAr}</p>
           </div>
           <p className="rounded-full bg-brand/10 px-4 py-1.5 text-sm font-semibold text-brand">
             {sectionProducts.length} products

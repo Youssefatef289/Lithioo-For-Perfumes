@@ -44,7 +44,7 @@
     @apply bg-neutral-950 text-neutral-200;
   }
 
-  /* صفحات داخلية: هوامش آمنة تحت الهيدر الثابت */
+  /* Inner pages: safe spacing below fixed header */
   .page-main {
     @apply w-full min-w-0;
   }
@@ -84,7 +84,7 @@
 }
 
 @layer utilities {
-  /* شريط تمرير — فاتح */
+  /* Light scrollbar */
   ::-webkit-scrollbar {
     @apply w-2.5;
   }
