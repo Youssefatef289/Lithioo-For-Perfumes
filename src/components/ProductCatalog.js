@@ -5,7 +5,7 @@ import ProductCard from './ProductCard';
 import ProductSectionTabs from './ProductSectionTabs';
 
 const PRODUCTS_PER_PAGE = 12;
-const VALID_SECTIONS = ['men', 'women', 'special'];
+const VALID_SECTIONS = ['men', 'women', 'special', 'original'];
 
 const resolveSection = (value) => (VALID_SECTIONS.includes(value) ? value : 'men');
 

@@ -60,7 +60,10 @@ const ProductDetails = () => {
   };
 
   const inWishlist = isInWishlist(product.id);
-  const images = [product.image];
+  const images =
+    product.detailImages?.length > 0
+      ? product.detailImages
+      : [product.image, product.imageHover].filter((img, i, arr) => img && arr.indexOf(img) === i);
 
   const qtyBtn =
     'flex h-10 w-10 items-center justify-center rounded-lg border border-neutral-200 text-lg font-medium text-neutral-700 transition hover:border-brand disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-600 dark:text-neutral-200';
@@ -92,7 +95,7 @@ const ProductDetails = () => {
                       selectedImage === index ? 'border-brand' : 'border-transparent opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <img src={img} alt="" className="h-full w-full object-cover" />
+                    <img src={img} alt="" className="h-full w-full object-contain" />
                   </button>
                 ))}
               </div>

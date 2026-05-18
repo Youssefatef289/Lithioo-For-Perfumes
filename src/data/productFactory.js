@@ -1,4 +1,5 @@
 import { MEN_LINES, WOMEN_LINES, SPECIAL_LINES } from './productLists';
+import { ORIGINAL_IMAGE_CATALOG, getOriginalMeta } from './originalProducts';
 import { DEFAULT_SIZE_ID, getSizeById, BOTTLE_SIZES } from './sizes';
 
 export const PRODUCT_CARD_IMAGE = '/image/products/product.png';
@@ -47,6 +48,19 @@ const SECTION_META = {
       ['Unique character that stands out from mass market', 'Ideal for gifting and special moments', 'Rich dry-down that evolves beautifully on skin'],
     ],
   },
+  original: {
+    category: 'Original Product',
+    description:
+      'Authentic original fragrance from trusted brands. Genuine packaging and long-lasting performance you can count on.',
+    ingredientSets: [
+      ['Premium oils', 'Natural accords', 'Long-lasting base notes'],
+      ['Authentic blend', 'Rich projection', 'Signature brand character'],
+    ],
+    benefitSets: [
+      ['100% original — not an imitation', 'Trusted brand with proven quality', 'Ideal for personal use or gifting'],
+      ['Available in multiple bottle sizes', 'Strong longevity on skin and clothes'],
+    ],
+  },
 };
 
 const parseLines = (text) =>
@@ -67,13 +81,16 @@ const hashNum = (str, max) => {
 
 const pickSet = (sets, seed) => sets[hashNum(seed, sets.length)];
 
-const buildProduct = (id, { name, brand }, section) => {
+const buildProduct = (id, { name, brand }, section, imageOverrides = {}) => {
   const meta = SECTION_META[section];
   const seed = `${section}-${name}`;
   const ingredients = pickSet(meta.ingredientSets, seed);
   const benefits = pickSet(meta.benefitSets, `${seed}-b`);
   const rating = 4.2 + (hashNum(seed, 8) * 0.1);
   const reviews = 40 + hashNum(seed, 220);
+  const image = imageOverrides.image || PRODUCT_CARD_IMAGE;
+  const imageHover = imageOverrides.imageHover || imageOverrides.image || PRODUCT_CARD_IMAGE_HOVER;
+  const detailImages = imageOverrides.detailImages || [image, imageHover].filter((v, i, a) => a.indexOf(v) === i);
 
   return {
     id,
@@ -84,8 +101,9 @@ const buildProduct = (id, { name, brand }, section) => {
     price: getSizeById(DEFAULT_SIZE_ID).price,
     defaultSize: DEFAULT_SIZE_ID,
     sizes: BOTTLE_SIZES,
-    image: PRODUCT_CARD_IMAGE,
-    imageHover: PRODUCT_CARD_IMAGE_HOVER,
+    image,
+    imageHover,
+    detailImages,
     description: `${meta.description} ${name} by ${brand}.`,
     ingredients,
     benefits,
@@ -95,6 +113,21 @@ const buildProduct = (id, { name, brand }, section) => {
   };
 };
 
+const buildOriginalProduct = (id, entry) => {
+  const { name, brand } = getOriginalMeta(entry.slug);
+  const [first, second] = entry.images;
+  return buildProduct(
+    id,
+    { name, brand },
+    'original',
+    {
+      image: first,
+      imageHover: second || first,
+      detailImages: entry.images,
+    }
+  );
+};
+
 export const buildAllProducts = () => {
   const items = [
     ...parseLines(MEN_LINES).map((item) => ({ ...item, section: 'men' })),
@@ -102,5 +135,10 @@ export const buildAllProducts = () => {
     ...parseLines(SPECIAL_LINES).map((item) => ({ ...item, section: 'special' })),
   ];
 
-  return items.map((item, index) => buildProduct(index + 1, item, item.section));
+  const catalog = items.map((item, index) => buildProduct(index + 1, item, item.section));
+  const originals = ORIGINAL_IMAGE_CATALOG.map((entry, index) =>
+    buildOriginalProduct(catalog.length + index + 1, entry)
+  );
+
+  return [...catalog, ...originals];
 };

@@ -15,6 +15,7 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [selectedSize, setSelectedSize] = useState(initialSize);
+  const [selectedImage, setSelectedImage] = useState(0);
 
   useEffect(() => {
     if (!isOpen) return undefined;
@@ -30,8 +31,11 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    if (isOpen) setSelectedSize(initialSize);
-  }, [isOpen, initialSize]);
+    if (isOpen) {
+      setSelectedSize(initialSize);
+      setSelectedImage(0);
+    }
+  }, [isOpen, initialSize, product?.id]);
 
   if (!isOpen || !product) return null;
 
@@ -44,7 +48,12 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
     price,
   };
 
-  const displayImage = product.imageHover || product.image;
+  const detailImages =
+    product.detailImages?.length > 0
+      ? product.detailImages
+      : [product.imageHover, product.image].filter(Boolean);
+  const uniqueImages = [...new Set(detailImages)];
+  const displayImage = uniqueImages[selectedImage] || uniqueImages[0];
   const inWishlist = isInWishlist(product.id);
   const rating = product.rating ?? 4.5;
   const reviews = product.reviews ?? 0;
@@ -80,8 +89,26 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
         </button>
 
         <div className="grid overflow-y-auto md:grid-cols-2">
-          <div className="relative aspect-square bg-gradient-to-br from-neutral-100 to-neutral-50 p-6 dark:from-neutral-800 dark:to-neutral-900 sm:p-8">
-            <img src={displayImage} alt={product.name} className="h-full w-full object-contain drop-shadow-xl" />
+          <div className="relative flex flex-col bg-gradient-to-br from-neutral-100 to-neutral-50 p-4 dark:from-neutral-800 dark:to-neutral-900 sm:p-6">
+            <div className="relative aspect-square flex-1 p-2 sm:p-4">
+              <img src={displayImage} alt={product.name} className="h-full w-full object-contain drop-shadow-xl" />
+            </div>
+            {uniqueImages.length > 1 && (
+              <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+                {uniqueImages.map((img, index) => (
+                  <button
+                    key={img}
+                    type="button"
+                    onClick={() => setSelectedImage(index)}
+                    className={`h-14 w-14 shrink-0 overflow-hidden rounded-lg border-2 bg-white p-0.5 dark:bg-neutral-800 ${
+                      selectedImage === index ? 'border-brand' : 'border-transparent opacity-70 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={img} alt="" className="h-full w-full object-contain" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-4 p-6 sm:gap-5 sm:p-8">

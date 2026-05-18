@@ -3,6 +3,7 @@ import Hero from '../components/Hero';
 import NewCollection from '../components/NewCollection';
 import WhyChooseUs from '../components/WhyChooseUs';
 import OurStore from '../components/OurStore';
+import OriginalProducts from '../components/OriginalProducts';
 import PromotionalBanner from '../components/PromotionalBanner';
 import Testimonials from '../components/Testimonials';
 import { observeElements } from '../utils/animations';
@@ -19,6 +20,7 @@ const Home = () => {
       <NewCollection />
       <WhyChooseUs />
       <OurStore />
+      <OriginalProducts />
       <PromotionalBanner />
       <Testimonials />
     </main>
