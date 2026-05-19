@@ -1,9 +1,11 @@
 import React, { useEffect } from 'react';
 import { FiCheck } from 'react-icons/fi';
 import { useCart } from '../contexts/CartContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const CartToast = () => {
   const { cartNotice, clearCartNotice } = useCart();
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!cartNotice) return undefined;
@@ -15,7 +17,7 @@ const CartToast = () => {
 
   return (
     <div
-      className="pointer-events-none fixed bottom-6 left-1/2 z-[1005] -translate-x-1/2 px-4"
+      className="pointer-events-none fixed bottom-6 start-1/2 z-[1005] -translate-x-1/2 px-4"
       role="status"
       aria-live="polite"
     >
@@ -23,7 +25,7 @@ const CartToast = () => {
         <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-white">
           <FiCheck className="h-4 w-4" />
         </span>
-        {cartNotice}
+        {t.cart.added}
       </div>
     </div>
   );

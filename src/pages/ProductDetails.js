@@ -7,6 +7,8 @@ import { DEFAULT_SIZE_ID, getSizeById } from '../data/sizes';
 import { formatEGP } from '../utils/price';
 import { buildSingleProductMessage, openWhatsApp } from '../utils/whatsapp';
 import { useCart } from '../contexts/CartContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useLocalizedProduct } from '../hooks/useLocalizedProduct';
 import { useWishlist } from '../contexts/WishlistContext';
 import { isOriginalProduct } from '../data/productFactory';
 import { getProductById } from '../data/products';
@@ -15,7 +17,9 @@ const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { t, language } = useLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
+  const { modal, productPage } = t;
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [isToggling, setIsToggling] = useState(false);
@@ -23,8 +27,9 @@ const ProductDetails = () => {
   const [selectedSize, setSelectedSize] = useState(DEFAULT_SIZE_ID);
 
   const product = getProductById(id);
+  const lp = useLocalizedProduct(product);
   const hideSizes = isOriginalProduct(product);
-  const sizeMeta = getSizeById(selectedSize);
+  const sizeMeta = getSizeById(selectedSize, language);
   const price = hideSizes ? product?.price : sizeMeta.price;
 
   useEffect(() => {
@@ -34,7 +39,7 @@ const ProductDetails = () => {
     }
   }, [id, product, navigate]);
 
-  if (!product) {
+  if (!product || !lp) {
     return null;
   }
 
@@ -86,13 +91,13 @@ const ProductDetails = () => {
           onClick={() => navigate(-1)}
           className="mb-8 flex items-center gap-2 text-sm font-medium text-neutral-600 transition hover:text-brand dark:text-neutral-400"
         >
-          <FiArrowLeft className="h-4 w-4" /> Back
+          <FiArrowLeft className="h-4 w-4" /> {productPage.back}
         </button>
 
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
           <div className="space-y-4">
             <div className="card-elevated overflow-hidden p-6">
-              <img src={images[selectedImage]} alt={product.name} className="mx-auto max-h-[420px] w-full object-contain" />
+              <img src={images[selectedImage]} alt={lp.name} className="mx-auto max-h-[420px] w-full object-contain" />
             </div>
             {images.length > 1 && (
               <div className="flex gap-2">
@@ -114,10 +119,10 @@ const ProductDetails = () => {
 
           <div className="flex flex-col gap-6">
             <div>
-              {product.brand && (
-                <p className="text-sm font-medium uppercase tracking-wider text-brand">{product.brand}</p>
+              {lp.brand && (
+                <p className="text-center text-sm font-medium uppercase tracking-wider text-brand">{lp.brand}</p>
               )}
-              <h1 className="heading-section">{product.name}</h1>
+              <h1 className="heading-section text-center">{lp.name}</h1>
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <div className="flex gap-0.5">
                   {[...Array(5)].map((_, i) => (
@@ -128,30 +133,36 @@ const ProductDetails = () => {
                   ))}
                 </div>
                 <span className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">{product.rating}</span>
-                <span className="text-sm text-neutral-500 dark:text-neutral-400">({product.reviews} reviews)</span>
+                <span className="text-sm text-neutral-500 dark:text-neutral-400">
+                  ({product.reviews} {modal.reviews})
+                </span>
               </div>
             </div>
 
-            {!hideSizes && <SizeSelector selectedSize={selectedSize} onChange={setSelectedSize} />}
             <div className="flex flex-wrap items-center gap-3">
+              {!hideSizes && <SizeSelector selectedSize={selectedSize} onChange={setSelectedSize} />}
               <span className="text-3xl font-bold text-brand">{formatEGP(price)}</span>
               {product.inStock && (
                 <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
-                  In Stock
+                  {modal.inStock}
                 </span>
               )}
             </div>
 
             <div className="card-elevated p-5">
-              <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Product details</h3>
-              <p className="text-muted-section !mt-0 leading-relaxed">{product.description}</p>
+              <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                {modal.productDetails}
+              </h3>
+              <p className="text-muted-section !mt-0 leading-relaxed">{lp.description}</p>
             </div>
 
-            {product.ingredients?.length > 0 && (
+            {lp.ingredients?.length > 0 && (
               <div className="card-elevated p-5">
-                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">Ingredients / Notes</h3>
+                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                  {modal.ingredients}
+                </h3>
                 <ul className="flex flex-wrap gap-2">
-                  {product.ingredients.map((note) => (
+                  {lp.ingredients.map((note) => (
                     <li key={note} className="rounded-full bg-brand/10 px-3 py-1 text-sm font-medium text-brand">
                       {note}
                     </li>
@@ -160,11 +171,13 @@ const ProductDetails = () => {
               </div>
             )}
 
-            {product.benefits?.length > 0 && (
+            {lp.benefits?.length > 0 && (
               <div className="card-elevated p-5">
-                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">How you benefit</h3>
+                <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+                  {modal.benefits}
+                </h3>
                 <ul className="list-inside list-disc space-y-2 text-muted-section !mt-0">
-                  {product.benefits.map((benefit) => (
+                  {lp.benefits.map((benefit) => (
                     <li key={benefit}>{benefit}</li>
                   ))}
                 </ul>
@@ -173,7 +186,9 @@ const ProductDetails = () => {
 
             <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
               <div>
-                <label className="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">Quantity</label>
+                <label className="mb-2 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                  {productPage.quantity}
+                </label>
                 <div className="flex items-center gap-2">
                   <button type="button" className={qtyBtn} onClick={() => handleQuantityChange(-1)} disabled={quantity <= 1}>
                     -
@@ -192,7 +207,7 @@ const ProductDetails = () => {
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3.5 text-base font-semibold text-white shadow-md transition hover:bg-[#20bd5a]"
             >
               <FaWhatsapp className="h-5 w-5" />
-              Order Now
+              {modal.orderNow}
             </button>
 
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -203,7 +218,7 @@ const ProductDetails = () => {
                 className={`btn-primary flex-1 ${isAdding ? 'bg-emerald-600 hover:bg-emerald-600' : ''}`}
               >
                 <FiShoppingCart className="h-5 w-5" />
-                {isAdding ? 'Added!' : 'Add to Cart'}
+                {isAdding ? productPage.added : productPage.addToCart}
               </button>
               <button
                 type="button"
@@ -211,17 +226,17 @@ const ProductDetails = () => {
                 className={`btn-outline flex-1 ${inWishlist ? 'border-brand bg-brand/10' : ''} ${isToggling ? 'animate-heart-pulse' : ''}`}
               >
                 <FiHeart className={`h-5 w-5 ${inWishlist ? 'fill-current' : ''}`} />
-                {inWishlist ? 'In Wishlist' : 'Add to Wishlist'}
+                {inWishlist ? productPage.inWishlist : productPage.addToWishlist}
               </button>
             </div>
 
             <div className="card-elevated flex flex-col gap-2 p-4 text-sm">
               <p className="text-neutral-700 dark:text-neutral-300">
-                <strong className="text-neutral-900 dark:text-white">Category:</strong> {product.category}
+                <strong className="text-neutral-900 dark:text-white">{productPage.category}:</strong> {lp.category}
               </p>
               <p className="text-neutral-700 dark:text-neutral-300">
-                <strong className="text-neutral-900 dark:text-white">Availability:</strong>{' '}
-                {product.inStock ? 'In Stock' : 'Out of Stock'}
+                <strong className="text-neutral-900 dark:text-white">{modal.availability}:</strong>{' '}
+                {product.inStock ? modal.inStock : modal.outOfStock}
               </p>
             </div>
           </div>

@@ -1,11 +1,13 @@
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 import { allProducts } from '../data/products';
 import ProductCard from './ProductCard';
 
 const HOME_ORIGINALS_LIMIT = 4;
 
 const OriginalProducts = () => {
+  const { t } = useLanguage();
   const originals = useMemo(() => allProducts.filter((p) => p.section === 'original'), []);
 
   const displayed = originals.slice(0, HOME_ORIGINALS_LIMIT);
@@ -15,13 +17,11 @@ const OriginalProducts = () => {
       <div className="section-inner max-w-wide">
         <div className="mb-8 flex flex-col items-center justify-between gap-4 text-center sm:mb-10 sm:flex-row sm:text-start">
           <div>
-            <h2 className="heading-section">Original Products</h2>
-            <p className="text-muted-section mt-2 max-w-lg">
-              Authentic fragrances from trusted brands — product name &amp; company clearly listed
-            </p>
+            <h2 className="heading-section">{t.originals.title}</h2>
+            <p className="text-muted-section mt-2 max-w-lg">{t.originals.subtitle}</p>
           </div>
           <Link to="/products?section=original" className="btn-outline shrink-0 px-6">
-            View all originals
+            {t.originals.viewAll}
           </Link>
         </div>
 

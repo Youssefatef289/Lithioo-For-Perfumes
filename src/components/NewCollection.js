@@ -15,7 +15,20 @@ const NewCollection = () => {
           <p className="text-muted-section mx-auto mt-4 max-w-2xl">{t.collection.description}</p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+        {/* Mobile slider */}
+        <div className="-mx-4 flex flex-nowrap gap-5 overflow-x-auto px-4 pb-2 pt-1 snap-x snap-mandatory md:hidden">
+          {products.map((product, index) => (
+            <div
+              key={product.id}
+              className="w-[min(78vw,260px)] shrink-0 snap-start"
+            >
+              <ProductCard product={product} animationClass={`slide-up stagger-${index + 1}`} />
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop grid */}
+        <div className="hidden grid-cols-2 gap-6 md:grid lg:grid-cols-4 lg:gap-8">
           {products.map((product, index) => (
             <ProductCard
               key={product.id}

@@ -1,40 +1,61 @@
-/* English UI — Josefin Sans (loaded from public/index.html) */
-html,
-body {
+/* English UI — Josefin Sans */
+html[data-lang='en'],
+html[lang='en']:not([data-lang]) {
   font-family: 'Josefin Sans', ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.01em;
 }
 
-html *,
-body * {
-  font-family: inherit;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-weight: 700;
+html[data-lang='en'] h1,
+html[data-lang='en'] h2,
+html[data-lang='en'] h3,
+html[data-lang='en'] h4,
+html[data-lang='en'] h5,
+html[data-lang='en'] h6,
+html[lang='en']:not([data-lang]) h1,
+html[lang='en']:not([data-lang]) h2,
+html[lang='en']:not([data-lang]) h3,
+html[lang='en']:not([data-lang]) h4,
+html[lang='en']:not([data-lang]) h5,
+html[lang='en']:not([data-lang]) h6 {
   font-family: 'Josefin Sans', sans-serif;
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 
-p,
-span,
-a,
-button,
-input,
-textarea,
-label,
-li,
-td,
-th {
-  font-family: 'Josefin Sans', sans-serif;
+/* Arabic UI — Cairo */
+html[data-lang='ar'],
+html[lang='ar'] {
+  font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+  letter-spacing: 0;
 }
 
-html {
-  letter-spacing: -0.01em;
+html[data-lang='ar'] h1,
+html[data-lang='ar'] h2,
+html[data-lang='ar'] h3,
+html[data-lang='ar'] h4,
+html[data-lang='ar'] h5,
+html[data-lang='ar'] h6,
+html[lang='ar'] h1,
+html[lang='ar'] h2,
+html[lang='ar'] h3,
+html[lang='ar'] h4,
+html[lang='ar'] h5,
+html[lang='ar'] h6 {
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+html[data-lang='ar'] p,
+html[data-lang='ar'] span,
+html[data-lang='ar'] a,
+html[data-lang='ar'] button,
+html[data-lang='ar'] input,
+html[data-lang='ar'] textarea,
+html[data-lang='ar'] label,
+html[data-lang='ar'] li {
+  font-family: 'Cairo', sans-serif;
+  line-height: 1.65;
 }
 
 html * {

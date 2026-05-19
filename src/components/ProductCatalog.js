@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useLanguage } from '../contexts/LanguageContext';
 import { allProducts, PRODUCT_SECTIONS } from '../data/products';
 import ProductCard from './ProductCard';
 import ProductSectionTabs from './ProductSectionTabs';
@@ -10,6 +11,7 @@ const VALID_SECTIONS = ['men', 'women', 'special', 'original'];
 const resolveSection = (value) => (VALID_SECTIONS.includes(value) ? value : 'men');
 
 const ProductCatalog = () => {
+  const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const sectionFromUrl = resolveSection(searchParams.get('section'));
   const [activeSection, setActiveSection] = useState(sectionFromUrl);
@@ -33,7 +35,7 @@ const ProductCatalog = () => {
   const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
   const displayedProducts = sectionProducts.slice(startIndex, startIndex + PRODUCTS_PER_PAGE);
 
-  const activeMeta = PRODUCT_SECTIONS.find((s) => s.id === activeSection);
+  const sectionLabel = t.sections[activeSection];
 
   useEffect(() => {
     setActiveSection(sectionFromUrl);
@@ -61,10 +63,8 @@ const ProductCatalog = () => {
       <div className="section-inner max-w-wide">
         {/* Page title */}
         <div className="mb-8 text-center md:mb-10">
-          <h1 className="heading-section">Our Products</h1>
-          <p className="text-muted-section mx-auto mt-3 max-w-xl">
-            Choose a collection and explore our luxury fragrances
-          </p>
+          <h1 className="heading-section">{t.productsPage.title}</h1>
+          <p className="text-muted-section mx-auto mt-3 max-w-xl">{t.productsPage.subtitle}</p>
         </div>
 
         <ProductSectionTabs
@@ -80,19 +80,17 @@ const ProductCatalog = () => {
           className="mb-8 flex flex-col items-start justify-between gap-3 rounded-2xl border border-neutral-100 bg-surface-muted/50 px-5 py-4 dark:border-neutral-800 dark:bg-neutral-900/50 sm:flex-row sm:items-center"
         >
           <div>
-            <h2 className="text-xl font-bold text-neutral-900 dark:text-white sm:text-2xl">
-              {activeMeta?.label}
-            </h2>
+            <h2 className="text-xl font-bold text-neutral-900 dark:text-white sm:text-2xl">{sectionLabel}</h2>
           </div>
           <p className="rounded-full bg-brand/10 px-4 py-1.5 text-sm font-semibold text-brand">
-            {sectionProducts.length} products
+            {sectionProducts.length} {t.store.productsCount}
           </p>
         </div>
 
         {/* Product grid */}
         {displayedProducts.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-neutral-200 py-16 text-center dark:border-neutral-700">
-            <p className="text-neutral-500 dark:text-neutral-400">No products in this section yet.</p>
+            <p className="text-neutral-500 dark:text-neutral-400">{t.productsPage.noProducts}</p>
           </div>
         ) : (
           <div
@@ -118,7 +116,7 @@ const ProductCatalog = () => {
               className={pageBtn(false, currentPage === 1)}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              aria-label="Previous page"
+              aria-label={t.a11y.prevPage}
             >
               ←
             </button>
@@ -145,7 +143,7 @@ const ProductCatalog = () => {
               className={pageBtn(false, currentPage === totalPages)}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              aria-label="Next page"
+              aria-label={t.a11y.nextPage}
             >
               →
             </button>

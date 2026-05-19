@@ -4,6 +4,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { useCart } from '../contexts/CartContext';
 import { FiMoon, FiSun, FiX, FiShoppingCart } from 'react-icons/fi';
+import LanguageToggle from './LanguageToggle';
 
 const navLinkClass = ({ isActive }) =>
   [
@@ -15,7 +16,7 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useLanguage();
-  const { theme, toggleTheme, setThemeMode } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const { getCartItemsCount, toggleCart } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
@@ -73,12 +74,6 @@ const Header = () => {
     [
       'text-[0.95rem] font-normal text-neutral-800 transition-colors hover:text-brand dark:text-neutral-100',
       isActive ? 'font-semibold text-brand' : '',
-    ].join(' ');
-
-  const themeIconBtn = (active) =>
-    [
-      iconBtn,
-      active ? 'bg-brand text-white shadow-md hover:bg-brand hover:text-white' : '',
     ].join(' ');
 
   const pillBtn =
@@ -139,7 +134,7 @@ const Header = () => {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <button type="button" className={iconBtn} onClick={toggleCart} aria-label="Shopping cart">
+            <button type="button" className={iconBtn} onClick={toggleCart} aria-label={t.a11y.shoppingCart}>
               <FiShoppingCart className="h-5 w-5" />
               {getCartItemsCount() > 0 && (
                 <span className="absolute -end-1.5 -top-1.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full border-2 border-white bg-red-500 px-0.5 text-[0.65rem] font-bold text-white shadow animate-cart-bounce dark:border-neutral-900">
@@ -147,36 +142,22 @@ const Header = () => {
                 </span>
               )}
             </button>
-            <div className="flex items-center gap-1.5 md:hidden" role="group" aria-label="Theme">
-              <button
-                type="button"
-                className={themeIconBtn(theme === 'light')}
-                onClick={() => setThemeMode('light')}
-                aria-label="Light mode"
-                aria-pressed={theme === 'light'}
-              >
-                <FiSun className="h-5 w-5" />
-              </button>
-              <button
-                type="button"
-                className={themeIconBtn(theme === 'dark')}
-                onClick={() => setThemeMode('dark')}
-                aria-label="Dark mode"
-                aria-pressed={theme === 'dark'}
-              >
-                <FiMoon className="h-5 w-5" />
-              </button>
-            </div>
+            <LanguageToggle className={overHero ? 'bg-white/70 backdrop-blur-sm dark:bg-neutral-900/50' : ''} />
 
-            <button type="button" className={`${pillBtn} hidden md:flex`} onClick={toggleTheme} aria-label="Toggle theme">
-              {theme === 'light' ? <FiMoon className="h-[18px] w-[18px]" /> : <FiSun className="h-[18px] w-[18px]" />}
+            <button
+              type="button"
+              className={iconBtn}
+              onClick={toggleTheme}
+              aria-label={t.a11y.toggleTheme}
+            >
+              {theme === 'light' ? <FiMoon className="h-5 w-5" /> : <FiSun className="h-5 w-5" />}
             </button>
 
             <button
               type="button"
               className="relative flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-md md:hidden"
               onClick={() => setMobileMenuOpen((o) => !o)}
-              aria-label="Toggle menu"
+              aria-label={t.a11y.toggleMenu}
             >
               <span
                 className={`block h-0.5 w-6 rounded-full transition ${
@@ -208,7 +189,7 @@ const Header = () => {
 
       <div
         className={`fixed top-0 z-[999] flex h-screen w-[min(300px,90vw)] max-w-[320px] flex-col bg-white shadow-2xl transition-transform duration-300 ease-out dark:bg-neutral-900 dark:shadow-black/50 md:hidden end-0 ${
-          mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          mobileMenuOpen ? 'translate-x-0' : 'translate-x-full rtl:-translate-x-full'
         }`}
       >
         <div className="flex items-center justify-between border-b border-neutral-200 p-4 dark:border-white/10">
@@ -219,7 +200,7 @@ const Header = () => {
             type="button"
             className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-700 transition hover:bg-neutral-100 hover:rotate-90 dark:text-neutral-200 dark:hover:bg-neutral-800"
             onClick={() => setMobileMenuOpen(false)}
-            aria-label="Close menu"
+            aria-label={t.a11y.closeMenu}
           >
             <FiX className="h-6 w-6" />
           </button>
@@ -271,25 +252,17 @@ const Header = () => {
             {t.nav.contact}
           </NavLink>
         </nav>
-        <div className="flex flex-col gap-2 border-t border-neutral-200 p-4 dark:border-white/10">
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              className={`${pillBtn} justify-center ${theme === 'light' ? 'bg-brand text-white' : ''}`}
-              onClick={() => setThemeMode('light')}
-              aria-pressed={theme === 'light'}
-            >
-              <FiSun className="h-[18px] w-[18px]" /> Light
-            </button>
-            <button
-              type="button"
-              className={`${pillBtn} justify-center ${theme === 'dark' ? 'bg-brand text-white' : ''}`}
-              onClick={() => setThemeMode('dark')}
-              aria-pressed={theme === 'dark'}
-            >
-              <FiMoon className="h-[18px] w-[18px]" /> Dark
-            </button>
-          </div>
+        <div className="flex flex-col gap-3 border-t border-neutral-200 p-4 dark:border-white/10">
+          <LanguageToggle variant="pill" />
+          <button
+            type="button"
+            className={`${pillBtn} w-full justify-center`}
+            onClick={toggleTheme}
+            aria-label={t.a11y.toggleTheme}
+          >
+            {theme === 'light' ? <FiMoon className="h-[18px] w-[18px]" /> : <FiSun className="h-[18px] w-[18px]" />}
+            {t.a11y.toggleTheme}
+          </button>
         </div>
       </div>
     </>

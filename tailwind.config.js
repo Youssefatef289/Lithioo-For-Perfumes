@@ -47,6 +47,7 @@ module.exports = {
       },
       fontFamily: {
         sans: ['"Josefin Sans"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        arabic: ['"Cairo"', 'Tahoma', 'ui-sans-serif', 'sans-serif'],
       },
       boxShadow: {
         card: '0 2px 8px rgba(0, 0, 0, 0.08)',

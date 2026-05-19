@@ -95,6 +95,7 @@ const buildProduct = (id, { name, brand }, section, imageOverrides = {}) => {
   return {
     id,
     name,
+    nameEn: name,
     brand,
     section,
     category: meta.category,

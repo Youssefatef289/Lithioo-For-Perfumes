@@ -8,8 +8,8 @@ import {
   FaMapMarkerAlt,
   FaEnvelope,
 } from 'react-icons/fa';
+import { useLanguage } from '../contexts/LanguageContext';
 import {
-  ADDRESS,
   EMAIL,
   EMAIL_MAILTO,
   MAP_URL,
@@ -20,6 +20,9 @@ import {
 import { getWhatsAppUrl } from '../utils/whatsapp';
 
 const Footer = () => {
+  const { t } = useLanguage();
+  const { footer, nav, address } = t;
+
   const navLink =
     'text-sm text-white/75 transition hover:text-brand hover:translate-x-0.5 inline-block';
 
@@ -29,11 +32,17 @@ const Footer = () => {
   const contactRow =
     'group flex items-start gap-3 text-sm text-white/80 transition hover:text-brand';
 
+  const quickLinks = [
+    { to: '/about', label: nav.about },
+    { to: '/products', label: nav.product },
+    { to: '/products', label: footer.catalog },
+    { to: '/contact', label: nav.contact },
+  ];
+
   return (
     <footer className="w-full border-t-4 border-brand bg-neutral-900 text-white">
       <div className="section-inner max-w-wide py-12 sm:py-14">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3 lg:gap-12">
-          {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="inline-block">
               <img
@@ -42,22 +51,14 @@ const Footer = () => {
                 className="h-14 w-auto object-contain"
               />
             </Link>
-            <p className="max-w-xs text-sm leading-relaxed text-white/65">
-              Premium fragrances crafted with care. Discover your signature scent at Lithioo.
-            </p>
+            <p className="max-w-xs text-sm leading-relaxed text-white/65">{footer.tagline}</p>
           </div>
 
-          {/* Quick links */}
           <div>
-            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand">Quick Links</h3>
+            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand">{footer.quickLinks}</h3>
             <ul className="space-y-2.5">
-              {[
-                { to: '/about', label: 'About' },
-                { to: '/products', label: 'Products' },
-                { to: '/products', label: 'Catalog' },
-                { to: '/contact', label: 'Contact' },
-              ].map((item) => (
-                <li key={item.label}>
+              {quickLinks.map((item) => (
+                <li key={item.to + item.label}>
                   <Link to={item.to} className={navLink}>
                     {item.label}
                   </Link>
@@ -66,23 +67,17 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
-            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand">Get in Touch</h3>
+            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand">{footer.getInTouch}</h3>
             <ul className="space-y-4">
               <li>
-                <a
-                  href={MAP_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={contactRow}
-                >
+                <a href={MAP_URL} target="_blank" rel="noopener noreferrer" className={contactRow}>
                   <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand/15 text-brand group-hover:bg-brand/25">
                     <FaMapMarkerAlt className="h-4 w-4" aria-hidden />
                   </span>
                   <span>
-                    <span className="block font-medium text-white/90 group-hover:text-brand">{ADDRESS.area}</span>
-                    <span className="mt-0.5 block text-white/60">{ADDRESS.street}</span>
+                    <span className="block font-medium text-white/90 group-hover:text-brand">{address.area}</span>
+                    <span className="mt-0.5 block text-white/60">{address.street}</span>
                   </span>
                 </a>
               </li>
@@ -99,7 +94,7 @@ const Footer = () => {
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand/15 text-brand group-hover:bg-brand/25">
                     <FaWhatsapp className="h-4 w-4" aria-hidden />
                   </span>
-                  <span className="pt-1.5 font-medium">WhatsApp — {PHONE_DISPLAY}</span>
+                  <span className="pt-1.5 font-medium">{footer.whatsappLine.replace('{phone}', PHONE_DISPLAY)}</span>
                 </a>
               </li>
               <li>
@@ -114,16 +109,15 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Social */}
         <div className="mt-10 flex flex-col items-center gap-4 border-t border-white/10 pt-8 sm:flex-row sm:justify-between">
-          <p className="text-xs font-semibold uppercase tracking-widest text-white/50">Follow us</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-white/50">{footer.followUs}</p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <a
               href={SOCIAL_LINKS.facebook}
               target="_blank"
               rel="noopener noreferrer"
               className={socialIcon}
-              aria-label="Facebook"
+              aria-label={footer.facebook}
             >
               <FaFacebookF className="h-4 w-4" />
             </a>
@@ -132,7 +126,7 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               className={socialIcon}
-              aria-label="Instagram"
+              aria-label={footer.instagram}
             >
               <FaInstagram className="h-4 w-4" />
             </a>
@@ -141,11 +135,11 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               className={socialIcon}
-              aria-label="WhatsApp"
+              aria-label={footer.whatsapp}
             >
               <FaWhatsapp className="h-5 w-5" />
             </a>
-            <a href={PHONE_TEL} className={socialIcon} aria-label="Call us">
+            <a href={PHONE_TEL} className={socialIcon} aria-label={footer.callUs}>
               <FaPhoneAlt className="h-4 w-4" />
             </a>
             <a
@@ -153,18 +147,18 @@ const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               className={socialIcon}
-              aria-label="View location on map"
+              aria-label={footer.viewMap}
             >
               <FaMapMarkerAlt className="h-4 w-4" />
             </a>
-            <a href={EMAIL_MAILTO} className={socialIcon} aria-label="Email us">
+            <a href={EMAIL_MAILTO} className={socialIcon} aria-label={footer.emailUs}>
               <FaEnvelope className="h-4 w-4" />
             </a>
           </div>
         </div>
 
         <p className="mt-8 text-center text-sm text-white/55">
-          © {new Date().getFullYear()} Lithioo For Perfumes — All Rights Reserved
+          © {new Date().getFullYear()} Lithioo For Perfumes — {footer.rights}
         </p>
       </div>
     </footer>

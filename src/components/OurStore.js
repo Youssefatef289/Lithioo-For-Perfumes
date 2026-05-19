@@ -26,16 +26,14 @@ const OurStore = () => {
   );
 
   const displayedProducts = sectionProducts.slice(0, HOME_PRODUCTS_LIMIT);
-  const activeMeta = PRODUCT_SECTIONS.find((s) => s.id === activeSection);
+  const sectionLabel = t.sections[activeSection];
 
   return (
     <section className="our-store w-full bg-white py-12 dark:bg-neutral-950 sm:py-16 md:py-20" id="product">
       <div className="section-inner max-w-wide">
         <div className="mb-8 text-center sm:mb-10">
           <h2 className="heading-section">{t.store.title}</h2>
-          <p className="text-muted-section mx-auto mt-3 max-w-xl">
-            Browse our collections — men&apos;s, women&apos;s, and oriental fragrances
-          </p>
+          <p className="text-muted-section mx-auto mt-3 max-w-xl">{t.store.subtitle}</p>
         </div>
 
         <ProductSectionTabs
@@ -47,17 +45,15 @@ const OurStore = () => {
 
         <div className="mb-8 flex flex-col items-start justify-between gap-3 rounded-2xl border border-neutral-100 bg-surface-muted/50 px-5 py-4 dark:border-neutral-800 dark:bg-neutral-900/50 sm:flex-row sm:items-center">
           <div>
-            <h3 className="text-lg font-bold text-neutral-900 dark:text-white sm:text-xl">
-              {activeMeta?.label}
-            </h3>
+            <h3 className="text-lg font-bold text-neutral-900 dark:text-white sm:text-xl">{sectionLabel}</h3>
           </div>
           <p className="rounded-full bg-brand/10 px-4 py-1.5 text-sm font-semibold text-brand">
-            {sectionProducts.length} products
+            {sectionProducts.length} {t.store.productsCount}
           </p>
         </div>
 
         {displayedProducts.length === 0 ? (
-          <p className="py-12 text-center text-neutral-500 dark:text-neutral-400">No products in this section.</p>
+          <p className="py-12 text-center text-neutral-500 dark:text-neutral-400">{t.store.noProducts}</p>
         ) : (
           <div
             key={activeSection}
@@ -80,10 +76,10 @@ const OurStore = () => {
 
         <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <Link to={`/products?section=${activeSection}`} className="btn-primary min-w-[200px]">
-            View all {activeMeta?.label}
+            {t.store.viewAll} {sectionLabel}
           </Link>
           <Link to="/products" className="btn-outline min-w-[200px]">
-            Full catalog
+            {t.store.fullCatalog}
           </Link>
         </div>
       </div>

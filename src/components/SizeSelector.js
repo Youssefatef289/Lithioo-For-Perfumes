@@ -1,16 +1,21 @@
 import React from 'react';
-import { BOTTLE_SIZES } from '../data/sizes';
+import { useLanguage } from '../contexts/LanguageContext';
+import { BOTTLE_SIZES, getSizeById } from '../data/sizes';
 import { formatEGP } from '../utils/price';
 
-const SizeSelector = ({ selectedSize, onChange, showPrices = false, className = '' }) => (
+const SizeSelector = ({ selectedSize, onChange, showPrices = false, className = '' }) => {
+  const { t, language } = useLanguage();
+
+  return (
   <div
     className={`flex flex-wrap gap-1.5 ${className}`}
     role="group"
-    aria-label="Bottle size"
+    aria-label={t.a11y.bottleSize}
     onClick={(e) => e.stopPropagation()}
   >
     {BOTTLE_SIZES.map((size) => {
       const active = selectedSize === size.id;
+      const meta = getSizeById(size.id, language);
       return (
         <button
           key={size.id}
@@ -24,12 +29,13 @@ const SizeSelector = ({ selectedSize, onChange, showPrices = false, className = 
           ].join(' ')}
           aria-pressed={active}
         >
-          {size.label}
-          {showPrices && <span className="ms-1 opacity-80">· {formatEGP(size.price)}</span>}
+          {meta.label}
+          {showPrices && <span className="ms-1 opacity-80">· {formatEGP(meta.price)}</span>}
         </button>
       );
     })}
   </div>
-);
+  );
+};
 
 export default SizeSelector;

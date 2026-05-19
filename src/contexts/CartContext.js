@@ -90,7 +90,7 @@ export const CartProvider = ({ children }) => {
       return [...prevItems, { ...lineItem, quantity }];
     });
 
-    setCartNotice('Added to cart');
+    setCartNotice(true);
     if (openCart) {
       setIsCartOpen(true);
     }

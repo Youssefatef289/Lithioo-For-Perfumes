@@ -11,7 +11,6 @@ import SocialLinks from '../components/SocialLinks';
 import { useLanguage } from '../contexts/LanguageContext';
 import { observeElements } from '../utils/animations';
 import {
-  ADDRESS,
   EMAIL,
   EMAIL_MAILTO,
   MAP_URL,
@@ -26,7 +25,7 @@ const iconWrap =
 
 const Contact = () => {
   const { t } = useLanguage();
-  const { contactPage } = t;
+  const { contactPage, address } = t;
 
   const [formData, setFormData] = useState({
     name: '',
@@ -62,7 +61,7 @@ const Contact = () => {
       id: 'location',
       Icon: FaMapMarkerAlt,
       title: contactPage.visitTitle,
-      lines: [ADDRESS.area, ADDRESS.street],
+      lines: [address.area, address.street],
       href: MAP_URL,
       external: true,
       cta: contactPage.mapCta,
@@ -70,7 +69,7 @@ const Contact = () => {
     {
       id: 'phone',
       Icon: FaPhoneAlt,
-      title: 'Phone',
+      title: contactPage.phone,
       lines: [PHONE_DISPLAY],
       href: PHONE_TEL,
       external: false,
@@ -78,7 +77,7 @@ const Contact = () => {
     {
       id: 'whatsapp',
       Icon: FaWhatsapp,
-      title: 'WhatsApp',
+      title: contactPage.whatsapp,
       lines: [PHONE_DISPLAY, contactPage.whatsappCta],
       href: getWhatsAppUrl(),
       external: true,
@@ -86,7 +85,7 @@ const Contact = () => {
     {
       id: 'email',
       Icon: FaEnvelope,
-      title: 'Email',
+      title: contactPage.email,
       lines: [EMAIL],
       href: EMAIL_MAILTO,
       external: false,
@@ -94,15 +93,15 @@ const Contact = () => {
     {
       id: 'facebook',
       Icon: FaFacebookF,
-      title: 'Facebook',
-      lines: ['Follow Lithioo on Facebook'],
+      title: t.footer.facebook,
+      lines: [contactPage.followFacebook],
       href: SOCIAL_LINKS.facebook,
       external: true,
     },
     {
       id: 'instagram',
       Icon: FaInstagram,
-      title: 'Instagram',
+      title: t.footer.instagram,
       lines: ['@lithioo_for_perfumes'],
       href: SOCIAL_LINKS.instagram,
       external: true,
@@ -122,10 +121,8 @@ const Contact = () => {
         <div className="section-inner max-w-6xl">
           <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
             <form className="slide-up card-elevated space-y-5 p-6 sm:p-8" onSubmit={handleSubmit}>
-              <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Send a Message</h2>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                Fill in the form and we will open your email app to send your message to us.
-              </p>
+              <h2 className="text-xl font-bold text-neutral-900 dark:text-white">{contactPage.sendMessage}</h2>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">{contactPage.formHint}</p>
               <div>
                 <label className="mb-1 block text-sm font-medium text-neutral-700 dark:text-neutral-300">
                   {contactPage.form.name}
