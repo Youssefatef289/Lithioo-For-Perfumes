@@ -156,8 +156,8 @@ export const translations = {
       ],
     },
     originals: {
-      title: 'Original Products',
-      subtitle: 'Authentic fragrances from trusted brands — product name & company clearly listed',
+      title: 'Luxury Collections',
+      subtitle: 'Discover our luxury collections',
       viewAll: 'View all originals',
     },
     luxury: {
@@ -412,8 +412,8 @@ export const translations = {
       ],
     },
     originals: {
-      title: 'المنتجات الأصلية',
-      subtitle: 'عطور أصلية من علامات موثوقة — اسم المنتج والشركة موضحان بوضوح',
+      title: 'مجموعات فاخرة',
+      subtitle: 'اكتشف مجموعاتنا الفاخرة',
       viewAll: 'عرض كل الأصلية',
     },
     luxury: {
