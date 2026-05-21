@@ -18,10 +18,12 @@ import {
   SOCIAL_LINKS,
 } from '../data/contact';
 import { getWhatsAppUrl } from '../utils/whatsapp';
+import { localizeDigits } from '../utils/digits';
 
 const Footer = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { footer, nav, address } = t;
+  const phoneDisplay = localizeDigits(PHONE_DISPLAY, language);
 
   const navLink =
     'text-sm text-white/75 transition hover:text-brand hover:translate-x-0.5 inline-block';
@@ -86,7 +88,7 @@ const Footer = () => {
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand/15 text-brand group-hover:bg-brand/25">
                     <FaPhoneAlt className="h-3.5 w-3.5" aria-hidden />
                   </span>
-                  <span className="pt-1.5 font-medium">{PHONE_DISPLAY}</span>
+                  <span className="pt-1.5 font-medium" dir="ltr">{phoneDisplay}</span>
                 </a>
               </li>
               <li>
@@ -94,7 +96,7 @@ const Footer = () => {
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand/15 text-brand group-hover:bg-brand/25">
                     <FaWhatsapp className="h-4 w-4" aria-hidden />
                   </span>
-                  <span className="pt-1.5 font-medium">{footer.whatsappLine.replace('{phone}', PHONE_DISPLAY)}</span>
+                  <span className="pt-1.5 font-medium">{footer.whatsappLine.replace('{phone}', phoneDisplay)}</span>
                 </a>
               </li>
               <li>

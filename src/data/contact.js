@@ -1,13 +1,13 @@
 export const WHATSAPP_NUMBER = '201064307053';
 
-export const PHONE_DISPLAY = '+20 10 64307053';
+export const PHONE_DISPLAY = '+20 10 6430 7053';
 export const PHONE_TEL = 'tel:+201064307053';
 
 export const EMAIL = 'laithymohamed9@gmail.com';
 export const EMAIL_MAILTO = 'mailto:laithymohamed9@gmail.com';
 
 export const ADDRESS = {
-  area: 'Al-Abasiry, Beni Suef, Egypt 082',
+  area: 'Al-Abasiry, Beni Suef',
   street: 'Chanel St., off Abdelsalam Aref St., next to Dona Dony dealership',
 };
 

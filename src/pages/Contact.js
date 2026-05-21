@@ -19,13 +19,15 @@ import {
   SOCIAL_LINKS,
 } from '../data/contact';
 import { getWhatsAppUrl } from '../utils/whatsapp';
+import { localizeDigits } from '../utils/digits';
 
 const iconWrap =
   'flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand/15 text-brand transition group-hover:bg-brand/25';
 
 const Contact = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { contactPage, address } = t;
+  const phoneDisplay = localizeDigits(PHONE_DISPLAY, language);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -70,7 +72,7 @@ const Contact = () => {
       id: 'phone',
       Icon: FaPhoneAlt,
       title: contactPage.phone,
-      lines: [PHONE_DISPLAY],
+      lines: [phoneDisplay],
       href: PHONE_TEL,
       external: false,
     },
@@ -78,7 +80,7 @@ const Contact = () => {
       id: 'whatsapp',
       Icon: FaWhatsapp,
       title: contactPage.whatsapp,
-      lines: [PHONE_DISPLAY, contactPage.whatsappCta],
+      lines: [phoneDisplay, contactPage.whatsappCta],
       href: getWhatsAppUrl(),
       external: true,
     },

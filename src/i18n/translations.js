@@ -225,7 +225,7 @@ export const translations = {
       email: 'Email',
     },
     address: {
-      area: 'Al-Abasiry, Beni Suef, Egypt 082',
+      area: 'Al-Abasiry, Beni Suef',
       street: 'Chanel St., off Abdelsalam Aref St., next to Dona Dony dealership',
     },
     whatsapp: {
@@ -481,7 +481,7 @@ export const translations = {
       email: 'البريد',
     },
     address: {
-      area: 'العباسية، بني سويف، مصر 082',
+      area: 'الاباصيرى، بنى سويف',
       street: 'شارع شانيل، خلف شارع عبدالسلام عارف، بجوار معرض دونا دوني',
     },
     whatsapp: {
