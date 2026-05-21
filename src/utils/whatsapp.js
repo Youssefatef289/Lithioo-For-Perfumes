@@ -8,7 +8,7 @@ export const getWhatsAppUrl = (text) => {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 };
 
-export const buildCartOrderMessage = (cartItems, total) => {
+export const buildCartOrderMessage = (cartItems, total, notes = '') => {
   const lang = getCurrentLanguage();
   const w = getT().whatsapp;
   const lines = cartItems.map((item, index) => {
@@ -18,7 +18,19 @@ export const buildCartOrderMessage = (cartItems, total) => {
     return `${index + 1}. ${itemDisplay.name}${sizePart} × ${item.quantity} — ${formatEGP(lineTotal)}`;
   });
 
-  return [w.cartIntro, '', ...lines, '', `${w.total}: ${formatEGP(total)}`, '', w.thankYou].join('\n');
+  const trimmedNotes = (notes || '').trim();
+  const notesBlock = trimmedNotes ? ['', `${w.notes}: ${trimmedNotes}`] : [];
+
+  return [
+    w.cartIntro,
+    '',
+    ...lines,
+    '',
+    `${w.total}: ${formatEGP(total)}`,
+    ...notesBlock,
+    '',
+    w.thankYou,
+  ].join('\n');
 };
 
 export const buildSingleProductMessage = (product, price) => {

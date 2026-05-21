@@ -4,13 +4,13 @@ import { useCart } from '../contexts/CartContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { buildCartOrderMessage, openWhatsApp } from '../utils/whatsapp';
 
-const OrderWhatsAppButton = ({ className = '', onOrdered }) => {
+const OrderWhatsAppButton = ({ className = '', onOrdered, notes = '' }) => {
   const { t } = useLanguage();
   const { cartItems, getCartTotal } = useCart();
 
   const handleOrder = () => {
     if (cartItems.length === 0) return;
-    const message = buildCartOrderMessage(cartItems, getCartTotal());
+    const message = buildCartOrderMessage(cartItems, getCartTotal(), notes);
     openWhatsApp(message);
     onOrdered?.();
   };

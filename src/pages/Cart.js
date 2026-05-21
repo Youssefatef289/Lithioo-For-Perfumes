@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiShoppingCart, FiTrash2, FiPlus, FiMinus, FiArrowLeft } from 'react-icons/fi';
 import { useCart } from '../contexts/CartContext';
@@ -13,6 +13,7 @@ const Cart = () => {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   const { cart, cartPage } = t;
+  const [notes, setNotes] = useState('');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -142,7 +143,24 @@ const Cart = () => {
               <span>{cart.total}</span>
               <span className="text-brand">{formatEGP(total)}</span>
             </div>
-            <OrderWhatsAppButton className="mt-6" />
+            <div className="mt-6">
+              <label
+                htmlFor="cart-notes-page"
+                className="mb-1 block text-sm font-semibold text-neutral-800 dark:text-neutral-100"
+              >
+                {cart.notesLabel}
+              </label>
+              <textarea
+                id="cart-notes-page"
+                rows={3}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder={cart.notesPlaceholder}
+                className="w-full resize-none rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-800 placeholder:text-neutral-400 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+              />
+              <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">{cart.notesHint}</p>
+            </div>
+            <OrderWhatsAppButton className="mt-4" notes={notes} onOrdered={() => setNotes('')} />
             <button type="button" className="btn-outline mt-3 w-full" onClick={clearCart}>
               {cart.clearCart}
             </button>

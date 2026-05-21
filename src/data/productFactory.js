@@ -1,5 +1,6 @@
 import { MEN_LINES, WOMEN_LINES, SPECIAL_LINES } from './productLists';
 import { ORIGINAL_IMAGE_CATALOG, getOriginalMeta, getOriginalPrice } from './originalProducts';
+import { getProductImages } from './productImages';
 import { DEFAULT_SIZE_ID, getSizeById, BOTTLE_SIZES } from './sizes';
 
 export const PRODUCT_CARD_IMAGE = '/image/products/product.png';
@@ -88,9 +89,18 @@ const buildProduct = (id, { name, brand }, section, imageOverrides = {}) => {
   const benefits = pickSet(meta.benefitSets, `${seed}-b`);
   const rating = 4.2 + (hashNum(seed, 8) * 0.1);
   const reviews = 40 + hashNum(seed, 220);
+  const realImages = !imageOverrides.image ? getProductImages(name) : null;
   const image = imageOverrides.image || PRODUCT_CARD_IMAGE;
-  const imageHover = imageOverrides.imageHover || imageOverrides.image || PRODUCT_CARD_IMAGE_HOVER;
-  const detailImages = imageOverrides.detailImages || [image, imageHover].filter((v, i, a) => a.indexOf(v) === i);
+  const imageHover =
+    imageOverrides.imageHover ||
+    (realImages && realImages[0]) ||
+    imageOverrides.image ||
+    PRODUCT_CARD_IMAGE_HOVER;
+  const detailImages =
+    imageOverrides.detailImages ||
+    (realImages && realImages.length > 0
+      ? [image, ...realImages]
+      : [image, imageHover].filter((v, i, a) => a.indexOf(v) === i));
 
   return {
     id,

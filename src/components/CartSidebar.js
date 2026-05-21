@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiX, FiShoppingCart, FiMinus, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { useCart } from '../contexts/CartContext';
@@ -20,6 +20,7 @@ const CartSidebar = () => {
     clearCart,
   } = useCart();
   const navigate = useNavigate();
+  const [notes, setNotes] = useState('');
 
   const handleCheckout = () => {
     navigate('/cart');
@@ -154,11 +155,37 @@ const CartSidebar = () => {
               </div>
 
               <div className="shrink-0 border-t border-neutral-200 bg-neutral-50 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] dark:border-neutral-700 dark:bg-neutral-900">
+                <div className="mb-3">
+                  <label
+                    htmlFor="cart-notes-sidebar"
+                    className="mb-1 block text-sm font-semibold text-neutral-800 dark:text-neutral-100"
+                  >
+                    {t.cart.notesLabel}
+                  </label>
+                  <textarea
+                    id="cart-notes-sidebar"
+                    rows={3}
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder={t.cart.notesPlaceholder}
+                    className="w-full resize-none rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-800 placeholder:text-neutral-400 focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 dark:placeholder:text-neutral-500"
+                  />
+                  <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+                    {t.cart.notesHint}
+                  </p>
+                </div>
                 <div className="mb-4 flex items-center justify-between gap-3 text-lg font-bold text-neutral-800 dark:text-white">
                   <span>{t.cart.total}</span>
                   <span className="text-brand">{formatEGP(getCartTotal())}</span>
                 </div>
-                <OrderWhatsAppButton className="mb-2" onOrdered={() => setIsCartOpen(false)} />
+                <OrderWhatsAppButton
+                  className="mb-2"
+                  notes={notes}
+                  onOrdered={() => {
+                    setNotes('');
+                    setIsCartOpen(false);
+                  }}
+                />
                 <div className="flex flex-col gap-2">
                   <button
                     type="button"

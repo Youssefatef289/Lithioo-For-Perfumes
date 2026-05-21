@@ -104,4 +104,13 @@
   [data-theme='dark'] ::-webkit-scrollbar-thumb {
     @apply bg-brand;
   }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
