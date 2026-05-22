@@ -6,10 +6,19 @@ import { useCart } from '../contexts/CartContext';
 import { FiMoon, FiSun, FiX, FiShoppingCart } from 'react-icons/fi';
 import LanguageToggle from './LanguageToggle';
 
-const navLinkClass = ({ isActive }) =>
+const NAV_BG = '#AE884F';
+const HERO_ROUTES = ['/', '/products'];
+
+const navLinkLight = ({ isActive }) =>
   [
-    'text-[0.95rem] font-normal text-neutral-800 transition-colors hover:text-brand dark:text-neutral-200',
-    isActive ? 'font-semibold text-brand' : '',
+    'text-[0.95rem] font-medium text-white/90 transition-colors hover:text-white',
+    isActive ? 'font-semibold text-white' : '',
+  ].join(' ');
+
+const navLinkDark = ({ isActive }) =>
+  [
+    'text-[0.95rem] font-medium text-neutral-800 transition-colors hover:text-[#AE884F] dark:text-neutral-100',
+    isActive ? 'font-semibold text-[#AE884F]' : '',
   ].join(' ');
 
 const Header = () => {
@@ -53,36 +62,37 @@ const Header = () => {
   };
 
   const isHome = location.pathname === '/';
-  const overHero = isHome && !scrolled && !mobileMenuOpen;
-
-  /** Gold brand mark — works on light & dark headers */
-  const logoSrc = '/image/logo/leithioo-logo-gold.png';
+  const isHeroRoute = HERO_ROUTES.includes(location.pathname);
+  const overHero = isHeroRoute && !scrolled && !mobileMenuOpen;
+  const useDarkTheme = isHome && overHero;
+  const logoSrc = useDarkTheme
+    ? '/image/logo/leithioo-logo-gold.png'
+    : '/image/logo/logo-white.png';
+  const navLinkClass = useDarkTheme ? navLinkDark : navLinkLight;
+  const burgerColor = useDarkTheme ? 'bg-neutral-900' : 'bg-white';
 
   const headerBar =
-    'fixed inset-x-0 top-0 z-[1000] flex items-center overflow-visible border-b transition-all duration-300 ' +
+    'fixed inset-x-0 top-0 z-[1000] flex items-center overflow-visible border-b border-transparent transition-all duration-500 ' +
     (overHero
-      ? 'min-h-[72px] border-transparent bg-white/45 shadow-none backdrop-blur-md sm:min-h-[80px] md:min-h-[88px] dark:bg-neutral-950/35'
+      ? 'min-h-[80px] bg-transparent shadow-none sm:min-h-[88px] md:min-h-[96px]'
       : scrolled
-        ? 'min-h-[72px] border-transparent bg-white/95 shadow-md backdrop-blur-sm sm:min-h-[76px] md:min-h-[84px] dark:border-white/10 dark:bg-neutral-900/95 dark:shadow-black/30'
-        : 'min-h-[88px] border-transparent bg-white sm:min-h-[96px] md:min-h-[108px] dark:bg-neutral-900/95');
+        ? 'min-h-[68px] shadow-lg sm:min-h-[72px] md:min-h-[80px]'
+        : 'min-h-[80px] shadow-md sm:min-h-[88px] md:min-h-[96px]');
 
-  const iconBtn =
-    'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-2 border-brand text-brand transition-all hover:-translate-y-0.5 hover:bg-brand hover:text-white hover:shadow-md dark:border-brand dark:text-brand' +
-    (overHero ? ' bg-white/70 backdrop-blur-sm dark:bg-neutral-900/50' : '');
+  const iconBtn = useDarkTheme
+    ? 'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-2 border-neutral-800 bg-white/40 text-neutral-800 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:bg-neutral-900 hover:text-white hover:shadow-md'
+    : 'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-2 border-white/80 bg-white/10 text-white transition-all hover:-translate-y-0.5 hover:bg-white hover:text-[#AE884F] hover:shadow-md';
 
-  const navLinkOverHero = ({ isActive }) =>
-    [
-      'text-[0.95rem] font-normal text-neutral-800 transition-colors hover:text-brand dark:text-neutral-100',
-      isActive ? 'font-semibold text-brand' : '',
-    ].join(' ');
+  const languageToggleClass = useDarkTheme
+    ? '!border-neutral-800 !bg-white/40 !text-neutral-800 hover:!border-neutral-900 hover:!bg-neutral-900 hover:!text-white'
+    : '!border-white/80 !bg-white/10 !text-white hover:!border-white hover:!bg-white hover:!text-[#AE884F]';
 
   const pillBtn =
-    'flex shrink-0 items-center gap-2 rounded-lg border-2 border-brand px-3 py-2 text-sm font-semibold text-brand transition-all hover:-translate-y-0.5 hover:bg-brand hover:text-white hover:shadow-md dark:text-brand' +
-    (overHero ? ' bg-white/70 backdrop-blur-sm dark:bg-neutral-900/50' : '');
+    'flex shrink-0 items-center gap-2 rounded-lg border-2 border-brand px-3 py-2 text-sm font-semibold text-brand transition-all hover:-translate-y-0.5 hover:bg-brand hover:text-white hover:shadow-md dark:text-brand';
 
   return (
     <>
-      <header className={headerBar}>
+      <header className={headerBar} style={overHero ? undefined : { backgroundColor: NAV_BG }}>
         <div className="mx-auto flex h-full w-full max-w-[1400px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
           <Link
             to="/"
@@ -92,43 +102,26 @@ const Header = () => {
             <img
               src={logoSrc}
               alt="Lithioo Perfume"
-              className={`w-auto object-contain drop-shadow-md transition-all duration-300 group-hover:scale-105 ${
-                scrolled || overHero
-                  ? 'h-12 sm:h-14 md:h-16 lg:h-[4.25rem]'
-                  : 'h-16 sm:h-[4.25rem] md:h-20 lg:h-24'
-              } dark:drop-shadow-[0_2px_12px_rgba(212,175,55,0.35)]`}
+              className={`w-auto object-contain transition-all duration-300 group-hover:scale-105 ${
+                scrolled
+                  ? 'h-12 sm:h-14 md:h-16'
+                  : 'h-14 sm:h-16 md:h-[4.5rem] lg:h-20'
+              }`}
             />
             <span className="sr-only">Lithioo</span>
           </Link>
 
           <nav className="hidden items-center gap-6 md:flex lg:gap-8">
-            <NavLink
-              to="/"
-              end
-              onClick={(e) => handleNavClick(e, '/')}
-              className={overHero ? navLinkOverHero : navLinkClass}
-            >
+            <NavLink to="/" end onClick={(e) => handleNavClick(e, '/')} className={navLinkClass}>
               {t.nav.home}
             </NavLink>
-            <NavLink
-              to="/about"
-              onClick={(e) => handleNavClick(e, '/about')}
-              className={overHero ? navLinkOverHero : navLinkClass}
-            >
+            <NavLink to="/about" onClick={(e) => handleNavClick(e, '/about')} className={navLinkClass}>
               {t.nav.about}
             </NavLink>
-            <NavLink
-              to="/products"
-              onClick={(e) => handleNavClick(e, '/products')}
-              className={overHero ? navLinkOverHero : navLinkClass}
-            >
+            <NavLink to="/products" onClick={(e) => handleNavClick(e, '/products')} className={navLinkClass}>
               {t.nav.product}
             </NavLink>
-            <NavLink
-              to="/contact"
-              onClick={(e) => handleNavClick(e, '/contact')}
-              className={overHero ? navLinkOverHero : navLinkClass}
-            >
+            <NavLink to="/contact" onClick={(e) => handleNavClick(e, '/contact')} className={navLinkClass}>
               {t.nav.contact}
             </NavLink>
           </nav>
@@ -137,12 +130,12 @@ const Header = () => {
             <button type="button" className={iconBtn} onClick={toggleCart} aria-label={t.a11y.shoppingCart}>
               <FiShoppingCart className="h-5 w-5" />
               {getCartItemsCount() > 0 && (
-                <span className="absolute -end-1.5 -top-1.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full border-2 border-white bg-red-500 px-0.5 text-[0.65rem] font-bold text-white shadow animate-cart-bounce dark:border-neutral-900">
+                <span className="absolute -end-1.5 -top-1.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full border-2 border-white bg-red-500 px-0.5 text-[0.65rem] font-bold text-white shadow animate-cart-bounce">
                   {getCartItemsCount()}
                 </span>
               )}
             </button>
-            <LanguageToggle className={overHero ? 'bg-white/70 backdrop-blur-sm dark:bg-neutral-900/50' : ''} />
+            <LanguageToggle className={languageToggleClass} />
 
             <button
               type="button"
@@ -160,19 +153,19 @@ const Header = () => {
               aria-label={t.a11y.toggleMenu}
             >
               <span
-                className={`block h-0.5 w-6 rounded-full transition ${
-                  overHero ? 'bg-neutral-800 dark:bg-neutral-100' : 'bg-neutral-800 dark:bg-white'
-                } ${mobileMenuOpen ? 'translate-y-2 rotate-45' : ''}`}
+                className={`block h-0.5 w-6 rounded-full ${burgerColor} transition ${
+                  mobileMenuOpen ? 'translate-y-2 rotate-45' : ''
+                }`}
               />
               <span
-                className={`block h-0.5 w-6 rounded-full transition ${
-                  overHero ? 'bg-neutral-800 dark:bg-neutral-100' : 'bg-neutral-800 dark:bg-white'
-                } ${mobileMenuOpen ? 'opacity-0' : ''}`}
+                className={`block h-0.5 w-6 rounded-full ${burgerColor} transition ${
+                  mobileMenuOpen ? 'opacity-0' : ''
+                }`}
               />
               <span
-                className={`block h-0.5 w-6 rounded-full transition ${
-                  overHero ? 'bg-neutral-800 dark:bg-neutral-100' : 'bg-neutral-800 dark:bg-white'
-                } ${mobileMenuOpen ? '-translate-y-2 -rotate-45' : ''}`}
+                className={`block h-0.5 w-6 rounded-full ${burgerColor} transition ${
+                  mobileMenuOpen ? '-translate-y-2 -rotate-45' : ''
+                }`}
               />
             </button>
           </div>
@@ -192,13 +185,16 @@ const Header = () => {
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full rtl:-translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-between border-b border-neutral-200 p-4 dark:border-white/10">
+        <div
+          className="flex items-center justify-between border-b p-4"
+          style={{ backgroundColor: NAV_BG, borderColor: 'rgba(255,255,255,0.18)' }}
+        >
           <Link to="/" className="flex items-center gap-2" onClick={handleHomeClick}>
-            <img src={logoSrc} alt="" className="h-14 w-auto object-contain drop-shadow-md sm:h-16 dark:drop-shadow-[0_2px_12px_rgba(212,175,55,0.35)]" />
+            <img src={logoSrc} alt="" className="h-14 w-auto object-contain sm:h-16" />
           </Link>
           <button
             type="button"
-            className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-700 transition hover:bg-neutral-100 hover:rotate-90 dark:text-neutral-200 dark:hover:bg-neutral-800"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-white transition hover:rotate-90 hover:bg-white/15"
             onClick={() => setMobileMenuOpen(false)}
             aria-label={t.a11y.closeMenu}
           >

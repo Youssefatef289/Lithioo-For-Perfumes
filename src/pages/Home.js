@@ -17,7 +17,7 @@ const Home = () => {
   }, []);
 
   return (
-    <main className="page-main bg-mesh-light bg-surface-cream/40 dark:bg-mesh-dark dark:bg-neutral-950">
+    <main className="page-main bg-white dark:bg-neutral-950">
       <Hero />
       <LuxuryCollections />
       <NewCollection />

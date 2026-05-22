@@ -112,7 +112,7 @@ const Contact = () => {
 
   return (
     <main className="page-main w-full bg-white dark:bg-neutral-950">
-      <section className="border-b border-neutral-100 bg-gradient-to-b from-surface-muted/50 to-white px-4 py-14 dark:border-neutral-800 dark:from-neutral-900 dark:to-neutral-950 sm:py-16">
+      <section className="border-b border-neutral-100 bg-white px-4 py-14 dark:border-neutral-800 dark:bg-neutral-950 sm:py-16">
         <div className="section-inner max-w-3xl text-center">
           <h1 className="heading-section">{contactPage.title}</h1>
           <p className="text-muted-section mx-auto mt-4 max-w-2xl leading-relaxed">{contactPage.subtitle}</p>

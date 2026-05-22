@@ -43,7 +43,7 @@ const OurStore = () => {
           className="mb-8"
         />
 
-        <div className="mb-8 flex flex-col items-start justify-between gap-3 rounded-2xl border border-neutral-100 bg-surface-muted/50 px-5 py-4 dark:border-neutral-800 dark:bg-neutral-900/50 sm:flex-row sm:items-center">
+        <div className="mb-8 flex flex-col items-start justify-between gap-3 rounded-2xl border border-neutral-100 bg-white px-5 py-4 dark:border-neutral-800 dark:bg-neutral-950 sm:flex-row sm:items-center">
           <div>
             <h3 className="text-lg font-bold text-neutral-900 dark:text-white sm:text-xl">{sectionLabel}</h3>
           </div>

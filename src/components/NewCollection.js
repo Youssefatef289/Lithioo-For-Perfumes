@@ -8,7 +8,7 @@ const NewCollection = () => {
   const products = allProducts.slice(0, 4);
 
   return (
-    <section className="new-collection w-full border-y border-neutral-100/90 bg-surface-muted/40 py-12 dark:border-neutral-800 dark:bg-neutral-900/40 sm:py-16 md:py-20">
+    <section className="new-collection w-full border-y border-neutral-100/90 bg-white py-12 dark:border-neutral-800 dark:bg-neutral-950 sm:py-16 md:py-20">
       <div className="section-inner-wide">
         <div className="slide-up mb-10 text-center sm:mb-12 md:mb-16">
           <h2 className="heading-section">{t.collection.title}</h2>

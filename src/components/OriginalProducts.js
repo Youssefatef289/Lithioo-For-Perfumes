@@ -13,7 +13,7 @@ const OriginalProducts = () => {
   const displayed = originals.slice(0, HOME_ORIGINALS_LIMIT);
 
   return (
-    <section className="w-full border-t border-neutral-100 bg-surface-muted/30 py-12 dark:border-neutral-800 dark:bg-neutral-900/40 sm:py-16" id="originals">
+    <section className="w-full border-t border-neutral-100 bg-white py-12 dark:border-neutral-800 dark:bg-neutral-950 sm:py-16" id="originals">
       <div className="section-inner max-w-wide">
         <div className="mb-8 flex flex-col items-center justify-between gap-4 text-center sm:mb-10 sm:flex-row sm:text-start">
           <div>
