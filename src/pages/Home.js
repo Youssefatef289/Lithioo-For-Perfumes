@@ -5,6 +5,7 @@ import NewCollection from '../components/NewCollection';
 import WhyChooseUs from '../components/WhyChooseUs';
 import OurStore from '../components/OurStore';
 import OriginalProducts from '../components/OriginalProducts';
+import NewLuxuryProducts from '../components/NewLuxuryProducts';
 import PromotionalBanner from '../components/PromotionalBanner';
 import Testimonials from '../components/Testimonials';
 import ImageBanner from '../components/ImageBanner';
@@ -23,6 +24,7 @@ const Home = () => {
       <NewCollection />
       <ImageBanner src="/image/banners/banner-1.webp" alt="Lithioo Perfumes banner" fullBleed />
       <WhyChooseUs />
+      <NewLuxuryProducts />
       <OurStore />
       <OriginalProducts />
       <ImageBanner src="/image/banners/banner-2.webp" alt="Lithioo Perfumes banner" />

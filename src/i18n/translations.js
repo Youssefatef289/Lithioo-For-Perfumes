@@ -155,6 +155,14 @@ export const translations = {
         { id: 'discount30', text: '30% off on all sizes', badge: '30%' },
       ],
     },
+    newLuxury: {
+      title: 'New Luxury Products',
+      subtitle: 'A handpicked selection of our latest luxury arrivals',
+      prev: 'Previous',
+      next: 'Next',
+      orderNow: 'Order on WhatsApp',
+      newTag: 'New',
+    },
     originals: {
       title: 'Luxury Collections',
       subtitle: 'Discover our luxury collections',
@@ -410,6 +418,14 @@ export const translations = {
         { id: 'halfprice', text: 'اشترِ زجاجة واحصل على الثانية بنصف السعر — جميع الأحجام', badge: '50%' },
         { id: 'discount30', text: 'خصم 30% على جميع الأحجام', badge: '30%' },
       ],
+    },
+    newLuxury: {
+      title: 'منتجات فاخرة جديدة',
+      subtitle: 'تشكيلة مختارة بعناية من أحدث وصولاتنا الفاخرة',
+      prev: 'السابق',
+      next: 'التالي',
+      orderNow: 'اطلب عبر واتساب',
+      newTag: 'جديد',
     },
     originals: {
       title: 'مجموعات فاخرة',

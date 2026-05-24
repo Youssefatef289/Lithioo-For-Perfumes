@@ -20,27 +20,35 @@ export const localizeProduct = (product, language = 'en') => {
   if (!product || language !== 'ar') return product;
 
   const nameKey = product.nameEn || product.name;
-  const nameAr = PRODUCT_NAMES_AR[nameKey] || nameKey;
-  const brandAr = BRANDS_AR[product.brand] || product.brand;
+  const nameAr = product.nameAr || PRODUCT_NAMES_AR[nameKey] || nameKey;
+  const brandAr = product.brandAr || BRANDS_AR[product.brand] || product.brand;
   const sectionMeta = SECTION_META_AR[product.section];
 
   const seed = `${product.section}-${nameKey}`;
-  const ingredientsAr = sectionMeta
-    ? pickSet(sectionMeta.ingredientSets, seed)
-    : translateList(product.ingredients, INGREDIENTS_AR);
-  const benefitsAr = sectionMeta
-    ? pickSet(sectionMeta.benefitSets, `${seed}-b`)
-    : translateList(product.benefits, BENEFITS_AR);
+  const ingredientsAr =
+    product.ingredientsAr ||
+    (sectionMeta
+      ? pickSet(sectionMeta.ingredientSets, seed)
+      : translateList(product.ingredients, INGREDIENTS_AR));
+  const benefitsAr =
+    product.benefitsAr ||
+    (sectionMeta
+      ? pickSet(sectionMeta.benefitSets, `${seed}-b`)
+      : translateList(product.benefits, BENEFITS_AR));
 
-  const descriptionAr = sectionMeta
-    ? `${sectionMeta.description} ${nameAr}${brandAr ? ` من ${brandAr}` : ''}.`
-    : product.description;
+  const descriptionAr =
+    product.descriptionAr ||
+    (sectionMeta
+      ? `${sectionMeta.description} ${nameAr}${brandAr ? ` من ${brandAr}` : ''}.`
+      : product.description);
+
+  const categoryAr = product.categoryAr || sectionMeta?.category || product.category;
 
   return {
     ...product,
     name: nameAr,
     brand: brandAr,
-    category: sectionMeta?.category || product.category,
+    category: categoryAr,
     description: descriptionAr,
     ingredients: ingredientsAr,
     benefits: benefitsAr,
