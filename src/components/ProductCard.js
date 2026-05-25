@@ -7,7 +7,7 @@ import { useLocalizedProduct } from '../hooks/useLocalizedProduct';
 import ProductDetailsModal from './ProductDetailsModal';
 import SizeSelector from './SizeSelector';
 import { isOriginalProduct } from '../data/productFactory';
-import { DEFAULT_SIZE_ID, getSizeById } from '../data/sizes';
+import { DEFAULT_SIZE_ID, getSizeById, getProductSizePrice } from '../data/sizes';
 import { formatEGP } from '../utils/price';
 import { buildSingleProductMessage, openWhatsApp } from '../utils/whatsapp';
 
@@ -23,7 +23,7 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
   const hoverImage = product.imageHover || product.image;
   const mainImage = product.image || hoverImage;
   const sizeMeta = getSizeById(selectedSize, language);
-  const price = hideSizes ? product.price : sizeMeta.price;
+  const price = hideSizes ? product.price : getProductSizePrice(product, selectedSize);
 
   const buildLineItem = () => {
     if (hideSizes) {
@@ -121,6 +121,7 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
                 <SizeSelector
                   selectedSize={selectedSize}
                   onChange={setSelectedSize}
+                  product={product}
                   className="justify-center"
                 />
               </div>

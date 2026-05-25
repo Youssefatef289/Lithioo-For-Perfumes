@@ -1,9 +1,15 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { BOTTLE_SIZES, getSizeById } from '../data/sizes';
+import { BOTTLE_SIZES, getSizeById, getProductSizePrice } from '../data/sizes';
 import { formatEGP } from '../utils/price';
 
-const SizeSelector = ({ selectedSize, onChange, showPrices = false, className = '' }) => {
+const SizeSelector = ({
+  selectedSize,
+  onChange,
+  showPrices = false,
+  className = '',
+  product = null,
+}) => {
   const { t, language } = useLanguage();
 
   return (
@@ -16,6 +22,7 @@ const SizeSelector = ({ selectedSize, onChange, showPrices = false, className = 
     {BOTTLE_SIZES.map((size) => {
       const active = selectedSize === size.id;
       const meta = getSizeById(size.id, language);
+      const displayPrice = product ? getProductSizePrice(product, size.id) : meta.price;
       return (
         <button
           key={size.id}
@@ -30,7 +37,7 @@ const SizeSelector = ({ selectedSize, onChange, showPrices = false, className = 
           aria-pressed={active}
         >
           {meta.label}
-          {showPrices && <span className="ms-1 opacity-80">· {formatEGP(meta.price)}</span>}
+          {showPrices && <span className="ms-1 opacity-80">· {formatEGP(displayPrice)}</span>}
         </button>
       );
     })}

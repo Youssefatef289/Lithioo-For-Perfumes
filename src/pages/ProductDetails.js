@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FiShoppingCart, FiHeart, FiStar, FiArrowLeft } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import SizeSelector from '../components/SizeSelector';
-import { DEFAULT_SIZE_ID, getSizeById } from '../data/sizes';
+import { DEFAULT_SIZE_ID, getSizeById, getProductSizePrice } from '../data/sizes';
 import { formatEGP } from '../utils/price';
 import { buildSingleProductMessage, openWhatsApp } from '../utils/whatsapp';
 import { useCart } from '../contexts/CartContext';
@@ -30,7 +30,11 @@ const ProductDetails = () => {
   const lp = useLocalizedProduct(product);
   const hideSizes = isOriginalProduct(product);
   const sizeMeta = getSizeById(selectedSize, language);
-  const price = hideSizes ? product?.price : sizeMeta.price;
+  const price = hideSizes
+    ? product?.price
+    : product
+    ? getProductSizePrice(product, selectedSize)
+    : sizeMeta.price;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -140,7 +144,9 @@ const ProductDetails = () => {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              {!hideSizes && <SizeSelector selectedSize={selectedSize} onChange={setSelectedSize} />}
+              {!hideSizes && (
+                <SizeSelector selectedSize={selectedSize} onChange={setSelectedSize} product={product} />
+              )}
               <span className="text-3xl font-bold text-brand">{formatEGP(price)}</span>
               {product.inStock && (
                 <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">

@@ -16,3 +16,10 @@ export const getSizeById = (sizeId, language = 'en') => {
 };
 
 export const getCartKey = (productId, sizeId) => `${productId}-${sizeId}`;
+
+export const getProductSizePrice = (product, sizeId) => {
+  if (product?.sizePrices && product.sizePrices[sizeId] != null) {
+    return product.sizePrices[sizeId];
+  }
+  return getSizeById(sizeId).price;
+};

@@ -6,6 +6,17 @@ import { DEFAULT_SIZE_ID, getSizeById, BOTTLE_SIZES } from './sizes';
 export const PRODUCT_CARD_IMAGE = '/image/products/product.png';
 export const PRODUCT_CARD_IMAGE_HOVER = '/image/products/product-details.png';
 
+const SECTION_SIZE_PRICES = {
+  special: { '30ml': 500, '50ml': 700, '100ml': 1100 },
+};
+
+const PRODUCT_SIZE_PRICES = {
+  'Alf Leila Wa Leila (1001 Nights)': { '30ml': 700, '50ml': 900, '100ml': 1500 },
+};
+
+const resolveSizePrices = (section, name) =>
+  PRODUCT_SIZE_PRICES[name] || SECTION_SIZE_PRICES[section] || null;
+
 const SECTION_META = {
   men: {
     category: "Men's Fragrance",
@@ -102,6 +113,10 @@ const buildProduct = (id, { name, brand }, section, imageOverrides = {}) => {
       ? [image, ...realImages]
       : [image, imageHover].filter((v, i, a) => a.indexOf(v) === i));
 
+  const sizePrices = resolveSizePrices(section, name);
+  const defaultPrice =
+    sizePrices?.[DEFAULT_SIZE_ID] ?? getSizeById(DEFAULT_SIZE_ID).price;
+
   return {
     id,
     name,
@@ -109,7 +124,8 @@ const buildProduct = (id, { name, brand }, section, imageOverrides = {}) => {
     brand,
     section,
     category: meta.category,
-    price: getSizeById(DEFAULT_SIZE_ID).price,
+    price: defaultPrice,
+    sizePrices,
     defaultSize: DEFAULT_SIZE_ID,
     sizes: BOTTLE_SIZES,
     image,

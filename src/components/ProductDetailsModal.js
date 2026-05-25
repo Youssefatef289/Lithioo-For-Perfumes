@@ -9,7 +9,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useLocalizedProduct } from '../hooks/useLocalizedProduct';
 import SizeSelector from './SizeSelector';
 import { isOriginalProduct } from '../data/productFactory';
-import { DEFAULT_SIZE_ID, getSizeById } from '../data/sizes';
+import { DEFAULT_SIZE_ID, getSizeById, getProductSizePrice } from '../data/sizes';
 import { formatEGP } from '../utils/price';
 import { buildSingleProductMessage, openWhatsApp } from '../utils/whatsapp';
 
@@ -46,7 +46,7 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
 
   const hideSizes = isOriginalProduct(product);
   const sizeMeta = getSizeById(selectedSize, language);
-  const price = hideSizes ? product.price : sizeMeta.price;
+  const price = hideSizes ? product.price : getProductSizePrice(product, selectedSize);
   const lineItem = hideSizes
     ? {
         ...product,
@@ -105,7 +105,14 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
-        {!hideSizes && <SizeSelector selectedSize={selectedSize} onChange={setSelectedSize} className="mt-1" />}
+        {!hideSizes && (
+          <SizeSelector
+            selectedSize={selectedSize}
+            onChange={setSelectedSize}
+            product={product}
+            className="mt-1"
+          />
+        )}
         <p className="text-2xl font-bold text-brand">{formatEGP(price)}</p>
       </div>
 
