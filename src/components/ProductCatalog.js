@@ -17,17 +17,24 @@ const ProductCatalog = () => {
   const [activeSection, setActiveSection] = useState(sectionFromUrl);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const sectionMatches = (product, sectionId) => {
+    if (sectionId === 'original') {
+      return product.section === 'original' || product.section === 'new-luxury';
+    }
+    return product.section === sectionId;
+  };
+
   const counts = useMemo(
     () =>
       PRODUCT_SECTIONS.reduce((acc, section) => {
-        acc[section.id] = allProducts.filter((p) => p.section === section.id).length;
+        acc[section.id] = allProducts.filter((p) => sectionMatches(p, section.id)).length;
         return acc;
       }, {}),
     []
   );
 
   const sectionProducts = useMemo(
-    () => allProducts.filter((p) => p.section === activeSection),
+    () => allProducts.filter((p) => sectionMatches(p, activeSection)),
     [activeSection]
   );
 
