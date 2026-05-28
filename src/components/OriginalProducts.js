@@ -37,12 +37,14 @@ const OriginalProducts = () => {
             {t.originals.viewAll}
           </Link>
         </div>
+      </div>
 
-        <div className="-mx-4 flex flex-nowrap gap-5 overflow-x-auto px-4 pb-2 no-scrollbar snap-x snap-mandatory md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 lg:grid-cols-4">
+      <div className="relative w-full">
+        <div className="flex flex-nowrap gap-5 overflow-x-auto px-4 pb-3 no-scrollbar snap-x snap-mandatory scroll-smooth sm:gap-6 sm:px-6 lg:px-10">
           {displayed.map((product, index) => (
             <div
               key={product.id}
-              className="w-[min(78vw,260px)] shrink-0 snap-start md:w-auto md:min-w-0"
+              className="w-[min(78vw,260px)] shrink-0 snap-start sm:w-[260px] md:w-[280px] lg:w-[300px]"
             >
               <ProductCard
                 product={product}
@@ -52,6 +54,9 @@ const OriginalProducts = () => {
             </div>
           ))}
         </div>
+
+        <div className="pointer-events-none absolute inset-y-0 start-0 hidden w-10 bg-gradient-to-r from-white to-transparent dark:from-neutral-950 md:block" />
+        <div className="pointer-events-none absolute inset-y-0 end-0 hidden w-10 bg-gradient-to-l from-white to-transparent dark:from-neutral-950 md:block" />
       </div>
     </section>
   );
