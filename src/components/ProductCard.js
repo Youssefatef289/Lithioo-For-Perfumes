@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { FiShoppingCart, FiEye } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '../contexts/CartContext';
@@ -10,6 +10,7 @@ import { isOriginalProduct } from '../data/productFactory';
 import { DEFAULT_SIZE_ID, getSizeById, getProductSizePrice } from '../data/sizes';
 import { formatEGP } from '../utils/price';
 import { buildSingleProductMessage, openWhatsApp } from '../utils/whatsapp';
+import { flyToCart } from '../utils/flyToCart';
 
 const ProductCard = ({ product, className = '', animationClass = '', style }) => {
   const { addToCart } = useCart();
@@ -18,6 +19,7 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
   const [selectedSize, setSelectedSize] = useState(DEFAULT_SIZE_ID);
   const [isAdding, setIsAdding] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const imageRef = useRef(null);
 
   const hideSizes = isOriginalProduct(product);
   const hoverImage = product.imageHover || product.image;
@@ -46,8 +48,9 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
   const handleAddToCart = (e) => {
     e.stopPropagation();
     setIsAdding(true);
+    flyToCart(imageRef.current);
     addToCart(buildLineItem(), 1);
-    setTimeout(() => setIsAdding(false), 500);
+    setTimeout(() => setIsAdding(false), 600);
   };
 
   const handleOrderNow = (e) => {
@@ -81,6 +84,7 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
                 loading="lazy"
               />
               <img
+                ref={imageRef}
                 src={hoverImage}
                 alt=""
                 aria-hidden

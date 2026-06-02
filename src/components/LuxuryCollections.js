@@ -74,7 +74,7 @@ const LuxuryCollections = () => {
             className={`absolute start-0 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white/95 p-2 text-neutral-700 shadow-lg ring-1 ring-neutral-200 transition hover:text-brand dark:bg-neutral-800/95 dark:text-neutral-200 dark:ring-neutral-700 md:flex ${
               canPrev ? 'opacity-100' : 'pointer-events-none opacity-0'
             }`}
-            aria-label="Previous"
+            aria-label={t.a11y.prevSlide}
           >
             {isRtl ? <FiChevronRight className="h-5 w-5" /> : <FiChevronLeft className="h-5 w-5" />}
           </button>
@@ -114,7 +114,7 @@ const LuxuryCollections = () => {
             className={`absolute end-0 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white/95 p-2 text-neutral-700 shadow-lg ring-1 ring-neutral-200 transition hover:text-brand dark:bg-neutral-800/95 dark:text-neutral-200 dark:ring-neutral-700 md:flex ${
               canNext ? 'opacity-100' : 'pointer-events-none opacity-0'
             }`}
-            aria-label="Next"
+            aria-label={t.a11y.nextSlide}
           >
             {isRtl ? <FiChevronLeft className="h-5 w-5" /> : <FiChevronRight className="h-5 w-5" />}
           </button>

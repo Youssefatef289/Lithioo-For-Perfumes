@@ -13,24 +13,22 @@ export const useLanguage = () => {
   return context;
 };
 
+const SUPPORTED_LANGUAGES = ['en', 'ar'];
+
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguageState] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      const lang = saved === 'ar' || saved === 'en' ? saved : 'en';
-      if (typeof document !== 'undefined') {
-        document.documentElement.lang = lang;
-        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-        document.documentElement.setAttribute('data-lang', lang);
-      }
-      return lang;
-    } catch {
-      return 'en';
+    // Always open the site in English by default; the user can switch during the session.
+    const lang = 'en';
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = lang;
+      document.documentElement.dir = 'ltr';
+      document.documentElement.setAttribute('data-lang', lang);
     }
+    return lang;
   });
 
   const setLanguage = useCallback((lang) => {
-    if (lang === 'ar' || lang === 'en') {
+    if (SUPPORTED_LANGUAGES.includes(lang)) {
       setLanguageState(lang);
     }
   }, []);
