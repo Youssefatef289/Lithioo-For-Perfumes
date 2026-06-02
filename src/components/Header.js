@@ -1,38 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
-import { useTheme } from '../contexts/ThemeContext';
 import { useCart } from '../contexts/CartContext';
-import { FiMoon, FiSun, FiX, FiShoppingCart } from 'react-icons/fi';
-import LanguageToggle from './LanguageToggle';
+import { FiX, FiShoppingCart } from 'react-icons/fi';
 
-const NAV_BG = '#AE884F';
-const HERO_ROUTES = ['/', '/products'];
+const HERO_ROUTES = ['/'];
 
-const navLinkLight = ({ isActive }) =>
+const navLinkClass = ({ isActive }) =>
   [
-    'text-[0.95rem] font-medium text-white/90 transition-colors hover:text-white',
-    isActive ? 'font-semibold text-white' : '',
-  ].join(' ');
-
-const navLinkDark = ({ isActive }) =>
-  [
-    'text-[0.95rem] font-medium text-neutral-800 transition-colors hover:text-[#AE884F] dark:text-neutral-100',
-    isActive ? 'font-semibold text-[#AE884F]' : '',
+    'text-[0.95rem] font-medium text-neutral-900 transition-colors hover:text-brand',
+    isActive ? 'font-semibold text-brand' : '',
   ].join(' ');
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { t } = useLanguage();
-  const { theme, toggleTheme } = useTheme();
   const { getCartItemsCount, toggleCart } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 30);
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -61,38 +52,30 @@ const Header = () => {
     }
   };
 
-  const isHome = location.pathname === '/';
   const isHeroRoute = HERO_ROUTES.includes(location.pathname);
   const overHero = isHeroRoute && !scrolled && !mobileMenuOpen;
-  const useDarkTheme = isHome && overHero;
-  const logoSrc = useDarkTheme
-    ? '/image/logo/leithioo-logo-gold.png'
-    : '/image/logo/logo-white.png';
-  const navLinkClass = useDarkTheme ? navLinkDark : navLinkLight;
-  const burgerColor = useDarkTheme ? 'bg-neutral-900' : 'bg-white';
+  const logoSrc = '/image/logo/leithioo-logo-gold.png';
+  const burgerColor = 'bg-neutral-900';
 
-  const headerBar =
-    'fixed inset-x-0 top-0 z-[1000] flex items-center overflow-visible border-b border-transparent transition-all duration-500 ' +
-    (overHero
-      ? 'min-h-[80px] bg-transparent shadow-none sm:min-h-[88px] md:min-h-[96px]'
+  const headerBar = [
+    'fixed inset-x-0 top-0 z-[1000] flex items-center overflow-visible transition-all duration-500',
+    overHero
+      ? 'min-h-[88px] sm:min-h-[96px] md:min-h-[104px] bg-transparent border-b border-transparent shadow-none'
       : scrolled
-        ? 'min-h-[68px] shadow-lg sm:min-h-[72px] md:min-h-[80px]'
-        : 'min-h-[80px] shadow-md sm:min-h-[88px] md:min-h-[96px]');
+      ? 'min-h-[64px] sm:min-h-[72px] md:min-h-[78px] bg-white/95 backdrop-blur-md border-b border-neutral-200 shadow-lg'
+      : 'min-h-[80px] sm:min-h-[88px] md:min-h-[96px] bg-white/95 backdrop-blur-md border-b border-neutral-200 shadow-md',
+  ].join(' ');
 
-  const iconBtn = useDarkTheme
-    ? 'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-2 border-neutral-800 bg-white/40 text-neutral-800 backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:bg-neutral-900 hover:text-white hover:shadow-md'
-    : 'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-2 border-white/80 bg-white/10 text-white transition-all hover:-translate-y-0.5 hover:bg-white hover:text-[#AE884F] hover:shadow-md';
-
-  const languageToggleClass = useDarkTheme
-    ? '!border-neutral-800 !bg-white/40 !text-neutral-800 hover:!border-neutral-900 hover:!bg-neutral-900 hover:!text-white'
-    : '!border-white/80 !bg-white/10 !text-white hover:!border-white hover:!bg-white hover:!text-[#AE884F]';
-
-  const pillBtn =
-    'flex shrink-0 items-center gap-2 rounded-lg border-2 border-brand px-3 py-2 text-sm font-semibold text-brand transition-all hover:-translate-y-0.5 hover:bg-brand hover:text-white hover:shadow-md dark:text-brand';
+  const iconBtn = [
+    'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5',
+    overHero
+      ? 'border border-neutral-900/15 bg-white/40 text-neutral-900 backdrop-blur-sm hover:bg-white/70 hover:text-brand hover:shadow-md'
+      : 'border border-neutral-300 bg-white text-neutral-800 hover:bg-neutral-100 hover:text-brand hover:shadow-md',
+  ].join(' ');
 
   return (
     <>
-      <header className={headerBar} style={overHero ? undefined : { backgroundColor: NAV_BG }}>
+      <header className={headerBar}>
         <div className="mx-auto flex h-full w-full max-w-[1400px] items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
           <Link
             to="/"
@@ -102,9 +85,11 @@ const Header = () => {
             <img
               src={logoSrc}
               alt="Lithioo Perfume"
-              className={`w-auto object-contain transition-all duration-300 group-hover:scale-105 ${
-                scrolled
-                  ? 'h-12 sm:h-14 md:h-16'
+              className={`w-auto object-contain transition-all duration-500 group-hover:scale-105 ${
+                overHero
+                  ? 'h-16 sm:h-[4.5rem] md:h-20 lg:h-[5.5rem] drop-shadow-md'
+                  : scrolled
+                  ? 'h-11 sm:h-12 md:h-14'
                   : 'h-14 sm:h-16 md:h-[4.5rem] lg:h-20'
               }`}
             />
@@ -134,16 +119,6 @@ const Header = () => {
                   {getCartItemsCount()}
                 </span>
               )}
-            </button>
-            <LanguageToggle className={languageToggleClass} />
-
-            <button
-              type="button"
-              className={iconBtn}
-              onClick={toggleTheme}
-              aria-label={t.a11y.toggleTheme}
-            >
-              {theme === 'light' ? <FiMoon className="h-5 w-5" /> : <FiSun className="h-5 w-5" />}
             </button>
 
             <button
@@ -181,20 +156,17 @@ const Header = () => {
       />
 
       <div
-        className={`fixed top-0 z-[999] flex h-screen w-[min(300px,90vw)] max-w-[320px] flex-col bg-white shadow-2xl transition-transform duration-300 ease-out dark:bg-neutral-900 dark:shadow-black/50 md:hidden end-0 ${
+        className={`fixed top-0 z-[999] flex h-screen w-[min(300px,90vw)] max-w-[320px] flex-col bg-white shadow-2xl transition-transform duration-300 ease-out md:hidden end-0 ${
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full rtl:-translate-x-full'
         }`}
       >
-        <div
-          className="flex items-center justify-between border-b p-4"
-          style={{ backgroundColor: NAV_BG, borderColor: 'rgba(255,255,255,0.18)' }}
-        >
+        <div className="flex items-center justify-between border-b p-4" style={{ backgroundColor: '#ffffff', borderColor: 'rgba(0,0,0,0.08)' }}>
           <Link to="/" className="flex items-center gap-2" onClick={handleHomeClick}>
-            <img src={logoSrc} alt="" className="h-14 w-auto object-contain sm:h-16" />
+            <img src="/image/logo/leithioo-logo-gold.png" alt="" className="h-14 w-auto object-contain sm:h-16" />
           </Link>
           <button
             type="button"
-            className="flex h-10 w-10 items-center justify-center rounded-full text-white transition hover:rotate-90 hover:bg-white/15"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-900 transition hover:rotate-90 hover:bg-neutral-100"
             onClick={() => setMobileMenuOpen(false)}
             aria-label={t.a11y.closeMenu}
           >
@@ -207,7 +179,7 @@ const Header = () => {
             end
             onClick={(e) => handleNavClick(e, '/')}
             className={({ isActive }) =>
-              `block border-b border-neutral-200 px-5 py-4 text-lg font-medium text-neutral-800 transition hover:bg-brand/10 hover:text-brand dark:border-white/10 dark:text-neutral-100 ${
+              `block border-b border-neutral-200 px-5 py-4 text-lg font-medium text-neutral-800 transition hover:bg-brand/10 hover:text-brand ${
                 isActive ? 'bg-brand/10 font-semibold text-brand' : ''
               }`
             }
@@ -218,7 +190,7 @@ const Header = () => {
             to="/about"
             onClick={(e) => handleNavClick(e, '/about')}
             className={({ isActive }) =>
-              `block border-b border-neutral-200 px-5 py-4 text-lg font-medium text-neutral-800 transition hover:bg-brand/10 hover:text-brand dark:border-white/10 dark:text-neutral-100 ${
+              `block border-b border-neutral-200 px-5 py-4 text-lg font-medium text-neutral-800 transition hover:bg-brand/10 hover:text-brand ${
                 isActive ? 'bg-brand/10 font-semibold text-brand' : ''
               }`
             }
@@ -229,7 +201,7 @@ const Header = () => {
             to="/products"
             onClick={(e) => handleNavClick(e, '/products')}
             className={({ isActive }) =>
-              `block border-b border-neutral-200 px-5 py-4 text-lg font-medium text-neutral-800 transition hover:bg-brand/10 hover:text-brand dark:border-white/10 dark:text-neutral-100 ${
+              `block border-b border-neutral-200 px-5 py-4 text-lg font-medium text-neutral-800 transition hover:bg-brand/10 hover:text-brand ${
                 isActive ? 'bg-brand/10 font-semibold text-brand' : ''
               }`
             }
@@ -240,7 +212,7 @@ const Header = () => {
             to="/contact"
             onClick={(e) => handleNavClick(e, '/contact')}
             className={({ isActive }) =>
-              `block border-b border-neutral-200 px-5 py-4 text-lg font-medium text-neutral-800 transition hover:bg-brand/10 hover:text-brand dark:border-white/10 dark:text-neutral-100 ${
+              `block border-b border-neutral-200 px-5 py-4 text-lg font-medium text-neutral-800 transition hover:bg-brand/10 hover:text-brand ${
                 isActive ? 'bg-brand/10 font-semibold text-brand' : ''
               }`
             }
@@ -248,18 +220,6 @@ const Header = () => {
             {t.nav.contact}
           </NavLink>
         </nav>
-        <div className="flex flex-col gap-3 border-t border-neutral-200 p-4 dark:border-white/10">
-          <LanguageToggle variant="pill" />
-          <button
-            type="button"
-            className={`${pillBtn} w-full justify-center`}
-            onClick={toggleTheme}
-            aria-label={t.a11y.toggleTheme}
-          >
-            {theme === 'light' ? <FiMoon className="h-[18px] w-[18px]" /> : <FiSun className="h-[18px] w-[18px]" />}
-            {t.a11y.toggleTheme}
-          </button>
-        </div>
       </div>
     </>
   );
