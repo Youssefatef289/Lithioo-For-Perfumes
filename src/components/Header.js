@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation, NavLink } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useCart } from '../contexts/CartContext';
 import { FiX, FiShoppingCart } from 'react-icons/fi';
+import LanguageToggle from './LanguageToggle';
 
 const HERO_ROUTES = ['/'];
 
@@ -112,7 +113,15 @@ const Header = () => {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <button type="button" className={iconBtn} onClick={toggleCart} aria-label={t.a11y.shoppingCart}>
+            <LanguageToggle overHero={overHero} />
+
+            <button
+              type="button"
+              id="header-cart-icon"
+              className={iconBtn}
+              onClick={toggleCart}
+              aria-label={t.a11y.shoppingCart}
+            >
               <FiShoppingCart className="h-5 w-5" />
               {getCartItemsCount() > 0 && (
                 <span className="absolute -end-1.5 -top-1.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full border-2 border-white bg-red-500 px-0.5 text-[0.65rem] font-bold text-white shadow animate-cart-bounce">
@@ -219,6 +228,10 @@ const Header = () => {
           >
             {t.nav.contact}
           </NavLink>
+
+          <div className="mt-auto border-t border-neutral-200 p-5">
+            <LanguageToggle variant="pill" />
+          </div>
         </nav>
       </div>
     </>

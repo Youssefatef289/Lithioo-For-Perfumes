@@ -13,24 +13,29 @@ export const useLanguage = () => {
   return context;
 };
 
+const SUPPORTED_LANGUAGES = ['en', 'ar'];
+
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguageState] = useState(() => {
+    let lang = 'en';
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      const lang = saved === 'ar' || saved === 'en' ? saved : 'en';
-      if (typeof document !== 'undefined') {
-        document.documentElement.lang = lang;
-        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-        document.documentElement.setAttribute('data-lang', lang);
+      if (saved && SUPPORTED_LANGUAGES.includes(saved)) {
+        lang = saved;
       }
-      return lang;
     } catch {
-      return 'en';
+      /* ignore */
     }
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      document.documentElement.setAttribute('data-lang', lang);
+    }
+    return lang;
   });
 
   const setLanguage = useCallback((lang) => {
-    if (lang === 'ar' || lang === 'en') {
+    if (SUPPORTED_LANGUAGES.includes(lang)) {
       setLanguageState(lang);
     }
   }, []);

@@ -1,50 +1,60 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 
-const FLAG_SRC = {
-  ar: '/image/flags/egypt.svg',
-  en: '/image/flags/uk.svg',
-};
+const SEGMENTS = [
+  { code: 'en', label: 'EN' },
+  { code: 'ar', label: 'ع' },
+];
 
-const FlagIcon = ({ lang, className = 'h-5 w-5 rounded-sm object-cover shadow-sm' }) => (
-  <img src={FLAG_SRC[lang]} alt="" className={className} aria-hidden />
-);
-
-const LanguageToggle = ({ className = '', variant = 'icon' }) => {
+const LanguageToggle = ({ className = '', variant = 'segmented', overHero = false }) => {
   const { language, setLanguage, t } = useLanguage();
   const nextLang = language === 'ar' ? 'en' : 'ar';
-
-  const baseIcon =
-    'flex shrink-0 items-center justify-center rounded-lg border-2 border-brand text-brand transition-all hover:-translate-y-0.5 hover:bg-brand hover:text-white hover:shadow-md dark:border-brand dark:text-brand';
-  const basePill =
-    'flex shrink-0 items-center justify-center gap-2 rounded-lg border-2 border-brand px-3 py-2 text-sm font-semibold text-brand transition-all hover:-translate-y-0.5 hover:bg-brand hover:text-white hover:shadow-md dark:text-brand';
-
-  const handleClick = () => setLanguage(nextLang);
 
   if (variant === 'pill') {
     return (
       <button
         type="button"
-        className={`${basePill} w-full ${className}`}
-        onClick={handleClick}
+        className={`flex w-full shrink-0 items-center justify-center gap-2 rounded-lg border-2 border-brand px-3 py-2 text-sm font-bold uppercase tracking-wider text-brand transition-all hover:-translate-y-0.5 hover:bg-brand hover:text-white hover:shadow-md ${className}`}
+        onClick={() => setLanguage(nextLang)}
         aria-label={t.a11y.switchLanguage}
       >
-        <FlagIcon lang={language} />
-        <span>{language === 'ar' ? t.a11y.languageAr : t.a11y.languageEn}</span>
+        <span>{language === 'ar' ? 'English' : 'العربية'}</span>
       </button>
     );
   }
 
+  const trackBase = overHero
+    ? 'border-neutral-900/15 bg-white/40 backdrop-blur-sm'
+    : 'border-neutral-300 bg-white dark:border-neutral-600 dark:bg-neutral-800';
+
   return (
-    <button
-      type="button"
-      className={`${baseIcon} h-10 w-10 overflow-hidden p-1.5 ${className}`}
-      onClick={handleClick}
+    <div
+      className={`flex shrink-0 items-center gap-0.5 rounded-lg border p-0.5 transition-all ${trackBase} ${className}`}
+      role="group"
       aria-label={t.a11y.switchLanguage}
-      title={language === 'ar' ? t.a11y.languageEn : t.a11y.languageAr}
     >
-      <FlagIcon lang={language} className="h-full w-full rounded object-cover" />
-    </button>
+      {SEGMENTS.map((seg) => {
+        const active = language === seg.code;
+        return (
+          <button
+            key={seg.code}
+            type="button"
+            onClick={() => setLanguage(seg.code)}
+            aria-pressed={active}
+            className={[
+              'flex h-8 min-w-[2rem] items-center justify-center rounded-md px-2 text-sm font-bold leading-none transition-all duration-300',
+              active
+                ? 'bg-brand text-white shadow-sm'
+                : overHero
+                ? 'text-neutral-900 hover:text-brand'
+                : 'text-neutral-500 hover:text-brand dark:text-neutral-400',
+            ].join(' ')}
+          >
+            {seg.label}
+          </button>
+        );
+      })}
+    </div>
   );
 };
 
