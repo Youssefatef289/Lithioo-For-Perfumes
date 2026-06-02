@@ -9,23 +9,11 @@ const About = () => {
   const { t } = useLanguage();
   const { aboutPage } = t;
 
-  const values = [
-    {
-      Icon: FiAward,
-      title: 'Authentic Quality',
-      text: 'Every fragrance is selected for lasting projection and a refined finish.',
-    },
-    {
-      Icon: FiDroplet,
-      title: 'Curated Selection',
-      text: "Men's, women's, and oriental collections — something for every taste.",
-    },
-    {
-      Icon: FiHeart,
-      title: 'Customer First',
-      text: 'Personal guidance and flexible sizes so you shop with confidence.',
-    },
-  ];
+  const valueIcons = [FiAward, FiDroplet, FiHeart];
+  const values = (aboutPage.values || []).map((item, index) => ({
+    ...item,
+    Icon: valueIcons[index] || FiAward,
+  }));
 
   useEffect(() => {
     observeElements();
@@ -99,10 +87,8 @@ const About = () => {
 
       <section className="bg-gradient-to-r from-brand/15 via-brand/10 to-accent/10 px-4 py-14 dark:from-brand/10 dark:via-neutral-900 dark:to-neutral-900 sm:py-16">
         <div className="section-inner max-w-2xl text-center">
-          <h2 className="heading-section !text-2xl sm:!text-3xl">Ready to find your scent?</h2>
-          <p className="text-muted-section mt-4">
-            Browse our full catalog — men&apos;s, women&apos;s, and oriental fragrances in every size.
-          </p>
+          <h2 className="heading-section !text-2xl sm:!text-3xl">{aboutPage.ctaTitle}</h2>
+          <p className="text-muted-section mt-4">{aboutPage.ctaText}</p>
           <Link to="/products" className="btn-primary mt-8 inline-flex px-10 py-3.5">
             {aboutPage.cta}
           </Link>

@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 @import './styles/fonts.css';
-@import './styles/dark-theme.css';
 @import './styles/animations.css';
 
 @layer base {
@@ -16,10 +15,6 @@
     @apply min-h-screen overflow-x-hidden bg-white text-neutral-800 antialiased transition-colors duration-300;
   }
 
-  [data-theme='dark'] body {
-    @apply bg-neutral-950 text-neutral-200;
-  }
-
   img,
   video,
   iframe {
@@ -29,19 +24,11 @@
   ::selection {
     @apply bg-brand/25 text-neutral-900;
   }
-
-  [data-theme='dark'] ::selection {
-    @apply bg-brand/35 text-white;
-  }
 }
 
 @layer components {
   .app-shell {
     @apply min-h-screen w-full overflow-x-hidden bg-white transition-colors duration-300;
-  }
-
-  [data-theme='dark'] .app-shell {
-    @apply bg-neutral-950 text-neutral-200;
   }
 
   /* Inner pages: safe spacing below fixed header */

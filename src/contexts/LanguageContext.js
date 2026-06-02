@@ -17,18 +17,11 @@ const SUPPORTED_LANGUAGES = ['en', 'ar'];
 
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguageState] = useState(() => {
-    let lang = 'en';
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved && SUPPORTED_LANGUAGES.includes(saved)) {
-        lang = saved;
-      }
-    } catch {
-      /* ignore */
-    }
+    // Always open the site in English by default; the user can switch during the session.
+    const lang = 'en';
     if (typeof document !== 'undefined') {
       document.documentElement.lang = lang;
-      document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      document.documentElement.dir = 'ltr';
       document.documentElement.setAttribute('data-lang', lang);
     }
     return lang;

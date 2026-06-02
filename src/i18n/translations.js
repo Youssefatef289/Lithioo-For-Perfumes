@@ -118,6 +118,22 @@ export const translations = {
       mission:
         'Quality ingredients, honest pricing, and attentive service — whether you shop online or visit us in Beni Suef.',
       cta: 'Shop the Collection',
+      ctaTitle: 'Ready to find your scent?',
+      ctaText: "Browse our full catalog — men's, women's, and oriental fragrances in every size.",
+      values: [
+        {
+          title: 'Authentic Quality',
+          text: 'Every fragrance is selected for lasting projection and a refined finish.',
+        },
+        {
+          title: 'Curated Selection',
+          text: "Men's, women's, and oriental collections — something for every taste.",
+        },
+        {
+          title: 'Customer First',
+          text: 'Personal guidance and flexible sizes so you shop with confidence.',
+        },
+      ],
       highlights: [
         { value: '114+', label: 'Fragrances' },
         { value: '4', label: 'Collections' },
@@ -382,6 +398,22 @@ export const translations = {
       missionTitle: 'ما نؤمن به',
       mission: 'مكونات عالية الجودة، أسعار عادلة، وخدمة متميزة — سواء تسوقت أونلاين أو زرتنا في بني سويف.',
       cta: 'تسوق المجموعة',
+      ctaTitle: 'جاهز لاكتشاف عطرك المميز؟',
+      ctaText: 'تصفّح تشكيلتنا الكاملة — عطور رجالية ونسائية وشرقية بجميع الأحجام.',
+      values: [
+        {
+          title: 'جودة أصلية',
+          text: 'كل عطر مُختار بعناية لثبات قوي ولمسة نهائية راقية.',
+        },
+        {
+          title: 'تشكيلة مختارة',
+          text: 'مجموعات رجالية ونسائية وشرقية — ما يناسب كل ذوق.',
+        },
+        {
+          title: 'العميل أولاً',
+          text: 'إرشاد شخصي وأحجام مرنة لتتسوق بثقة وراحة.',
+        },
+      ],
       highlights: [
         { value: '+114', label: 'عطر' },
         { value: '4', label: 'مجموعات' },

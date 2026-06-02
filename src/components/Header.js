@@ -5,12 +5,21 @@ import { useCart } from '../contexts/CartContext';
 import { FiX, FiShoppingCart } from 'react-icons/fi';
 import LanguageToggle from './LanguageToggle';
 
-const HERO_ROUTES = ['/'];
+const HERO_CONFIG = {
+  '/': 'light',
+  '/products': 'dark',
+};
 
-const navLinkClass = ({ isActive }) =>
+const makeNavLinkClass = (darkHero) => ({ isActive }) =>
   [
-    'text-[0.95rem] font-medium text-neutral-900 transition-colors hover:text-brand',
-    isActive ? 'font-semibold text-brand' : '',
+    'text-[0.95rem] font-medium transition-colors',
+    darkHero
+      ? isActive
+        ? 'font-semibold text-white'
+        : 'text-white/90 hover:text-white'
+      : isActive
+      ? 'font-semibold text-brand'
+      : 'text-neutral-900 hover:text-brand',
   ].join(' ');
 
 const Header = () => {
@@ -53,10 +62,13 @@ const Header = () => {
     }
   };
 
-  const isHeroRoute = HERO_ROUTES.includes(location.pathname);
+  const heroTheme = HERO_CONFIG[location.pathname];
+  const isHeroRoute = Boolean(heroTheme);
   const overHero = isHeroRoute && !scrolled && !mobileMenuOpen;
-  const logoSrc = '/image/logo/leithioo-logo-gold.png';
-  const burgerColor = 'bg-neutral-900';
+  const darkHero = overHero && heroTheme === 'dark';
+  const logoSrc = darkHero ? '/image/logo/logo-white.png' : '/image/logo/leithioo-logo-gold.png';
+  const burgerColor = darkHero ? 'bg-white' : 'bg-neutral-900';
+  const navLinkClass = makeNavLinkClass(darkHero);
 
   const headerBar = [
     'fixed inset-x-0 top-0 z-[1000] flex items-center overflow-visible transition-all duration-500',
@@ -69,7 +81,9 @@ const Header = () => {
 
   const iconBtn = [
     'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5',
-    overHero
+    darkHero
+      ? 'border border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/25 hover:shadow-md'
+      : overHero
       ? 'border border-neutral-900/15 bg-white/40 text-neutral-900 backdrop-blur-sm hover:bg-white/70 hover:text-brand hover:shadow-md'
       : 'border border-neutral-300 bg-white text-neutral-800 hover:bg-neutral-100 hover:text-brand hover:shadow-md',
   ].join(' ');
@@ -113,7 +127,7 @@ const Header = () => {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <LanguageToggle overHero={overHero} />
+            <LanguageToggle overHero={overHero} darkHero={darkHero} />
 
             <button
               type="button"
