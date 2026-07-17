@@ -1,10 +1,11 @@
 import { buildAllProducts, PRODUCT_CARD_IMAGE, PRODUCT_CARD_IMAGE_HOVER } from './productFactory';
 import { PRODUCT_SECTIONS } from './productLists';
 import { NEW_LUXURY_PRODUCTS } from './newLuxuryProducts';
+import { NEW_DIVERSE_PRODUCTS } from './newDiverseProducts';
 
 export { PRODUCT_CARD_IMAGE, PRODUCT_CARD_IMAGE_HOVER, PRODUCT_SECTIONS };
 
-export const allProducts = [...buildAllProducts(), ...NEW_LUXURY_PRODUCTS];
+export const allProducts = [...buildAllProducts(), ...NEW_LUXURY_PRODUCTS, ...NEW_DIVERSE_PRODUCTS];
 
 export const getProductById = (id) => {
   const numericId = parseInt(id, 10);

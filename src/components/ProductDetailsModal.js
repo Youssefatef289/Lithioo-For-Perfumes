@@ -7,10 +7,10 @@ import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useLocalizedProduct } from '../hooks/useLocalizedProduct';
+import PriceDisplay from './PriceDisplay';
 import SizeSelector from './SizeSelector';
 import { isOriginalProduct } from '../data/productFactory';
 import { DEFAULT_SIZE_ID, getSizeById, getProductSizePrice } from '../data/sizes';
-import { formatEGP } from '../utils/price';
 import { buildSingleProductMessage, openWhatsApp } from '../utils/whatsapp';
 
 const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_SIZE_ID }) => {
@@ -199,9 +199,14 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
             {rating} ({reviews})
           </span>
         </div>
-        <span className="ms-auto text-2xl font-bold text-brand" dir="ltr">
-          {formatEGP(price)}
-        </span>
+        <PriceDisplay
+          price={price}
+          originalPrice={product.originalPrice}
+          discountPercent={product.discountPercent}
+          language={language}
+          size="lg"
+          className="ms-auto"
+        />
       </div>
 
       {!hideSizes && (

@@ -1,20 +1,22 @@
 import React, { useRef, useState } from 'react';
-import { FiShoppingCart, FiEye } from 'react-icons/fi';
+import { FiShoppingCart, FiEye, FiHeart } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useLocalizedProduct } from '../hooks/useLocalizedProduct';
 import ProductDetailsModal from './ProductDetailsModal';
+import PriceDisplay from './PriceDisplay';
 import SizeSelector from './SizeSelector';
 import { isOriginalProduct } from '../data/productFactory';
 import { DEFAULT_SIZE_ID, getSizeById, getProductSizePrice } from '../data/sizes';
-import { formatEGP } from '../utils/price';
 import { buildSingleProductMessage, openWhatsApp } from '../utils/whatsapp';
 import { flyToCart } from '../utils/flyToCart';
 
 const ProductCard = ({ product, className = '', animationClass = '', style }) => {
   const { addToCart } = useCart();
   const { t, language } = useLanguage();
+  const { toggleWishlist, isInWishlist } = useWishlist();
   const lp = useLocalizedProduct(product);
   const [selectedSize, setSelectedSize] = useState(DEFAULT_SIZE_ID);
   const [isAdding, setIsAdding] = useState(false);
@@ -26,6 +28,7 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
   const mainImage = product.image || hoverImage;
   const sizeMeta = getSizeById(selectedSize, language);
   const price = hideSizes ? product.price : getProductSizePrice(product, selectedSize);
+  const inWishlist = isInWishlist(product.id);
 
   const buildLineItem = () => {
     if (hideSizes) {
@@ -56,6 +59,11 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
   const handleOrderNow = (e) => {
     e.stopPropagation();
     openWhatsApp(buildSingleProductMessage(buildLineItem(), price));
+  };
+
+  const handleWishlistToggle = (e) => {
+    e.stopPropagation();
+    toggleWishlist(buildLineItem());
   };
 
   const openDetails = (e) => {
@@ -93,7 +101,7 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
               />
             </div>
 
-            <div className="pointer-events-none absolute end-3 top-3 flex flex-col gap-2 opacity-0 translate-x-2 rtl:-translate-x-2 transition-all duration-300 ease-out group-hover:opacity-100 group-hover:translate-x-0">
+            <div className="pointer-events-none absolute end-3 top-3 flex flex-col gap-2 opacity-100 translate-x-0 transition-all duration-300 ease-out md:opacity-0 md:translate-x-2 md:rtl:-translate-x-2 md:group-hover:opacity-100 md:group-hover:translate-x-0">
               <button
                 type="button"
                 onClick={handleOrderNow}
@@ -101,6 +109,18 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
                 aria-label={t.productCard.orderWhatsApp}
               >
                 <FaWhatsapp className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                onClick={handleWishlistToggle}
+                className={`${floatingIconBtn} ${
+                  inWishlist
+                    ? 'bg-red-500 text-white hover:bg-red-500 hover:text-white'
+                    : 'hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10'
+                }`}
+                aria-label={inWishlist ? t.productPage.inWishlist : t.productPage.addToWishlist}
+              >
+                <FiHeart className={`h-5 w-5 ${inWishlist ? 'fill-current' : ''}`} />
               </button>
               <button
                 type="button"
@@ -117,9 +137,13 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
             <h3 className="m-0 line-clamp-2 w-full px-1 text-[0.95rem] font-semibold uppercase tracking-[0.08em] text-neutral-800 dark:text-neutral-100">
               {lp.name}
             </h3>
-            <p className="m-0 text-sm font-medium text-neutral-500 dark:text-neutral-400" dir="ltr">
-              {formatEGP(price)}
-            </p>
+            <PriceDisplay
+              price={price}
+              originalPrice={product.originalPrice}
+              discountPercent={product.discountPercent}
+              language={language}
+              className="mt-0.5"
+            />
             {!hideSizes && (
               <div className="mt-1 w-full">
                 <SizeSelector

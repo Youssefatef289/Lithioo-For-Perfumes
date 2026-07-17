@@ -2,7 +2,13 @@ import React, { useEffect, useRef } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { PRODUCT_SECTIONS } from '../data/products';
 
-const ProductSectionTabs = ({ activeSection, onChange, counts = {}, className = '' }) => {
+const ProductSectionTabs = ({
+  activeSection,
+  onChange,
+  counts = {},
+  className = '',
+  showAll = false,
+}) => {
   const { t } = useLanguage();
   const scrollerRef = useRef(null);
   const tabRefs = useRef({});
@@ -37,6 +43,36 @@ const ProductSectionTabs = ({ activeSection, onChange, counts = {}, className = 
         ref={scrollerRef}
         className="-mx-4 flex items-center gap-1.5 overflow-x-auto px-4 no-scrollbar snap-x scroll-smooth sm:mx-0 sm:justify-center sm:gap-3 sm:overflow-visible sm:px-0"
       >
+        {showAll && (
+          <button
+            ref={(el) => {
+              tabRefs.current.all = el;
+            }}
+            type="button"
+            role="tab"
+            aria-selected={activeSection === 'all'}
+            onClick={() => onChange('all')}
+            className={[
+              'group relative inline-flex shrink-0 snap-center items-center justify-center gap-1.5 whitespace-nowrap px-4 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.16em] transition-all duration-300 sm:px-6 sm:py-2.5 sm:text-sm sm:tracking-[0.18em]',
+              activeSection === 'all'
+                ? 'border border-brand text-brand'
+                : 'border border-transparent text-neutral-400 hover:text-brand dark:text-neutral-500 dark:hover:text-brand',
+            ].join(' ')}
+          >
+            <span>{t.header.allProducts}</span>
+            {counts.all != null && (
+              <span
+                className={[
+                  'text-[0.6rem] font-medium tracking-normal sm:text-[0.65rem]',
+                  activeSection === 'all' ? 'text-brand/70' : 'text-neutral-400/80',
+                ].join(' ')}
+              >
+                ({counts.all})
+              </span>
+            )}
+          </button>
+        )}
+
         {PRODUCT_SECTIONS.map((section) => {
           const active = activeSection === section.id;
           const count = counts[section.id];
