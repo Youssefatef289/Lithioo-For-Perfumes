@@ -69,7 +69,7 @@ const FloatingContactButton = () => {
 
   return (
     <div
-      className="pointer-events-none fixed bottom-5 end-4 z-[997] flex flex-col items-end gap-3 sm:bottom-6 sm:end-6"
+      className="pointer-events-none fixed bottom-24 end-4 z-[985] flex flex-col items-end gap-3 md:bottom-6 md:end-6 md:z-[997]"
       aria-label={f.quickContact}
     >
       <div

@@ -126,5 +126,6 @@ export const PRODUCT_SECTIONS = [
   { id: 'men' },
   { id: 'women' },
   { id: 'special' },
+  { id: 'new-diverse' },
   { id: 'original' },
 ];

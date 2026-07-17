@@ -6,9 +6,9 @@ import ProductCard from './ProductCard';
 import ProductSectionTabs from './ProductSectionTabs';
 
 const PRODUCTS_PER_PAGE = 12;
-const VALID_SECTIONS = ['men', 'women', 'special', 'original'];
+const VALID_SECTIONS = ['all', 'men', 'women', 'special', 'new-diverse', 'original'];
 
-const resolveSection = (value) => (VALID_SECTIONS.includes(value) ? value : 'men');
+const resolveSection = (value) => (VALID_SECTIONS.includes(value) ? value : 'all');
 
 const ProductCatalog = () => {
   const { t } = useLanguage();
@@ -18,6 +18,9 @@ const ProductCatalog = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const sectionMatches = (product, sectionId) => {
+    if (sectionId === 'all') {
+      return true;
+    }
     if (sectionId === 'original') {
       return product.section === 'original' || product.section === 'new-luxury';
     }
@@ -25,11 +28,14 @@ const ProductCatalog = () => {
   };
 
   const counts = useMemo(
-    () =>
-      PRODUCT_SECTIONS.reduce((acc, section) => {
+    () => {
+      const sectionCounts = PRODUCT_SECTIONS.reduce((acc, section) => {
         acc[section.id] = allProducts.filter((p) => sectionMatches(p, section.id)).length;
         return acc;
-      }, {}),
+      }, {});
+
+      return { all: allProducts.length, ...sectionCounts };
+    },
     []
   );
 
@@ -42,7 +48,7 @@ const ProductCatalog = () => {
   const startIndex = (currentPage - 1) * PRODUCTS_PER_PAGE;
   const displayedProducts = sectionProducts.slice(startIndex, startIndex + PRODUCTS_PER_PAGE);
 
-  const sectionLabel = t.sections[activeSection];
+  const sectionLabel = activeSection === 'all' ? t.header.allProducts : t.sections[activeSection];
 
   useEffect(() => {
     setActiveSection(sectionFromUrl);
@@ -78,6 +84,7 @@ const ProductCatalog = () => {
           activeSection={activeSection}
           onChange={handleSectionChange}
           counts={counts}
+          showAll
           className="mb-8"
         />
 

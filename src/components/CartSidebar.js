@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiX, FiShoppingCart, FiMinus, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { useCart } from '../contexts/CartContext';
@@ -20,7 +20,6 @@ const CartSidebar = () => {
     clearCart,
   } = useCart();
   const navigate = useNavigate();
-  const [notes, setNotes] = useState('');
 
   const handleCheckout = () => {
     navigate('/cart');
@@ -163,21 +162,6 @@ const CartSidebar = () => {
               </div>
 
               <div className="shrink-0 border-t border-neutral-100 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] dark:border-neutral-800">
-                <details className="mb-3 group">
-                  <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-neutral-600 transition hover:text-brand dark:text-neutral-300">
-                    <span>{t.cart.notesLabel}</span>
-                    <FiPlus className="h-4 w-4 transition group-open:rotate-45" />
-                  </summary>
-                  <textarea
-                    id="cart-notes-sidebar"
-                    rows={2}
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder={t.cart.notesPlaceholder}
-                    className="mt-2 w-full resize-none rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-sm text-neutral-800 placeholder:text-neutral-400 focus:border-brand focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100"
-                  />
-                </details>
-
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <span className="text-sm font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
                     {t.cart.total}
@@ -188,12 +172,9 @@ const CartSidebar = () => {
                 </div>
 
                 <OrderWhatsAppButton
-                  className="mb-2"
-                  notes={notes}
-                  onOrdered={() => {
-                    setNotes('');
-                    setIsCartOpen(false);
-                  }}
+                  className="mb-3"
+                  compact
+                  onOrdered={() => setIsCartOpen(false)}
                 />
                 <div className="flex items-center gap-2">
                   <button

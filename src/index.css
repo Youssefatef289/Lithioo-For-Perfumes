@@ -100,4 +100,8 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+  .brands-swiper .swiper-wrapper {
+    transition-timing-function: linear !important;
+  }
 }

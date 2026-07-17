@@ -3,8 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FiShoppingCart, FiHeart, FiStar, FiArrowLeft } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import SizeSelector from '../components/SizeSelector';
+import PriceDisplay from '../components/PriceDisplay';
 import { DEFAULT_SIZE_ID, getSizeById, getProductSizePrice } from '../data/sizes';
-import { formatEGP } from '../utils/price';
 import { buildSingleProductMessage, openWhatsApp } from '../utils/whatsapp';
 import { useCart } from '../contexts/CartContext';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -147,7 +147,14 @@ const ProductDetails = () => {
               {!hideSizes && (
                 <SizeSelector selectedSize={selectedSize} onChange={setSelectedSize} product={product} />
               )}
-              <span className="text-3xl font-bold text-brand">{formatEGP(price)}</span>
+              <PriceDisplay
+                price={price}
+                originalPrice={product.originalPrice}
+                discountPercent={product.discountPercent}
+                language={language}
+                size="lg"
+                className="ms-auto items-end text-end"
+              />
               {product.inStock && (
                 <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
                   {modal.inStock}

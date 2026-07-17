@@ -1,3 +1,4 @@
+const CART_ICON_SELECTOR = '[data-cart-icon]';
 const CART_ICON_ID = 'header-cart-icon';
 
 const prefersReducedMotion = () =>
@@ -22,7 +23,12 @@ const bumpCartIcon = (cartEl) => {
  */
 export const flyToCart = (sourceImg) => {
   if (typeof document === 'undefined') return;
-  const cartEl = document.getElementById(CART_ICON_ID);
+  const cartCandidates = Array.from(document.querySelectorAll(CART_ICON_SELECTOR));
+  const cartEl =
+    cartCandidates.find((el) => {
+      const rect = el.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0;
+    }) || document.getElementById(CART_ICON_ID);
   if (!cartEl) return;
 
   if (!sourceImg || prefersReducedMotion()) {

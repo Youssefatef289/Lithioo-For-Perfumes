@@ -15,7 +15,7 @@ import Cart from './pages/Cart';
 function App() {
   return (
     <Router>
-      <div className="app-shell">
+      <div className="app-shell pb-24 md:pb-0">
         <Header />
         <CartSidebar />
         <CartToast />
