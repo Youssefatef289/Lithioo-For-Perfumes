@@ -65,6 +65,9 @@ export const translations = {
     header: {
       allProducts: 'All products',
       productsShort: 'Products',
+      brandsShort: 'Brands',
+      brandsTitle: 'Browse brands',
+      brandsEmpty: 'No brands available yet.',
       searchShort: 'Search',
       wishlistShort: 'Favorites',
       cartShort: 'Cart',
@@ -383,6 +386,9 @@ export const translations = {
     header: {
       allProducts: 'الكل',
       productsShort: 'المنتجات',
+      brandsShort: 'البراندات',
+      brandsTitle: 'تصفح البراندات',
+      brandsEmpty: 'لا توجد براندات متاحة بعد.',
       searchShort: 'بحث',
       wishlistShort: 'المفضلة',
       cartShort: 'السلة',

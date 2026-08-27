@@ -2,6 +2,7 @@ import { MEN_LINES, WOMEN_LINES, SPECIAL_LINES } from './productLists';
 import { ORIGINAL_IMAGE_CATALOG, getOriginalMeta, getOriginalPrice } from './originalProducts';
 import { getProductImages } from './productImages';
 import { DEFAULT_SIZE_ID, getSizeById, BOTTLE_SIZES } from './sizes';
+import { getBrandIdByName } from './brands';
 
 export const PRODUCT_CARD_IMAGE = '/image/products/product.png';
 export const PRODUCT_CARD_IMAGE_HOVER = '/image/products/product-details.png';
@@ -122,6 +123,7 @@ const buildProduct = (id, { name, brand }, section, imageOverrides = {}) => {
     name,
     nameEn: name,
     brand,
+    brandId: getBrandIdByName(brand),
     section,
     category: meta.category,
     price: defaultPrice,

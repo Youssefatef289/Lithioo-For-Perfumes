@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
 import { BRAND_LOGOS } from '../data/brands';
@@ -20,7 +20,7 @@ const BrandCard = ({ brand, language }) => {
     <motion.article
       variants={cardVariants}
       whileHover={{ y: -4, scale: 1.02 }}
-      className="group flex h-full flex-col items-center justify-center rounded-3xl border border-neutral-100 bg-white px-4 py-5 text-center shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-shadow duration-500 hover:shadow-[0_8px_28px_rgba(0,0,0,0.1)] dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)]"
+      className="group min-w-[180px] flex-1 rounded-3xl border border-neutral-100 bg-white px-4 py-5 text-center shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-shadow duration-500 hover:shadow-[0_8px_28px_rgba(0,0,0,0.1)] dark:border-neutral-800 dark:bg-neutral-900 dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] sm:min-w-[200px]"
     >
       <div className="flex h-[120px] w-full items-center justify-center rounded-2xl bg-gradient-to-br from-neutral-50 via-white to-neutral-50 p-4 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800">
         <img
@@ -32,7 +32,7 @@ const BrandCard = ({ brand, language }) => {
           className="max-h-[82px] max-w-full object-contain grayscale transition-all duration-500 ease-out group-hover:grayscale-0"
         />
       </div>
-      <span className="mt-4 line-clamp-1 text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-neutral-500 dark:text-neutral-400">
+      <span className="mt-4 line-clamp-1 block text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-neutral-500 dark:text-neutral-400">
         {label}
       </span>
     </motion.article>
@@ -41,6 +41,28 @@ const BrandCard = ({ brand, language }) => {
 
 const BrandsSlider = () => {
   const { t, language } = useLanguage();
+  const sliderRef = useRef(null);
+
+  useEffect(() => {
+    const slider = sliderRef.current;
+    if (!slider) return undefined;
+
+    const interval = setInterval(() => {
+      const maxScroll = slider.scrollWidth - slider.clientWidth;
+
+      if (slider.scrollLeft >= maxScroll - 10) {
+        slider.scrollTo({ left: 0, behavior: 'smooth' });
+        return;
+      }
+
+      slider.scrollBy({
+        left: 220,
+        behavior: 'smooth',
+      });
+    }, 2200);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <section
@@ -61,6 +83,7 @@ const BrandsSlider = () => {
         </header>
 
         <motion.div
+          ref={sliderRef}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.18 }}
@@ -72,10 +95,13 @@ const BrandsSlider = () => {
               },
             },
           }}
-          className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+          className="flex gap-4 overflow-x-auto pb-3 scroll-smooth [scrollbar-width:none]"
+          style={{ msOverflowStyle: 'none' }}
         >
           {BRAND_LOGOS.map((brand) => (
-            <BrandCard key={brand.id} brand={brand} language={language} />
+            <div key={brand.id} className="flex-shrink-0">
+              <BrandCard brand={brand} language={language} />
+            </div>
           ))}
         </motion.div>
       </div>

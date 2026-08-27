@@ -1,3 +1,5 @@
+import { getBrandIdByName } from './brands';
+
 const base = '/image/products/new-diverse';
 
 const make = (config) => ({
@@ -7,6 +9,7 @@ const make = (config) => ({
   nameAr: config.nameAr,
   brand: config.brand,
   brandAr: config.brandAr,
+  brandId: getBrandIdByName(config.brand),
   category: config.category,
   categoryAr: config.categoryAr,
   size: config.size,

@@ -7,13 +7,13 @@ export const BRAND_LOGOS = [
     id: 'assaf',
     name: 'Assaf',
     nameAr: 'عساف',
-    logo: '/image/brands/assaf_final.png',
+    logo: '/image/brands/assaf.png',
   },
   {
     id: 'ibraq',
     name: 'Ibraq',
     nameAr: 'إبراق',
-    logo: '/image/brands/ibraaq_gold_final.png',
+    logo: '/image/brands/ibraq.png',
   },
   {
     id: 'rasasi',
@@ -31,7 +31,7 @@ export const BRAND_LOGOS = [
     id: 'al-majed-oud',
     name: 'Al Majed Oud',
     nameAr: 'المجد للعود',
-    logo: '/image/brands/al-majed-oud.webp',
+    logo: '/image/brands/al-majed-oud.png',
   },
   {
     id: 'al-qurashi',
@@ -49,7 +49,7 @@ export const BRAND_LOGOS = [
     id: 'dkhoon-emirates',
     name: 'Dkhoon Emirates',
     nameAr: 'دخون الإمارات',
-    logo: '/image/brands/dkhoon-emirates.jpg',
+    logo: '/image/brands/Dkhoon Emirates.jpg',
   },
   {
     id: 'amarah',
@@ -58,15 +58,39 @@ export const BRAND_LOGOS = [
     logo: '/image/brands/amarah.webp',
   },
   {
-    id: 'jean-paul-gaultier',
-    name: 'Jean Paul Gaultier',
-    nameAr: 'جان بول غوتييه',
-    logo: '/image/brands/jean-paul-gaultier.webp',
-  },
-  {
     id: 'jean-antoine',
     name: 'Jean Antoine',
     nameAr: 'جان أنطوان',
-    logo: '/image/brands/jean-antoine.webp',
+    logo: '/image/brands/jean antone.webp',
+  },
+  {
+    id: 'Laverne',
+    name: 'Laverne',
+    nameAr: 'لافيرن',
+    logo: '/image/brands/Laverne.jpeg',
+  },
+  {
+    id: 'match',
+    name: 'Match',
+    nameAr: ' ماتش',
+    logo: '/image/brands/match.png',
   },
 ];
+
+export const getBrandById = (brandId) => BRAND_LOGOS.find((brand) => brand.id === brandId);
+
+export const getBrandIdByName = (brandName) => {
+  if (!brandName) return null;
+
+  const normalized = brandName.trim().toLowerCase();
+  const matched = BRAND_LOGOS.find((brand) =>
+    [brand.name, brand.nameAr].filter(Boolean).some((label) => label.trim().toLowerCase() === normalized)
+  );
+
+  return matched?.id || null;
+};
+
+export const getBrandLabel = (brand, language = 'en') => {
+  if (!brand) return '';
+  return language === 'ar' ? brand.nameAr || brand.name : brand.name;
+};

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { FiGrid, FiHeart, FiShoppingCart, FiTrash2, FiX } from 'react-icons/fi';
+import { FiGrid, FiHeart, FiShoppingCart, FiTrash2, FiX, FiTag } from 'react-icons/fi';
 import LanguageToggle from './LanguageToggle';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { PRODUCT_SECTIONS } from '../data/products';
+import { BRAND_LOGOS } from '../data/brands';
 import { formatEGP } from '../utils/price';
 import { localizeProduct } from '../utils/localizeProduct';
 
@@ -228,6 +229,57 @@ const Header = () => {
           )}
 
           <div className="relative z-[990]">
+            {mobilePanel === 'brands' && (
+              <div className="absolute inset-x-0 bottom-full z-[991] mb-3">
+                <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-900">
+                  <div className="flex items-start justify-between gap-4 border-b border-neutral-100 px-4 py-4 dark:border-neutral-800">
+                    <div>
+                      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-brand">
+                        {t.header.brandsShort}
+                      </p>
+                      <h2 className="mt-1 text-base font-bold text-neutral-900 dark:text-white">
+                        {t.header.brandsTitle}
+                      </h2>
+                    </div>
+                    <button
+                      type="button"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-white"
+                      onClick={() => setMobilePanel(null)}
+                      aria-label={t.a11y.closeMenu}
+                    >
+                      <FiX className="h-5 w-5" />
+                    </button>
+                  </div>
+
+                  <div className="max-h-[60vh] overflow-y-auto p-4">
+                    {BRAND_LOGOS.length === 0 ? (
+                      <p className="py-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
+                        {t.header.brandsEmpty}
+                      </p>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-3">
+                        {BRAND_LOGOS.map((brand) => (
+                          <Link
+                            key={brand.id}
+                            to={`/products?brand=${brand.id}`}
+                            className="flex items-center gap-3 rounded-2xl border border-neutral-100 bg-neutral-50 p-3 text-start transition hover:border-brand hover:bg-brand/5 dark:border-neutral-800 dark:bg-neutral-800/60 dark:hover:bg-brand/10"
+                            onClick={() => setMobilePanel(null)}
+                          >
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white p-2 dark:bg-neutral-900">
+                              <img src={brand.logo} alt={brand.name} className="max-h-full max-w-full object-contain" />
+                            </div>
+                            <span className="min-w-0 flex-1 truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                              {language === 'ar' ? brand.nameAr : brand.name}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {mobilePanel === 'products' && (
               <div className="absolute inset-x-0 bottom-full z-[991] mb-3">
                 <div className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-2xl dark:border-neutral-700 dark:bg-neutral-900">
@@ -397,7 +449,7 @@ const Header = () => {
               </div>
             )}
 
-            <nav className="grid grid-cols-3 overflow-hidden rounded-t-3xl border border-neutral-200 border-b-0 bg-white/95 shadow-[0_-16px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl dark:border-neutral-700 dark:bg-neutral-900/95">
+            <nav className="grid grid-cols-4 overflow-hidden rounded-t-3xl border border-neutral-200 border-b-0 bg-white/95 shadow-[0_-16px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl dark:border-neutral-700 dark:bg-neutral-900/95">
               <button
                 type="button"
                 className={`${mobileNavButton} ${
@@ -413,6 +465,19 @@ const Header = () => {
               >
                 <FiGrid className="h-5 w-5" />
                 <span>{t.header.productsShort}</span>
+              </button>
+
+              <button
+                type="button"
+                className={`${mobileNavButton} ${
+                  mobilePanel === 'brands' ? mobileNavActive : mobileNavInactive
+                }`}
+                onClick={() => setMobilePanel((current) => (current === 'brands' ? null : 'brands'))}
+                aria-expanded={mobilePanel === 'brands'}
+                aria-label={t.header.brandsShort}
+              >
+                <FiTag className="h-5 w-5" />
+                <span>{t.header.brandsShort}</span>
               </button>
 
               <button
