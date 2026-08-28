@@ -231,6 +231,7 @@ export const translations = {
     brands: {
       title: 'Our Brands',
       subtitle: 'Trusted fragrance houses and luxury partners from around the world',
+      price: 'Price',
     },
     footer: {
       tagline: 'Premium fragrances crafted with care. Discover your signature scent at Lithioo.',
@@ -549,6 +550,7 @@ export const translations = {
     brands: {
       title: 'شركاؤنا من الماركات العالمية',
       subtitle: 'علامات عطور موثوقة وشركاء فاخرون من مختلف أنحاء العالم',
+      price: 'السعر',
     },
     footer: {
       tagline: 'عطور فاخرة مصنوعة بعناية. اكتشف عطرك المميز مع ليثيو.',

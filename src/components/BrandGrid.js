@@ -1,9 +1,12 @@
 import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { getBrandLabel } from '../data/brands';
+import { getBrandPriceSummary } from '../data/brandPrices';
+import { formatEGP } from '../utils/price';
+import { localizeDigits } from '../utils/digits';
 
 const BrandGrid = ({ brands, activeBrandId = null, onBrandChange, className = '' }) => {
-  const { language } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <div
@@ -15,6 +18,7 @@ const BrandGrid = ({ brands, activeBrandId = null, onBrandChange, className = ''
       {brands.map((brand, index) => {
         const label = getBrandLabel(brand, language);
         const isActive = activeBrandId === brand.id;
+        const summary = getBrandPriceSummary(brand);
 
         return (
           <button
@@ -42,6 +46,15 @@ const BrandGrid = ({ brands, activeBrandId = null, onBrandChange, className = ''
             </div>
             <p className="mt-3 line-clamp-2 min-h-[2.5rem] text-sm font-semibold leading-snug text-neutral-900 dark:text-neutral-100">
               {label}
+            </p>
+            <p className="mt-0.5 min-h-[1.15rem] text-xs font-semibold text-brand">
+              {summary != null && (
+                <span dir="ltr">
+                  {summary.min === summary.max
+                    ? localizeDigits(formatEGP(summary.min), language)
+                    : `${localizeDigits(formatEGP(summary.min), language)} – ${localizeDigits(formatEGP(summary.max), language)}`}
+                </span>
+              )}
             </p>
           </button>
         );

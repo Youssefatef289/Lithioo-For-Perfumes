@@ -7,7 +7,9 @@ import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { PRODUCT_SECTIONS } from '../data/products';
 import { BRAND_LOGOS } from '../data/brands';
+import { getBrandPriceSummary } from '../data/brandPrices';
 import { formatEGP } from '../utils/price';
+import { localizeDigits } from '../utils/digits';
 import { localizeProduct } from '../utils/localizeProduct';
 
 const HERO_CONFIG = {
@@ -170,9 +172,9 @@ const Header = () => {
             <img
               src={logoSrc}
               alt="Lithioo Perfume"
-              className={`w-auto object-contain transition-all duration-500 group-hover:scale-105 ${
+              className={`w-auto object-cover transition-all duration-500 group-hover:scale-105 ${
                 overHero
-                  ? 'h-11 sm:h-12 md:h-[4.5rem] lg:h-[5.5rem] drop-shadow-md'
+                  ? 'h-14 sm:h-12 md:h-[4.5rem] lg:h-[5.5rem] drop-shadow-md'
                   : scrolled
                   ? 'h-9 sm:h-10 md:h-14'
                   : 'h-10 sm:h-11 md:h-[4.5rem] lg:h-20'
@@ -268,8 +270,22 @@ const Header = () => {
                             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white p-2 dark:bg-neutral-900">
                               <img src={brand.logo} alt={brand.name} className="max-h-full max-w-full object-contain" />
                             </div>
-                            <span className="min-w-0 flex-1 truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-                              {language === 'ar' ? brand.nameAr : brand.name}
+                            <span className="min-w-0 flex-1">
+                              <span className="block truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+                                {language === 'ar' ? brand.nameAr : brand.name}
+                              </span>
+                              {(() => {
+                                const summary = getBrandPriceSummary(brand);
+                                return summary != null ? (
+                                  <span className="mt-0.5 block text-xs font-semibold text-brand">
+                                    <span dir="ltr">
+                                      {summary.min === summary.max
+                                        ? localizeDigits(formatEGP(summary.min), language)
+                                        : `${localizeDigits(formatEGP(summary.min), language)} – ${localizeDigits(formatEGP(summary.max), language)}`}
+                                    </span>
+                                  </span>
+                                ) : null;
+                              })()}
                             </span>
                           </Link>
                         ))}
