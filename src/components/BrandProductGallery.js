@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import React from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import PriceDisplay from './PriceDisplay';
+import ProductCard from './ProductCard';
 
 const BRAND_IMAGE_CONTEXT = require.context(
   '../../image/Perfume brands',
@@ -56,61 +55,6 @@ const getBrandProducts = (brandId) => {
   return Object.values(grouped);
 };
 
-const BrandProductCard = ({ product, brandName, language }) => {
-  const [activeImage, setActiveImage] = useState(0);
-  const hasMultipleImages = product.images.length > 1;
-  const showPrevious = () =>
-    setActiveImage((index) => (index === 0 ? product.images.length - 1 : index - 1));
-  const showNext = () =>
-    setActiveImage((index) => (index + 1) % product.images.length);
-
-  return (
-    <article className="group overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-brand/60 hover:shadow-card-hover dark:border-neutral-800 dark:bg-neutral-900">
-      <div className="relative aspect-square bg-neutral-50 p-4 dark:bg-neutral-950">
-        <img
-          src={product.images[activeImage]}
-          alt={`${brandName} ${product.name}`}
-          loading="lazy"
-          className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
-        />
-        {hasMultipleImages && (
-          <>
-            <button
-              type="button"
-              onClick={showPrevious}
-              className="absolute start-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-neutral-700 shadow-sm transition hover:bg-brand hover:text-white dark:bg-neutral-800/90 dark:text-neutral-100"
-              aria-label={language === 'ar' ? 'الصورة السابقة' : 'Previous product image'}
-            >
-              <FiChevronLeft className="h-4 w-4 rtl:rotate-180" />
-            </button>
-            <button
-              type="button"
-              onClick={showNext}
-              className="absolute end-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-neutral-700 shadow-sm transition hover:bg-brand hover:text-white dark:bg-neutral-800/90 dark:text-neutral-100"
-              aria-label={language === 'ar' ? 'الصورة التالية' : 'Next product image'}
-            >
-              <FiChevronRight className="h-4 w-4 rtl:rotate-180" />
-            </button>
-            <span className="absolute bottom-2 start-1/2 -translate-x-1/2 rounded-full bg-black/60 px-2 py-1 text-[0.65rem] font-semibold text-white">
-              {activeImage + 1}/{product.images.length}
-            </span>
-          </>
-        )}
-      </div>
-      <div className="p-4 text-center">
-        <h3 className="line-clamp-2 min-h-[2.75rem] text-sm font-semibold uppercase tracking-[0.06em] text-neutral-800 dark:text-neutral-100">
-          {product.name}
-        </h3>
-        {product.price ? (
-          <PriceDisplay price={product.price} className="mt-2" />
-        ) : (
-          <p className="mt-2 text-sm font-semibold text-brand">Price on request</p>
-        )}
-      </div>
-    </article>
-  );
-};
-
 const BrandProductGallery = ({ brandId, brandName }) => {
   const { language } = useLanguage();
   const products = getBrandProducts(brandId);
@@ -135,11 +79,25 @@ const BrandProductGallery = ({ brandId, brandName }) => {
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {products.map((product) => (
-          <BrandProductCard
+          <ProductCard
             key={`${brandId}-${product.name}`}
-            product={product}
-            brandName={brandName}
-            language={language}
+            product={{
+              id: `brand-${brandId}-${product.name}`,
+              name: product.name,
+              nameEn: product.name,
+              brand: brandName,
+              brandId,
+              section: 'original',
+              category: 'Brand product',
+              price: product.price || 0,
+              image: product.images[0],
+              imageHover: product.images[1] || product.images[0],
+              detailImages: product.images,
+              description: `${product.name} by ${brandName}.`,
+              hideSizes: true,
+              sizes: [],
+              inStock: true,
+            }}
           />
         ))}
       </div>
