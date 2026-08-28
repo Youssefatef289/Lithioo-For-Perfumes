@@ -102,13 +102,21 @@ const ASSAF_PRICE_BY_NAME = {
   'wild colt by assaf': 2600,
 };
 
+/**
+ * Extracts a price embedded in a gallery image file name (mirrors
+ * src/data/brandPrices.js): handles prices glued to "EGP" ("2700EGP") and
+ * letter-prefixed numbers ("Set4500EGP"), while keeping sizes like
+ * "100ml"/"12 x 20ml" out. Range 300..10000 filters size numbers.
+ */
+const PRICE_IN_NAME_REGEX = /(^|[^0-9])(\d{3,4})(?:\s*egp)?(?![a-z0-9])/gi;
+
 const getPriceFromName = (name) => {
-  const prices = name.match(/\b\d{3,4}\b/g) || [];
-  const price = prices
-    .map((value) => Number(value))
-    .filter((value) => value >= 300 && value <= 10000)
-    .pop();
-  return price || null;
+  const prices = [];
+  for (const match of String(name || '').matchAll(PRICE_IN_NAME_REGEX)) {
+    const value = Number(match[2]);
+    if (value >= 300 && value <= 10000) prices.push(value);
+  }
+  return prices.pop() || null;
 };
 
 const normalizeProductName = (name) =>
@@ -122,10 +130,62 @@ const getNormalizedKey = (name) =>
     .trim()
     .toLowerCase();
 
+/* Reference prices for gallery products without a price in the file name —
+   mirrors GALLERY_REFERENCE_PRICES in src/data/brandPrices.js */
+const GALLERY_REFERENCE_PRICES = {
+  'Candy Musk Al Majed Oud كاندي مسك من الماجد للعود (150مل للجنسين)': 2500,
+  'Lady Sukoon Perfume - 100ml': 1800,
+  'Prestige Black Perfume': 2500,
+  'Prestige Ruby': 2500,
+  'Balas Rose by Ibrahim Al Qurashi – Eau de Parfum 150ml': 2300,
+  'Blue Diamond Aqua Eau De Perfume 150ml': 2300,
+  'Body Oud Cardamom': 2500,
+  'EMERALD soul': 2300,
+  'Grey Pearl Diamond EDP by Ibraheem Al Qurashi for Unisex - Luxury 150 ML': 2300,
+  'Ibraheem Al Qurashi Pink Diamond Sakura For Women EDP 150ml': 2300,
+  'Ibraheem Al. Qurashi Brazilian Tobacco 100 Ml': 2300,
+  'Ibrahim al qurashi perfume Black Carbon Diamond 200ml EDP, luxury Long Lasting Perfume For Women, Perfume For men, Refreshing scent': 2300,
+  'IBRAQ DIAMOND COLLECTION-NEW COLLECTION MINI 10 ML 10 IN 1': 3500,
+  'IBRAQ Ibrahim Al-Qurashi Al Shams musk EDP75 ml ابراهيم القرشي عطر مسك الشمس للنساء - 75 مل': 1500,
+  'Irth Collection 100 ML': 3500,
+  'NUDE CORAL diamond': 2300,
+  'Ranat khalkhal 75ml Abdul samad AlQurashi': 1500,
+  'satin body oud': 2500,
+  'Spanish Tobacco 100 Ml': 2500,
+  'summer collection ibraq': 1800,
+  'Tobacco collection': 4500,
+  'Tobacoo body oud': 2500,
+  'vintage tobacco': 3500,
+  'WHITE REGENT Diamond': 2300,
+
+  /* Ibraq / Ibrahim Al Qurashi — same-brand averages (mirrors brandPrices.js) */
+  'Grey Diamond Collection by Ibraq 225 ml': 2200,
+  'IBRAHEEM AL.QURASHI MUSK ABAZH POMEGRANATE BY IBRAHIM AL QURASHI': 2650,
+  'Ibraq black diamond incense perfume': 2650,
+  'ibraq-diamond-collection Diamond Perfume Set 3 Pcs': 2650,
+  'Maroon Diamond Box by Ibraq 225 ml': 2200,
+  'Maroon Diamond Collection Perfume Set - 3 x 75ml': 1500,
+  'Mini Collection 6-in-1 Eau de Parfum Set – 6 x 10ml Mini Perfume Gift Set for Men & Women – Long-Lasting Luxury Fragrance Variety Pack': 3500,
+  'Mini Diamond Collection by Abraq 10 x 20ml Eau de Parfum - Unisex': 2650,
+  'Moon Collection by Abraq Abraq Luxurious perfumes in 75ml, 100ml, and 150ml sizes to solve the dilemma of choice and provide long-lasting fragrance': 1500,
+  'Musk Al Fajr by Ibraheem Al Qurashi Eau de Parfum EDP For Unisex - 75 Ml': 1500,
+  'Musk Collection By Ibraq 12 × 20 ml Eau De Parfum - Unisex': 2650,
+  'Musk collection': 2650,
+  'Powder Musk Eau de Parfum by Ibraheem Al Qurashi for Unisex - 75 ML EDP': 1500,
+  'Sapphire Leather by Ibrahim Al Qurashi – Eau de Parfum 150ml': 2300,
+};
+
+const GALLERY_REFERENCE_BY_KEY = new Map(
+  Object.entries(GALLERY_REFERENCE_PRICES).map(([name, price]) => [
+    getNormalizedKey(name),
+    price,
+  ])
+);
+
 const getPriceForProduct = (fileName, basePrice = null) => {
-  const directPrice = getPriceFromName(fileName);
   const key = getNormalizedKey(fileName);
-  const mappedPrice = ASSAF_PRICE_BY_NAME[key];
+  const mappedPrice = ASSAF_PRICE_BY_NAME[key] ?? GALLERY_REFERENCE_BY_KEY.get(key);
+  const directPrice = getPriceFromName(fileName);
   return mappedPrice || directPrice || basePrice || null;
 };
 

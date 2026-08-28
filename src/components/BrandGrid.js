@@ -6,7 +6,7 @@ import { formatEGP } from '../utils/price';
 import { localizeDigits } from '../utils/digits';
 
 const BrandGrid = ({ brands, activeBrandId = null, onBrandChange, className = '' }) => {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
 
   return (
     <div
