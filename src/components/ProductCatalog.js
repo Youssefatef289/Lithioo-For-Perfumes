@@ -6,6 +6,7 @@ import { BRAND_LOGOS, getBrandById, getBrandLabel } from '../data/brands';
 import ProductCard from './ProductCard';
 import ProductSectionTabs from './ProductSectionTabs';
 import BrandGrid from './BrandGrid';
+import BrandProductGallery from './BrandProductGallery';
 
 const PRODUCTS_PER_PAGE = 12;
 const VALID_SECTIONS = ['all', 'men', 'women', 'special', 'new-diverse', 'original'];
@@ -238,6 +239,13 @@ const ProductCatalog = () => {
           <div className="mt-12">
             <BrandGrid brands={BRAND_LOGOS} />
           </div>
+        )}
+
+        {activeBrandData && (
+          <BrandProductGallery
+            brandId={activeBrandData.id}
+            brandName={activeBrandName}
+          />
         )}
 
         {totalPages > 1 && (
