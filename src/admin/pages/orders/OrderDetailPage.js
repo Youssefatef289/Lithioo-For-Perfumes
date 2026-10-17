@@ -5,8 +5,6 @@ import {
   FiArrowRight,
   FiPhone,
   FiMessageSquare,
-  FiClock,
-  FiCheckCircle,
   FiPrinter,
 } from 'react-icons/fi';
 import { useAdminLang } from '../../contexts/AdminLangContext';

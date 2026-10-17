@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   FiPlus,
   FiSearch,
@@ -7,7 +7,6 @@ import {
   FiTrash2,
   FiCopy,
   FiAlertTriangle,
-  FiCheckSquare,
 } from 'react-icons/fi';
 import { useAdminLang } from '../../contexts/AdminLangContext';
 import { useToast } from '../../components/ui/Toast';
@@ -28,7 +27,6 @@ import {
 export default function ProductsPage() {
   const { t, language } = useAdminLang();
   const toast = useToast();
-  const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('list'); // 'list' | 'audit'
   const [products, setProducts] = useState([]);
@@ -367,12 +365,22 @@ export default function ProductsPage() {
 
             <Select value={selectedSection} onChange={(e) => setSelectedSection(e.target.value)}>
               <option value="all">{language === 'ar' ? 'كل الأقسام' : 'All Sections'}</option>
-              <option value="men">Men Section</option>
-              <option value="women">Women Section</option>
-              <option value="special">Oriental Section</option>
-              <option value="original">Original Section</option>
-              <option value="new-luxury">New Luxury</option>
-              <option value="new-diverse">New & Diverse</option>
+              {sections.length > 0 ? (
+                sections.map((s) => (
+                  <option key={s.id || s.slug} value={s.slug}>
+                    {s.name_en}
+                  </option>
+                ))
+              ) : (
+                <>
+                  <option value="men">Men Section</option>
+                  <option value="women">Women Section</option>
+                  <option value="special">Oriental Section</option>
+                  <option value="original">Original Section</option>
+                  <option value="new-luxury">New Luxury</option>
+                  <option value="new-diverse">New & Diverse</option>
+                </>
+              )}
             </Select>
           </div>
 

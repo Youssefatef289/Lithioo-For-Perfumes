@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FiPlus, FiTrash2, FiStar } from 'react-icons/fi';
+import { FiPlus, FiTrash2 } from 'react-icons/fi';
 import { useAdminLang } from '../contexts/AdminLangContext';
 import { useToast } from '../components/ui/Toast';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
@@ -20,7 +20,6 @@ export default function ReviewsPage() {
   const toast = useToast();
 
   const [reviews, setReviews] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -34,7 +33,6 @@ export default function ReviewsPage() {
   });
 
   const loadReviews = useCallback(async () => {
-    setLoading(true);
     if (!isSupabaseConfigured) {
       setReviews(
         CUSTOMER_REVIEW_IMAGES.map((img, i) => ({
@@ -46,7 +44,6 @@ export default function ReviewsPage() {
           is_active: true,
         }))
       );
-      setLoading(false);
       return;
     }
 
@@ -60,8 +57,6 @@ export default function ReviewsPage() {
     } catch (err) {
       console.error(err);
       toast({ message: t.common.error, type: 'error' });
-    } finally {
-      setLoading(false);
     }
   }, [t.common.error, toast]);
 

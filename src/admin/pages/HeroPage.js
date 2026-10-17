@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FiPlus, FiEdit2, FiTrash2, FiEye } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { useAdminLang } from '../contexts/AdminLangContext';
 import { useToast } from '../components/ui/Toast';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
@@ -21,7 +21,6 @@ export default function HeroPage() {
   const toast = useToast();
 
   const [slides, setSlides] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingSlide, setEditingSlide] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -38,7 +37,6 @@ export default function HeroPage() {
   });
 
   const loadSlides = useCallback(async () => {
-    setLoading(true);
     if (!isSupabaseConfigured) {
       setSlides(
         HERO_SLIDES.map((s, i) => ({
@@ -52,7 +50,6 @@ export default function HeroPage() {
           is_active: true,
         }))
       );
-      setLoading(false);
       return;
     }
 
@@ -66,8 +63,6 @@ export default function HeroPage() {
     } catch (err) {
       console.error(err);
       toast({ message: t.common.error, type: 'error' });
-    } finally {
-      setLoading(false);
     }
   }, [t.common.error, toast]);
 

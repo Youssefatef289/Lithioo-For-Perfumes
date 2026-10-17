@@ -6,7 +6,6 @@ import {
   FiTrendingUp,
   FiAlertCircle,
   FiClock,
-  FiPackage,
   FiArrowUpRight,
 } from 'react-icons/fi';
 import {
@@ -23,7 +22,7 @@ import {
 } from 'recharts';
 import { useAdminLang } from '../contexts/AdminLangContext';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
-import { Card, StatCard, StatusPill, Skeleton, Button } from '../components/ui';
+import { Card, StatCard, StatusPill, Skeleton } from '../components/ui';
 
 const STATUS_COLORS = {
   new: '#3b82f6',

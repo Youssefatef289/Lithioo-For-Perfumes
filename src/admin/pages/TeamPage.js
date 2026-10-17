@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FiUserPlus, FiShield, FiSave, FiCopy, FiCheck } from 'react-icons/fi';
+import { FiUserPlus, FiShield, FiCopy, FiCheck } from 'react-icons/fi';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
 import { useAdminLang } from '../contexts/AdminLangContext';
 import { useToast } from '../components/ui/Toast';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
-import { Card, Button, Select, Badge, Skeleton } from '../components/ui';
+import { Card, Select, Badge, Skeleton } from '../components/ui';
 
 export default function TeamPage() {
   const { isAdmin, profile: myProfile } = useAdminAuth();

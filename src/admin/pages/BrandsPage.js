@@ -19,7 +19,6 @@ export default function BrandsPage() {
   const toast = useToast();
 
   const [brands, setBrands] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
@@ -37,7 +36,6 @@ export default function BrandsPage() {
   });
 
   const loadBrands = useCallback(async () => {
-    setLoading(true);
     if (!isSupabaseConfigured) {
       setBrands(
         BRAND_LOGOS.map((b, i) => ({
@@ -51,7 +49,6 @@ export default function BrandsPage() {
           is_active: true,
         }))
       );
-      setLoading(false);
       return;
     }
 
@@ -65,8 +62,6 @@ export default function BrandsPage() {
     } catch (err) {
       console.error(err);
       toast({ message: t.common.error, type: 'error' });
-    } finally {
-      setLoading(false);
     }
   }, [t.common.error, toast]);
 
