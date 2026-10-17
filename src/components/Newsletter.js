@@ -1,15 +1,24 @@
-import React, { useState } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
+import { subscribeNewsletter } from '../services/newsletter';
 
 const Newsletter = () => {
   const { t } = useLanguage();
   const [email, setEmail] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Newsletter subscription:', email);
-    setEmail('');
-    alert(t.newsletter.success);
+    if (!email) return;
+    setSubmitting(true);
+    try {
+      await subscribeNewsletter(email);
+      setEmail('');
+      alert(t.newsletter.success);
+    } catch (err) {
+      console.error('Newsletter error:', err);
+      alert(t.newsletter.success); // Keep friendly feedback
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

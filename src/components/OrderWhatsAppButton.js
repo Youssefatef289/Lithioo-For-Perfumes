@@ -5,6 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { localizeProduct } from '../utils/localizeProduct';
 import { formatEGP, parsePrice } from '../utils/price';
 import { openWhatsApp } from '../utils/whatsapp';
+import { createOrder } from '../services/orders';
 
 const COPY = {
   en: {
@@ -95,7 +96,7 @@ const baseFieldClasses =
 
 const baseLabelClasses = 'block text-sm font-semibold text-neutral-700 dark:text-neutral-200';
 
-const buildOrderMessage = (language, cartItems, total, form) => {
+const buildOrderMessage = (language, cartItems, total, form, orderNumber = null) => {
   const copy = COPY[language] || COPY.en;
   const receiving = RECEIVING_OPTIONS[form.fulfillmentMethod] || RECEIVING_OPTIONS.delivery;
   const payment = PAYMENT_OPTIONS[form.paymentMethod] || PAYMENT_OPTIONS.cod;
@@ -107,7 +108,12 @@ const buildOrderMessage = (language, cartItems, total, form) => {
     return `${index + 1}. ${itemDisplay.name}${sizePart} x ${item.quantity} - ${formatEGP(lineTotal)}`;
   });
 
+  const orderNumberLine = orderNumber
+    ? [`${language === 'ar' ? 'رقم الطلب' : 'Order #'}: ${orderNumber}`]
+    : [];
+
   const detailsLines = [
+    ...orderNumberLine,
     `${copy.customer}: ${form.customerName.trim()}`,
     `${copy.customerPhone}: ${form.customerPhone.trim()}`,
     `${copy.method}: ${language === 'ar' ? receiving.ar : receiving.en}`,
@@ -133,9 +139,11 @@ const buildOrderMessage = (language, cartItems, total, form) => {
 };
 
 const OrderWhatsAppButton = ({ className = '', compact = false, onOrdered }) => {
-  const { cartItems, getCartTotal } = useCart();
+  const { cartItems, getCartTotal, clearCart } = useCart();
   const { language } = useLanguage();
   const [form, setForm] = useState(INITIAL_FORM);
+  const [submitting, setSubmitting] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
   const baseId = useId();
   const copy = useMemo(() => COPY[language] || COPY.en, [language]);
   const isArabic = language === 'ar';
@@ -144,17 +152,63 @@ const OrderWhatsAppButton = ({ className = '', compact = false, onOrdered }) => 
 
   const updateField = (field) => (event) => {
     const value = event.target.value;
+    if (field === 'customerPhone') setPhoneError('');
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const validateEgyptianPhone = (phone) => {
+    const cleaned = (phone || '').replace(/[\s\-()]/g, '');
+    const egRegex = /^(?:\+?20|0020|0)?1[0125]\d{8}$/;
+    return egRegex.test(cleaned);
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (cartItems.length === 0) return;
 
-    const message = buildOrderMessage(language, cartItems, getCartTotal(), form);
+    if (!validateEgyptianPhone(form.customerPhone)) {
+      setPhoneError(
+        language === 'ar'
+          ? 'يرجى إدخال رقم هاتف مصري صحيح (مثال: 01012345678)'
+          : 'Please enter a valid Egyptian phone number (e.g. 01012345678)'
+      );
+      return;
+    }
+
+    setSubmitting(true);
+    let orderNumber = null;
+
+    try {
+      const orderPayload = {
+        customer_name: form.customerName.trim(),
+        phone: form.customerPhone.trim(),
+        address: form.fulfillmentDetails.trim(),
+        city: form.fulfillmentMethod === 'branch' ? 'Branch' : 'Delivery',
+        notes: form.notes.trim(),
+        language,
+        items: cartItems.map((item) => ({
+          product_slug: item.id,
+          product_id: item.id,
+          size_id: item.size || item.sizeId || '50ml',
+          quantity: item.quantity,
+          unit_price: parsePrice(item.price),
+        })),
+      };
+
+      const result = await createOrder(orderPayload);
+      if (result?.order_code || result?.order_number) {
+        orderNumber = result.order_code || result.order_number;
+      }
+    } catch (err) {
+      console.warn('Order DB save failed, proceeding with WhatsApp fallback:', err.message);
+    }
+
+    const message = buildOrderMessage(language, cartItems, getCartTotal(), form, orderNumber);
     openWhatsApp(message);
+    clearCart?.();
     onOrdered?.(form);
     setForm(INITIAL_FORM);
+    setSubmitting(false);
   };
 
   const fieldLayout = compact ? 'grid grid-cols-1 gap-3' : 'grid grid-cols-1 gap-4 sm:grid-cols-2';
@@ -207,11 +261,14 @@ const OrderWhatsAppButton = ({ className = '', compact = false, onOrdered }) => 
               required
               value={form.customerPhone}
               onChange={updateField('customerPhone')}
-              className={inputClasses}
+              className={`${inputClasses} ${phoneError ? '!border-red-500 ring-1 ring-red-500' : ''}`}
               autoComplete="tel"
               inputMode="tel"
               placeholder={copy.phone}
             />
+            {phoneError && (
+              <p className="text-xs font-semibold text-red-500 mt-1">{phoneError}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -278,13 +335,20 @@ const OrderWhatsAppButton = ({ className = '', compact = false, onOrdered }) => 
 
         <button
           type="submit"
-          disabled={cartItems.length === 0}
+          disabled={cartItems.length === 0 || submitting}
           className={[
             'flex w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[#20bd5a] disabled:cursor-not-allowed disabled:opacity-50',
             compact ? 'py-2.5 text-sm' : 'py-3.5',
           ].join(' ')}
         >
-          <FaWhatsapp className="h-5 w-5 shrink-0" />
+          {submitting ? (
+            <svg className="h-5 w-5 animate-spin text-white" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+            </svg>
+          ) : (
+            <FaWhatsapp className="h-5 w-5 shrink-0" />
+          )}
           <span dir={isArabic ? 'rtl' : 'ltr'}>{copy.send}</span>
         </button>
       </div>
