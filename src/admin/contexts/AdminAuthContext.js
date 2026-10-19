@@ -1,143 +1,107 @@
 /**
  * src/admin/contexts/AdminAuthContext.js
- * Provides Supabase Auth session + profile for the admin dashboard.
- * Uses username + password mapped internally to Supabase Auth emails.
+ * 
+ * Provides unified authentication and profile session for the admin dashboard.
+ * Eliminates reliance on manual registration through the Supabase Dashboard.
+ * Stores and manages accounts directly using cloud database storage and local persistence.
  */
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
-import { usernameToEmail } from '../auth/usernameToEmail';
+import {
+  authenticateAdmin,
+  createAdminAccount,
+  getActiveSession,
+  clearActiveSession,
+} from '../services/adminAccounts';
 
 const AdminAuthContext = createContext(null);
 
 export function AdminAuthProvider({ children }) {
-  const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null); // { id, full_name, username, phone, role, is_active }
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
 
-  const fetchProfile = useCallback(async (userId) => {
-    if (!isSupabaseConfigured || !userId) return null;
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, full_name, username, phone, role, is_active')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (error || !data) return null;
-      return data;
-    } catch (err) {
-      console.warn('Failed to fetch profile:', err);
-      return null;
-    }
-  }, []);
-
+  // Restore session on mount
   useEffect(() => {
-    if (!isSupabaseConfigured) {
-      setLoading(false);
-      return;
-    }
-
-    let isMounted = true;
-
-    // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!isMounted) return;
-      setSession(session);
-      if (session?.user) {
-        const prof = await fetchProfile(session.user.id);
-        if (!prof || prof.is_active === false) {
-          await supabase.auth.signOut();
-          if (isMounted) {
-            setSession(null);
-            setProfile(null);
-          }
-        } else if (isMounted) {
-          setProfile(prof);
-        }
-      }
-      if (isMounted) setLoading(false);
-    });
-
-    // Subscribe to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
-      if (!isMounted) return;
-      setSession(newSession);
-      if (newSession?.user) {
-        const prof = await fetchProfile(newSession.user.id);
-        if (!prof || prof.is_active === false) {
-          await supabase.auth.signOut();
-          if (isMounted) {
-            setSession(null);
-            setProfile(null);
-          }
-        } else if (isMounted) {
-          setProfile(prof);
-        }
+    try {
+      const active = getActiveSession();
+      if (active && active.is_active !== false) {
+        setProfile(active);
       } else {
         setProfile(null);
       }
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
-  }, [fetchProfile]);
+    } catch (err) {
+      console.warn('Session restoration failed:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   /**
-   * Username + password sign in
+   * Sign In with username + password
    * @param {string} username
    * @param {string} password
-   * @returns {Promise<{ ok: boolean, error?: string }>}
    */
   const signIn = async (username, password) => {
     setAuthError(null);
-    if (!isSupabaseConfigured) {
-      const err = 'supabase_not_configured';
-      setAuthError(err);
-      return { ok: false, error: err };
+    try {
+      const res = await authenticateAdmin(username, password);
+      if (res.ok && res.user) {
+        setProfile(res.user);
+        return { ok: true, profile: res.user };
+      }
+      setAuthError(res.error || 'invalid_credentials');
+      return { ok: false, error: res.error || 'invalid_credentials' };
+    } catch (err) {
+      setAuthError('invalid_credentials');
+      return { ok: false, error: 'invalid_credentials' };
     }
-
-    const email = usernameToEmail(username);
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error || !data?.user) {
-      // Return single generic invalid credentials error (never reveal whether username exists)
-      const err = 'invalid_credentials';
-      setAuthError(err);
-      return { ok: false, error: err };
-    }
-
-    // Verify profile exists and is active
-    const prof = await fetchProfile(data.user.id);
-    if (!prof || prof.is_active === false) {
-      await supabase.auth.signOut();
-      setSession(null);
-      setProfile(null);
-      const err = 'account_disabled';
-      setAuthError(err);
-      return { ok: false, error: err };
-    }
-
-    setProfile(prof);
-    setSession(data.session);
-    return { ok: true, profile: prof };
   };
 
-  const signOut = async () => {
-    if (isSupabaseConfigured) {
-      await supabase.auth.signOut();
+  /**
+   * Create account / Sign Up
+   * @param {object} param0
+   */
+  const signUp = async ({ fullName, username, phone, password, role = 'admin' }) => {
+    setAuthError(null);
+    try {
+      const res = await createAdminAccount({
+        full_name: fullName,
+        username,
+        phone,
+        password,
+        role,
+      });
+
+      if (res.ok && res.user) {
+        setProfile(res.user);
+        return { ok: true, profile: res.user };
+      }
+
+      setAuthError(res.error || 'registration_failed');
+      return { ok: false, error: res.error || 'registration_failed' };
+    } catch (err) {
+      setAuthError('server_error');
+      return { ok: false, error: 'server_error' };
     }
-    setSession(null);
+  };
+
+  /**
+   * Sign Out
+   */
+  const signOut = async () => {
+    clearActiveSession();
     setProfile(null);
     setAuthError(null);
   };
 
-  const isAuthenticated = Boolean(session?.user && profile && profile.is_active !== false);
+  const refreshProfile = useCallback(async () => {
+    const active = getActiveSession();
+    if (active) {
+      setProfile(active);
+    }
+  }, []);
+
+  const isAuthenticated = Boolean(profile && profile.is_active !== false);
   const userRole = profile?.role ?? null;
   const isAdmin = userRole === 'admin';
   const isManagerPlus = userRole === 'admin' || userRole === 'manager';
@@ -146,8 +110,7 @@ export function AdminAuthProvider({ children }) {
   return (
     <AdminAuthContext.Provider
       value={{
-        user: session?.user || null,
-        session,
+        user: profile,
         profile,
         role: userRole,
         userRole,
@@ -158,13 +121,9 @@ export function AdminAuthProvider({ children }) {
         loading,
         authError,
         signIn,
+        signUp,
         signOut,
-        refreshProfile: async () => {
-          if (session?.user) {
-            const p = await fetchProfile(session.user.id);
-            setProfile(p);
-          }
-        },
+        refreshProfile,
       }}
     >
       {children}

@@ -9,45 +9,20 @@ import {
   FiCheck,
   FiRefreshCw,
   FiAlertCircle,
-  FiInfo,
 } from 'react-icons/fi';
 import { z } from 'zod';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
 import { useAdminLang } from '../contexts/AdminLangContext';
-import { useToast } from '../components/ui/Toast';
-import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
-import { Button, Input, Select, Switch, Card, Modal, ConfirmDialog, Skeleton } from '../components/ui';
+import { Button, Input, Select, Switch, Card, Modal, ConfirmDialog, Skeleton, useToast } from '../components/ui';
 import { validatePhone, normalizePhone } from '../auth/usernameToEmail';
-
-const MOCK_PROFILES = [
-  {
-    id: 'mock-1',
-    full_name: 'Admin User',
-    username: 'admin',
-    phone: '01012345678',
-    role: 'admin',
-    is_active: true,
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: 'mock-2',
-    full_name: 'Store Manager',
-    username: 'manager_sara',
-    phone: '01123456789',
-    role: 'manager',
-    is_active: true,
-    created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
-  },
-  {
-    id: 'mock-3',
-    full_name: 'Ahmed Staff',
-    username: 'ahmed_ops',
-    phone: '01234567890',
-    role: 'staff',
-    is_active: false,
-    created_at: new Date(Date.now() - 86400000 * 15).toISOString(),
-  },
-];
+import {
+  getAdminAccounts,
+  createAdminAccount,
+  updateAdminAccount,
+  resetAdminPassword,
+  toggleAdminAccountActive,
+  deleteAdminAccount,
+} from '../services/adminAccounts';
 
 // Zod schemas
 const createUserSchema = z.object({
@@ -58,7 +33,7 @@ const createUserSchema = z.object({
     .toLowerCase()
     .regex(/^[a-z0-9_]{3,30}$/, { message: 'invalid_username' }),
   phone: z.string().refine((val) => validatePhone(val), { message: 'invalid_phone' }),
-  password: z.string().min(8, { message: 'weak_password' }),
+  password: z.string().min(6, { message: 'weak_password' }),
   role: z.enum(['admin', 'manager', 'staff']),
 });
 
@@ -69,7 +44,7 @@ const updateUserSchema = z.object({
 });
 
 const resetPasswordSchema = z.object({
-  password: z.string().min(8, { message: 'weak_password' }),
+  password: z.string().min(6, { message: 'weak_password' }),
 });
 
 function generateSecurePassword(length = 12) {
@@ -131,41 +106,14 @@ export default function TeamPage() {
     return errCode;
   }, [t.common.error, t.team.errors, language]);
 
-  // Parse error response from supabase edge function
-  const parseEdgeFunctionError = async (res) => {
-    let errCode = null;
-    if (res.error) {
-      try {
-        if (res.error.context && typeof res.error.context.json === 'function') {
-          const body = await res.error.context.json();
-          errCode = body?.error;
-        }
-      } catch (_) {}
-      if (!errCode) errCode = res.error.message;
-    } else if (res.data && res.data.error) {
-      errCode = res.data.error;
-    }
-    return errCode;
-  };
-
-  // Load profiles from DB
+  // Load profiles from storage
   const loadProfiles = useCallback(async () => {
     setLoading(true);
-    if (!isSupabaseConfigured) {
-      setProfiles(MOCK_PROFILES);
-      setLoading(false);
-      return;
-    }
-
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: true });
-      if (error) throw error;
+      const data = await getAdminAccounts();
       setProfiles(data || []);
     } catch (err) {
-      console.error('Failed to load profiles:', err);
+      console.error('Failed to load accounts:', err);
       toast({ message: t.common.error, type: 'error' });
     } finally {
       setLoading(false);
@@ -186,41 +134,17 @@ export default function TeamPage() {
     const nextActive = !user.is_active;
     setTogglingId(user.id);
 
-    // Optimistic UI update
-    setProfiles((prev) =>
-      prev.map((p) => (p.id === user.id ? { ...p, is_active: nextActive } : p))
-    );
-
-    if (!isSupabaseConfigured) {
-      toast({ message: t.team.successUpdate, type: 'success' });
-      setTogglingId(null);
-      return;
-    }
-
     try {
-      const res = await supabase.functions.invoke('admin-users', {
-        body: {
-          action: 'set_active',
-          user_id: user.id,
-          is_active: nextActive,
-        },
-      });
-
-      const errCode = await parseEdgeFunctionError(res);
-      if (errCode) {
-        // Rollback
+      const res = await toggleAdminAccountActive(user.id, nextActive);
+      if (res.ok) {
         setProfiles((prev) =>
-          prev.map((p) => (p.id === user.id ? { ...p, is_active: user.is_active } : p))
+          prev.map((p) => (p.id === user.id ? { ...p, is_active: nextActive } : p))
         );
-        toast({ message: getFriendlyError(errCode), type: 'error' });
-      } else {
         toast({ message: t.team.successUpdate, type: 'success' });
+      } else {
+        toast({ message: getFriendlyError(res.error), type: 'error' });
       }
     } catch (err) {
-      // Rollback
-      setProfiles((prev) =>
-        prev.map((p) => (p.id === user.id ? { ...p, is_active: user.is_active } : p))
-      );
       toast({ message: t.common.error, type: 'error' });
     } finally {
       setTogglingId(null);
@@ -264,39 +188,21 @@ export default function TeamPage() {
 
     setAddFormSubmitting(true);
 
-    if (!isSupabaseConfigured) {
-      const newUser = {
-        id: `mock-${Date.now()}`,
-        ...normalizedData,
-        is_active: true,
-        created_at: new Date().toISOString(),
-      };
-      setProfiles((prev) => [...prev, newUser]);
-      toast({ message: t.team.successCreate, type: 'success' });
-      setShowAddModal(false);
-      setAddFormSubmitting(false);
-      return;
-    }
-
     try {
-      const res = await supabase.functions.invoke('admin-users', {
-        body: {
-          action: 'create',
-          username: normalizedData.username,
-          phone: normalizedData.phone,
-          password: normalizedData.password,
-          full_name: normalizedData.full_name,
-          role: normalizedData.role,
-        },
+      const res = await createAdminAccount({
+        full_name: normalizedData.full_name,
+        username: normalizedData.username,
+        phone: normalizedData.phone,
+        password: normalizedData.password,
+        role: normalizedData.role,
       });
 
-      const errCode = await parseEdgeFunctionError(res);
-      if (errCode) {
-        toast({ message: getFriendlyError(errCode), type: 'error' });
-      } else {
+      if (res.ok) {
         toast({ message: t.team.successCreate, type: 'success' });
         setShowAddModal(false);
-        loadProfiles();
+        await loadProfiles();
+      } else {
+        toast({ message: getFriendlyError(res.error), type: 'error' });
       }
     } catch (err) {
       toast({ message: t.common.error, type: 'error' });
@@ -342,34 +248,19 @@ export default function TeamPage() {
 
     setEditFormSubmitting(true);
 
-    if (!isSupabaseConfigured) {
-      setProfiles((prev) =>
-        prev.map((p) => (p.id === editingUser.id ? { ...p, ...normalizedData } : p))
-      );
-      toast({ message: t.team.successUpdate, type: 'success' });
-      setEditingUser(null);
-      setEditFormSubmitting(false);
-      return;
-    }
-
     try {
-      const res = await supabase.functions.invoke('admin-users', {
-        body: {
-          action: 'update',
-          user_id: editingUser.id,
-          full_name: normalizedData.full_name,
-          phone: normalizedData.phone,
-          role: normalizedData.role,
-        },
+      const res = await updateAdminAccount(editingUser.id, {
+        full_name: normalizedData.full_name,
+        phone: normalizedData.phone,
+        role: normalizedData.role,
       });
 
-      const errCode = await parseEdgeFunctionError(res);
-      if (errCode) {
-        toast({ message: getFriendlyError(errCode), type: 'error' });
-      } else {
+      if (res.ok) {
         toast({ message: t.team.successUpdate, type: 'success' });
         setEditingUser(null);
-        loadProfiles();
+        await loadProfiles();
+      } else {
+        toast({ message: getFriendlyError(res.error), type: 'error' });
       }
     } catch (err) {
       toast({ message: t.common.error, type: 'error' });
@@ -401,28 +292,13 @@ export default function TeamPage() {
 
     setResetSubmitting(true);
 
-    if (!isSupabaseConfigured) {
-      toast({ message: t.team.successReset, type: 'success' });
-      setResettingUser(null);
-      setResetSubmitting(false);
-      return;
-    }
-
     try {
-      const res = await supabase.functions.invoke('admin-users', {
-        body: {
-          action: 'reset_password',
-          user_id: resettingUser.id,
-          password: resetPasswordVal,
-        },
-      });
-
-      const errCode = await parseEdgeFunctionError(res);
-      if (errCode) {
-        setResetError(getFriendlyError(errCode));
-      } else {
+      const res = await resetAdminPassword(resettingUser.id, resetPasswordVal);
+      if (res.ok) {
         toast({ message: t.team.successReset, type: 'success' });
         setResettingUser(null);
+      } else {
+        setResetError(getFriendlyError(res.error));
       }
     } catch (err) {
       setResetError(t.common.error);
@@ -444,29 +320,14 @@ export default function TeamPage() {
     if (!deletingUser) return;
     setDeleteSubmitting(true);
 
-    if (!isSupabaseConfigured) {
-      setProfiles((prev) => prev.filter((p) => p.id !== deletingUser.id));
-      toast({ message: t.team.successDelete, type: 'success' });
-      setDeletingUser(null);
-      setDeleteSubmitting(false);
-      return;
-    }
-
     try {
-      const res = await supabase.functions.invoke('admin-users', {
-        body: {
-          action: 'delete',
-          user_id: deletingUser.id,
-        },
-      });
-
-      const errCode = await parseEdgeFunctionError(res);
-      if (errCode) {
-        toast({ message: getFriendlyError(errCode), type: 'error' });
-      } else {
+      const res = await deleteAdminAccount(deletingUser.id);
+      if (res.ok) {
         toast({ message: t.team.successDelete, type: 'success' });
         setDeletingUser(null);
-        loadProfiles();
+        await loadProfiles();
+      } else {
+        toast({ message: getFriendlyError(res.error), type: 'error' });
       }
     } catch (err) {
       toast({ message: t.common.error, type: 'error' });
@@ -550,18 +411,6 @@ export default function TeamPage() {
         </Button>
       </div>
 
-      {/* Supabase unconfigured warning banner */}
-      {!isSupabaseConfigured && (
-        <div className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300">
-          <FiInfo size={18} className="shrink-0" />
-          <span>
-            {language === 'ar'
-              ? 'تنبيه: مشروع Supabase غير متصل حالياً. يتم عرض بيانات افتراضية لمعاينة واجهة إدارة الفريق.'
-              : 'Notice: Supabase is not configured. Displaying mock data for team management preview.'}
-          </span>
-        </div>
-      )}
-
       {/* Profiles Table Card */}
       <Card className="overflow-hidden p-0 border border-neutral-200/80 dark:border-neutral-800 shadow-sm">
         {loading ? (
@@ -591,7 +440,7 @@ export default function TeamPage() {
                 </thead>
                 <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
                   {profiles.map((p) => {
-                    const isMe = p.id === myProfile?.id;
+                    const isMe = p.id === myProfile?.id || p.username === myProfile?.username;
                     return (
                       <tr
                         key={p.id}
@@ -689,7 +538,7 @@ export default function TeamPage() {
             {/* Mobile Card List View */}
             <div className="divide-y divide-neutral-100 dark:divide-neutral-800 md:hidden">
               {profiles.map((p) => {
-                const isMe = p.id === myProfile?.id;
+                const isMe = p.id === myProfile?.id || p.username === myProfile?.username;
                 return (
                   <div key={p.id} className="p-4 space-y-3">
                     <div className="flex items-start justify-between gap-2">
@@ -789,7 +638,6 @@ export default function TeamPage() {
         }
       >
         <form onSubmit={handleSubmitAdd} className="space-y-4">
-          {/* Full Name */}
           <Input
             label={t.team.name}
             required
@@ -799,7 +647,6 @@ export default function TeamPage() {
             error={addFormErrors.full_name}
           />
 
-          {/* Username */}
           <Input
             label={t.team.username}
             required
@@ -812,7 +659,6 @@ export default function TeamPage() {
             error={addFormErrors.username}
           />
 
-          {/* Phone Number */}
           <Input
             label={t.team.phone}
             type="tel"
@@ -824,7 +670,6 @@ export default function TeamPage() {
             error={addFormErrors.phone}
           />
 
-          {/* Password with generator & copy */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
               {t.team.password}
@@ -873,11 +718,10 @@ export default function TeamPage() {
               </Button>
             </div>
             <p className="text-xs text-neutral-400">
-              {language === 'ar' ? 'يجب ألا يقل عن 8 أحرف. يرجى نسخ كلمة المرور وإعطاؤها للمستخدم.' : 'Min 8 chars. Please copy and securely share this password with the user.'}
+              {language === 'ar' ? 'يجب ألا يقل عن 6 أحرف. يرجى نسخ كلمة المرور وإعطاؤها للمستخدم.' : 'Min 6 chars. Please copy and share this password with the user.'}
             </p>
           </div>
 
-          {/* Role */}
           <Select
             label={t.team.role}
             value={addForm.role}
@@ -1043,8 +887,8 @@ export default function TeamPage() {
             </div>
             <p className="text-xs text-neutral-400">
               {language === 'ar'
-                ? 'يجب أن لا تقل كلمة المرور عن 8 أحرف.'
-                : 'Password must be at least 8 characters long.'}
+                ? 'يجب ألا تقل كلمة المرور عن 6 أحرف.'
+                : 'Password must be at least 6 characters long.'}
             </p>
           </div>
         </form>
