@@ -148,12 +148,12 @@ export async function authenticateAdmin(username, password) {
  */
 export async function createAdminAccount({ full_name, username, phone, password, role = 'admin' }) {
   const accounts = await getAdminAccounts();
-  const cleanUsername = String(username || '').trim().toLowerCase();
+  const cleanUsername = String(username || '').trim();
   const cleanPhone = String(phone || '').trim();
   const cleanName = String(full_name || '').trim();
 
-  // Check username collision
-  if (accounts.some((a) => a.username.toLowerCase() === cleanUsername)) {
+  // Check username collision (case-insensitive)
+  if (accounts.some((a) => String(a.username || '').trim().toLowerCase() === cleanUsername.toLowerCase())) {
     return { ok: false, error: 'username_taken_or_invalid' };
   }
 

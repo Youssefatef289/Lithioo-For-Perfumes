@@ -27,11 +27,7 @@ import {
 // Zod schemas
 const createUserSchema = z.object({
   full_name: z.string().trim().min(2, { message: 'invalid_name' }),
-  username: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .regex(/^[a-z0-9_]{3,30}$/, { message: 'invalid_username' }),
+  username: z.string().trim().min(2, { message: 'invalid_username' }),
   phone: z.string().refine((val) => validatePhone(val), { message: 'invalid_phone' }),
   password: z.string().min(6, { message: 'weak_password' }),
   role: z.enum(['admin', 'manager', 'staff']),
@@ -171,7 +167,7 @@ export default function TeamPage() {
 
     const normalizedData = {
       ...addForm,
-      username: addForm.username.trim().toLowerCase(),
+      username: addForm.username.trim(),
       phone: normalizePhone(addForm.phone),
     };
 
@@ -650,12 +646,9 @@ export default function TeamPage() {
           <Input
             label={t.team.username}
             required
-            autoCapitalize="none"
-            spellCheck="false"
-            placeholder={language === 'ar' ? 'اسم المستخدم (أحرف صغيرة)' : 'username'}
+            placeholder={language === 'ar' ? 'اسم المستخدم' : 'username'}
             value={addForm.username}
-            onChange={(e) => setAddForm({ ...addForm, username: e.target.value.toLowerCase() })}
-            hint={language === 'ar' ? 'أحرف إنجليزية صغيرة وأرقام وشرطة سفلية فقط (3-30)' : '3-30 lowercase characters, numbers or underscores'}
+            onChange={(e) => setAddForm({ ...addForm, username: e.target.value })}
             error={addFormErrors.username}
           />
 

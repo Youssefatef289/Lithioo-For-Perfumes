@@ -27,8 +27,8 @@ export function usernameToEmail(username) {
  */
 export function validateUsername(username) {
   if (!username || typeof username !== 'string') return false;
-  const clean = username.trim().toLowerCase();
-  return /^[a-z0-9_]{3,30}$/.test(clean);
+  const clean = username.trim();
+  return clean.length >= 2 && clean.length <= 50;
 }
 
 /**

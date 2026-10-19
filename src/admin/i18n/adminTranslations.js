@@ -200,7 +200,7 @@ export const adminT = {
       successReset:        'Password reset successfully.',
       successDelete:       'User deleted successfully.',
       errors: {
-        invalid_username:           'Username must be 3-30 characters (lowercase letters, numbers, underscores only).',
+        invalid_username:           'Username must be at least 2 characters.',
         invalid_phone:              'Invalid phone number. Must be a valid Egyptian mobile number (e.g. 01012345678).',
         weak_password:              'Password must be at least 8 characters long.',
         username_taken_or_invalid:  'This username is already taken. Please choose another one.',
@@ -448,7 +448,7 @@ export const adminT = {
       successReset:        'تمت إعادة تعيين كلمة المرور بنجاح.',
       successDelete:       'تم حذف المستخدم بنجاح.',
       errors: {
-        invalid_username:           'اسم المستخدم يجب أن يتكون من 3-30 حرفاً (أحرف إنجليزية صغيرة، أرقام، وشرطة سفلية فقط).',
+        invalid_username:           'اسم المستخدم يجب ألا يقل عن حرفين.',
         invalid_phone:              'رقم هاتف غير صالح. يجب أن يكون رقماً مصرياً صالحاً (مثال: 01012345678).',
         weak_password:              'يجب ألا تقل كلمة المرور عن 8 أحرف.',
         username_taken_or_invalid:  'اسم المستخدم هذا مستخدم بالفعل. يرجى اختيار اسم آخر.',

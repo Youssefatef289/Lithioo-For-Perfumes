@@ -123,7 +123,7 @@ export default function LoginPage() {
     setSuccessMsg('');
 
     const fullName = signUpFullName.trim();
-    const cleanUsername = signUpUsername.trim().toLowerCase();
+    const cleanUsername = signUpUsername.trim();
     const cleanPhone = normalizePhone(signUpPhone);
     const pass = signUpPassword;
     const confirmPass = signUpConfirmPass;
@@ -136,8 +136,8 @@ export default function LoginPage() {
     if (!validateUsername(cleanUsername)) {
       setErrorMsg(
         language === 'ar'
-          ? 'اسم المستخدم يجب أن يتكون من 3-30 حرفاً (أحرف إنجليزية صغيرة، أرقام، وشرطة سفلية فقط).'
-          : 'Username must be 3-30 lowercase characters, numbers or underscores.'
+          ? 'اسم المستخدم يجب ألا يقل عن حرفين.'
+          : 'Username must be at least 2 characters.'
       );
       return;
     }
@@ -265,13 +265,10 @@ export default function LoginPage() {
                   <Input
                     type="text"
                     required
-                    autoCapitalize="none"
-                    autoCorrect="off"
-                    spellCheck="false"
                     value={signInUsername}
-                    onChange={(e) => setSignInUsername(e.target.value.toLowerCase())}
+                    onChange={(e) => setSignInUsername(e.target.value)}
                     placeholder={language === 'ar' ? 'اسم المستخدم (مثال: admin)' : 'username (e.g. admin)'}
-                    className="ps-9 font-mono"
+                    className="ps-9"
                     disabled={isLocked || loading}
                   />
                   <FiUser className="absolute start-3 top-3 text-neutral-400" size={16} />
@@ -361,20 +358,14 @@ export default function LoginPage() {
                   <Input
                     type="text"
                     required
-                    autoCapitalize="none"
-                    autoCorrect="off"
-                    spellCheck="false"
                     value={signUpUsername}
-                    onChange={(e) => setSignUpUsername(e.target.value.toLowerCase())}
-                    placeholder={language === 'ar' ? 'اسم المستخدم (أحرف صغيرة)' : 'username'}
-                    className="ps-9 font-mono"
+                    onChange={(e) => setSignUpUsername(e.target.value)}
+                    placeholder={language === 'ar' ? 'اسم المستخدم' : 'username'}
+                    className="ps-9"
                     disabled={loading}
                   />
                   <FiUser className="absolute start-3 top-3 text-neutral-400" size={16} />
                 </div>
-                <p className="mt-1 text-[11px] text-neutral-400">
-                  {language === 'ar' ? 'أحرف إنجليزية صغيرة وأرقام وشرطة سفلية فقط (3-30)' : '3-30 lowercase characters, numbers or underscores'}
-                </p>
               </div>
 
               {/* Phone */}
