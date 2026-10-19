@@ -68,6 +68,7 @@ flowchart TD
 ```bash
 REACT_APP_SUPABASE_URL=https://xkpcfdacdwtihtpotdbp.supabase.co
 REACT_APP_SUPABASE_PUBLISHABLE_KEY=sb_publishable_03sk7OtgPlcBOukevWECcQ_JH5RciqP
+REACT_APP_AUTH_EMAIL_DOMAIN=lithioo.app
 ```
 
 #### 2. مفتاح السيرفر السري (`SUPABASE_SECRET_KEY`):
@@ -99,7 +100,10 @@ erDiagram
     profiles {
         uuid id PK
         text full_name
+        text username UK
+        text phone UK
         user_role role
+        boolean is_active
         timestamptz created_at
     }
 
@@ -293,18 +297,20 @@ erDiagram
 
 ## 8. خطوات الإعداد والتهيئة خطوة بخطوة (Setup Guide)
 
-### الخطوة 1: تطبيق ملف الترحيل (Apply Migration SQL)
+### الخطوة 1: تطبيق ملفات الترحيل (Apply Migrations SQL)
 1. افتح مشروعك في **[Supabase Dashboard](https://supabase.com/dashboard)**.
 2. توجّه إلى القائمة الجانبية واختر **SQL Editor**.
-3. افتح الملف [`supabase/migrations/0001_initial_schema.sql`](supabase/migrations/0001_initial_schema.sql) من المشروع وانسخ محتواه بالكامل.
-4. الصق الكود في محرر Supabase واضغط **Run**.
-5. سيقوم الكود بإنشاء:
-   - كافة الجداول والفهارس والـ Triggers.
-   - سياسات الأمان RLS بالكامل.
-   - الدوال `create_order` و `admin_dashboard_stats`.
-   - حاويات التخزين الـ 4 وسياسات الأمان الخاصة بها.
-   - تفعيل الـ Realtime لجدول الطلبات.
-   - البيانات الأولية للأقسام والإعدادات.
+3. **الملف الأول:** انسخ والصق محتوى [`supabase/migrations/0001_initial_schema.sql`](supabase/migrations/0001_initial_schema.sql) واضغط **Run**.
+4. **الملف الثاني:** انسخ والصق محتوى [`supabase/migrations/002_username_auth.sql`](supabase/migrations/002_username_auth.sql) واضغط **Run**.
+   - يضيف أعمدة `username` و `phone` و `is_active` إلى جدول `profiles`.
+   - يحدّث دوال التحقق من الصلاحيات (`has_role`, `is_staff`, `is_admin`, `is_manager`) للتأكد من أن الحساب نشط `is_active = true`.
+
+### الخطوة 2: نشر الـ Edge Function (`admin-users`)
+لتمكين لوحة التحكم من إنشاء وتعديل وحذف الحسابات وتعيين كلمات المرور:
+```bash
+supabase functions deploy admin-users
+```
+> تأكد من ضبط سر `REACT_APP_AUTH_EMAIL_DOMAIN=lithioo.app` في إعدادات Functions إذا رغبت بنطاق مخصص.
 
 ---
 
@@ -325,30 +331,42 @@ node scripts/seed-products-full.mjs
 
 ---
 
-## 10. إنشاء حسابات الإدارة والصلاحيات (Admin Management)
+## 10. نظام الدخول وإدارة الفريق (Username Auth & Team Management)
 
-### كيفية إنشاء أول حساب مدير عام (Super Admin):
+### معمارية تسجيل الدخول باسم المستخدم:
+* لا يدعم Supabase Auth تسجيل الدخول باسم المستخدم مباشرة؛ لذا يتم تحويل اسم المستخدم تلقائياً داخلياً إلى صيغة بريد إلكتروني مقترنة بنطاق المشروع: `${username.toLowerCase()}@lithioo.app`.
+* المستخدم لا يرى ولا يكتب هذا البريد إطلاقاً؛ تسجيل الدخول يتم بالكامل عبر **اسم المستخدم + كلمة المرور**.
+* تم إلغاء التسجيل العام ورابط استعادة كلمة المرور عبر البريد للعامة، واستبداله بتوجيه للتواصل مع مدير النظام.
+* تم تفعيل حماية ضد التخمين (Throttle): بعد 5 محاولات خاطئة يتم إيقاف زر الدخول لمدة 30 ثانية مع عد تنازلي.
+
+### إنشاء أول حساب مدير عام (Super Admin):
 1. في Supabase Dashboard، اذهب إلى **Authentication** -> **Users**.
-2. اضغط **Add User** -> **Invite User** أو **Create User** وأدخل بريدك الإلكتروني وكلمة المرور.
-3. انسخ الـ `User UID` الخاص بالمستخدم الذي تم إنشاؤه.
-4. انتقل إلى **SQL Editor** ونفّذ الاستعلام التالي لترقية المستخدم إلى رتبة **Admin**:
+2. اضغط **Add User** -> **Create User** وأدخل:
+   - البريد الإلكتروني: `admin@lithioo.app`
+   - كلمة المرور: (اختر كلمة مرور قوية من 8 أحرف فأكثر)
+   - فعّل خيار `Auto Confirm User`.
+3. انتقل إلى **SQL Editor** ونفّذ الاستعلام التالي لربط اسم المستخدم وصلاحية المدير العام:
 
 ```sql
-INSERT INTO public.profiles (id, full_name, role)
-VALUES ('<الصق-UID-الخاص-بالمستخدم-هنا>', 'مدير النظام', 'admin')
-ON CONFLICT (id) DO UPDATE SET role = 'admin';
+INSERT INTO public.profiles (id, full_name, username, phone, role, is_active)
+SELECT id, 'Super Admin', 'admin', '01000000000', 'admin', true
+FROM auth.users WHERE email = 'admin@lithioo.app'
+ON CONFLICT (id) DO UPDATE SET
+  username = 'admin',
+  phone = '01000000000',
+  role = 'admin',
+  is_active = true;
 ```
 
-أو يمكنك الترقية بواسطة البريد الإلكتروني مباشرة:
-```sql
-INSERT INTO public.profiles (id, full_name, role)
-SELECT id, 'Admin', 'admin' FROM auth.users WHERE email = 'your-email@example.com'
-ON CONFLICT (id) DO UPDATE SET role = 'admin';
-```
-
-5. افتح مسار لوحة التحكم:
+4. الآن افتح لوحة التحكم:
    `http://localhost:3000/admin/login`
-   وقم بتسجيل الدخول مباشرة!
+   - **اسم المستخدم:** `admin`
+   - **كلمة المرور:** الكلمة التي اخترتها.
+
+### إدارة الفريق من داخل لوحة التحكم (`/admin/team`):
+* يستطيع المدير العام (Admin فقط) الدخول إلى صفحة `/admin/team`.
+* **إضافة عضو جديد:** إدخال الاسم، اسم المستخدم (فريد 3-30 حرف)، رقم الهاتف المصري (`010/011/012/015`)، وتوليد كلمة مرور عشوائية مع زر نسخ مباشر، واختيار الصلاحية (`admin` / `manager` / `staff`).
+* **إجراءات الحسابات:** تعديل البيانات، إعادة تعيين كلمة المرور، تفعيل/تعطيل الحساب فوراً، وحذف الحساب مع نافذة تأكيد، مع حظر تعطيل أو حذف المدير لنفسه.
 
 ---
 

@@ -59,6 +59,7 @@ export function AdminLayout({ children, newOrders = 0, onThemeToggle, isDark }) 
   const navigate = useNavigate();
   const [collapsed, setCollapsed]   = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -116,7 +117,8 @@ export function AdminLayout({ children, newOrders = 0, onThemeToggle, isDark }) 
         {!collapsed && profile && (
           <div className="mt-2 rounded-xl bg-neutral-50 px-3 py-2 dark:bg-neutral-800">
             <p className="text-xs font-semibold text-neutral-700 dark:text-neutral-200 truncate">{profile.full_name || 'Admin'}</p>
-            <p className="text-xs text-neutral-400 capitalize">{profile.role}</p>
+            <p className="text-[11px] text-brand font-mono">@{profile.username || 'admin'}</p>
+            <p className="text-[10px] text-neutral-400 capitalize">{profile.role}</p>
           </div>
         )}
       </div>
@@ -181,9 +183,55 @@ export function AdminLayout({ children, newOrders = 0, onThemeToggle, isDark }) 
               </Link>
             )}
 
-            {/* User avatar */}
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand text-white text-xs font-bold">
-              {profile?.full_name?.[0]?.toUpperCase() ?? 'A'}
+            {/* Topbar User Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setUserMenuOpen((o) => !o)}
+                className="flex items-center gap-2 rounded-xl border border-neutral-200/80 p-1.5 pe-2.5 hover:bg-neutral-50 dark:border-neutral-700 dark:hover:bg-neutral-800 transition"
+                title="User menu"
+              >
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-white text-xs font-bold">
+                  {profile?.full_name?.[0]?.toUpperCase() ?? 'A'}
+                </div>
+                <div className="hidden sm:block text-start leading-tight">
+                  <p className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 truncate max-w-[120px]">
+                    {profile?.full_name || 'Admin'}
+                  </p>
+                  <p className="text-[10px] text-brand font-mono truncate max-w-[120px]">
+                    @{profile?.username || 'admin'}
+                  </p>
+                </div>
+              </button>
+
+              {userMenuOpen && (
+                <>
+                  <div className="fixed inset-0 z-30" onClick={() => setUserMenuOpen(false)} />
+                  <div className="absolute end-0 top-full mt-2 z-40 w-52 rounded-2xl border border-neutral-200 bg-white p-2 shadow-xl dark:border-neutral-800 dark:bg-neutral-900">
+                    <div className="px-3 py-2 border-b border-neutral-100 dark:border-neutral-800">
+                      <p className="text-xs font-bold text-neutral-900 dark:text-white truncate">
+                        {profile?.full_name || 'Admin'}
+                      </p>
+                      <p className="text-[11px] text-brand font-mono">
+                        @{profile?.username || 'admin'}
+                      </p>
+                      <span className="mt-1 inline-block rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] font-semibold text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300 capitalize">
+                        {profile?.role || 'staff'}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        handleSignOut();
+                      }}
+                      className="mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20 transition"
+                    >
+                      <FiLogOut size={14} />
+                      <span>{t.nav.logout}</span>
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </header>

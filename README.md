@@ -25,7 +25,8 @@ The project now includes a full **Admin Dashboard** at `/admin`, backed by **Sup
 
 ```
 REACT_APP_SUPABASE_URL=https://your-project-ref.supabase.co
-REACT_APP_SUPABASE_ANON_KEY=your-anon-key
+REACT_APP_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+REACT_APP_AUTH_EMAIL_DOMAIN=lithioo.app
 ```
 
 > **Never commit `.env.local` or any file containing `SUPABASE_SERVICE_ROLE_KEY`.**
@@ -54,13 +55,18 @@ The storefront still works without Supabase (falls back to static data files). T
 
 Open your Supabase project → **SQL Editor**, paste and run:
 
-```
-supabase/migrations/0001_initial_schema.sql
+1. `supabase/migrations/0001_initial_schema.sql` (Tables, enums, RLS policies, RPCs)
+2. `supabase/migrations/002_username_auth.sql` (Username + phone columns, index, is_active check)
+
+### 2. Deploy Edge Functions
+
+Deploy the admin users management Edge Function:
+
+```bash
+supabase functions deploy admin-users
 ```
 
-This creates all tables, enums, RLS policies, and RPCs.
-
-### 2. Create Storage Buckets
+### 3. Create Storage Buckets
 
 In Supabase Dashboard → **Storage**, create these buckets with **Public** access:
 
@@ -69,7 +75,7 @@ In Supabase Dashboard → **Storage**, create these buckets with **Public** acce
 - `hero`
 - `reviews`
 
-### 3. Seed Initial Data
+### 4. Seed Initial Data
 
 Add `SUPABASE_SERVICE_ROLE_KEY=<your service_role key>` to `.env.local` (never commit), then run:
 
@@ -80,18 +86,25 @@ node scripts/seed-products-full.mjs     # all ~286 products
 
 The seed scripts are **idempotent** — safe to re-run.
 
-### 4. Create Your First Admin Account
+### 5. Create Your First Admin Account
 
-1. Go to Supabase Dashboard → **Auth** → **Users** → **Invite User**, enter your email.
-2. Confirm the email and set a password.
-3. Copy the user UUID, then run this SQL in the SQL Editor:
+1. Go to Supabase Dashboard → **Auth** → **Users** → **Add User** → **Create User**.
+2. Enter Email: `admin@lithioo.app`, set a password, and enable **Auto Confirm User**.
+3. Run this SQL in the SQL Editor to assign the username and admin role:
 
 ```sql
-INSERT INTO profiles (id, full_name, role)
-VALUES ('<paste-user-uuid-here>', 'Admin Name', 'admin');
+INSERT INTO public.profiles (id, full_name, username, phone, role, is_active)
+SELECT id, 'Super Admin', 'admin', '01000000000', 'admin', true
+FROM auth.users WHERE email = 'admin@lithioo.app'
+ON CONFLICT (id) DO UPDATE SET
+  username = 'admin',
+  phone = '01000000000',
+  role = 'admin',
+  is_active = true;
 ```
 
-4. Log in at `/admin/login`.
+4. Log in at `/admin/login` using username `admin` and your password.
+5. Create team members from `/admin/team`.
 
 ---
 
