@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { FiX, FiShoppingCart, FiStar, FiHeart, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiX, FiStar, FiHeart, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import AddToCartButton from './AddToCartButton';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
@@ -201,9 +202,7 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
         </div>
         <PriceDisplay
           price={price}
-          originalPrice={product.originalPrice}
-          discountPercent={product.discountPercent}
-          language={language}
+                    language={language}
           size="lg"
           className="ms-auto"
         />
@@ -276,15 +275,12 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
           {t.modal.orderNow}
         </button>
         <div className="flex gap-3">
-          <button
-            type="button"
+          <AddToCartButton
             onClick={handleAddToCart}
             disabled={product.inStock === false}
-            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-neutral-900 py-3 text-sm font-semibold text-white transition hover:bg-neutral-700 disabled:opacity-50 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
-          >
-            <FiShoppingCart className="h-5 w-5" />
-            {t.modal.addToCart}
-          </button>
+            variant="modal"
+            className="flex-1"
+          />
           <button
             type="button"
             onClick={() => toggleWishlist({ ...product, price })}

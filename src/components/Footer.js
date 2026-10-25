@@ -1,167 +1,133 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {
-  FaFacebookF,
-  FaInstagram,
-  FaWhatsapp,
-  FaPhoneAlt,
-  FaMapMarkerAlt,
-  FaEnvelope,
-} from 'react-icons/fa';
+import { FaPhoneAlt, FaMapMarkerAlt, FaEnvelope } from 'react-icons/fa';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useTheme } from '../contexts/ThemeContext';
 import {
   EMAIL,
   EMAIL_MAILTO,
   MAP_URL,
   PHONE_DISPLAY,
   PHONE_TEL,
-  SOCIAL_LINKS,
 } from '../data/contact';
-import { getWhatsAppUrl } from '../utils/whatsapp';
 import { localizeDigits } from '../utils/digits';
+import SocialLinks from './SocialLinks';
 
 const Footer = () => {
-  const { t, language } = useLanguage();
-  const { footer, nav, address } = t;
+  const { t, language, isRtl } = useLanguage();
+  const footer = t?.footer || {};
+  const address = t?.address || {};
+  const { theme } = useTheme();
   const phoneDisplay = localizeDigits(PHONE_DISPLAY, language);
 
-  const navLink =
-    'text-sm text-white/75 transition hover:text-brand hover:translate-x-0.5 inline-block';
-
-  const socialIcon =
-    'flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white transition hover:-translate-y-0.5 hover:border-brand hover:bg-brand/20 hover:text-brand';
-
   const contactRow =
-    'group flex items-start gap-3 text-sm text-white/80 transition hover:text-brand';
+    'group flex items-start gap-3 text-sm text-neutral-300 transition hover:text-brand';
 
-  const quickLinks = [
-    { to: '/about', label: nav.about },
-    { to: '/products', label: nav.product },
-    { to: '/products', label: footer.catalog },
-    { to: '/contact', label: nav.contact },
-  ];
+  const iconCircle =
+    'mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand/15 text-brand transition group-hover:bg-brand/25 group-hover:scale-105';
 
   return (
-    <footer className="w-full border-t-4 border-brand bg-neutral-900 text-white">
-      <div className="section-inner max-w-wide py-12 sm:py-14">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3 lg:gap-12">
-          <div className="space-y-4">
-            <Link to="/" className="inline-block">
-              <img
-                src="/image/logo/leithioo-logo-gold.png"
-                alt="Lithioo For Perfumes"
-                className="h-14 w-auto object-contain"
-              />
-            </Link>
-            <p className="max-w-xs text-sm leading-relaxed text-white/65">{footer.tagline}</p>
-          </div>
-
-          <div>
-            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand">{footer.quickLinks}</h3>
-            <ul className="space-y-2.5">
-              {quickLinks.map((item) => (
-                <li key={item.to + item.label}>
-                  <Link to={item.to} className={navLink}>
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand">{footer.getInTouch}</h3>
+    <footer className="w-full border-t-4 border-brand bg-neutral-900 text-white dark:bg-neutral-950">
+      <div className="section-inner max-w-wide py-12 sm:py-14 md:py-16">
+        {/* 3 Main Columns */}
+        <div className="grid grid-cols-1 gap-10 text-center sm:text-start md:grid-cols-3 md:gap-8 lg:gap-12">
+          {/* 1. Contact Us */}
+          <div className="flex flex-col items-center sm:items-start">
+            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand">
+              {footer.getInTouch || (isRtl ? 'تواصل معنا' : 'Contact Us')}
+            </h3>
             <ul className="space-y-4">
               <li>
-                <a href={MAP_URL} target="_blank" rel="noopener noreferrer" className={contactRow}>
-                  <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand/15 text-brand group-hover:bg-brand/25">
-                    <FaMapMarkerAlt className="h-4 w-4" aria-hidden />
+                <a
+                  href={MAP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={contactRow}
+                >
+                  <span className={iconCircle}>
+                    <FaMapMarkerAlt className="h-4 w-4" aria-hidden="true" />
                   </span>
                   <span>
-                    <span className="block font-medium text-white/90 group-hover:text-brand">{address.area}</span>
-                    <span className="mt-0.5 block text-white/60">{address.street}</span>
+                    <span className="block font-medium text-neutral-200 group-hover:text-brand">
+                      {address?.area || 'Beni Suef, Egypt'}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-neutral-400">
+                      {address?.street || 'Chanel St., off Abdelsalam Aref'}
+                    </span>
                   </span>
                 </a>
               </li>
               <li>
                 <a href={PHONE_TEL} className={contactRow}>
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand/15 text-brand group-hover:bg-brand/25">
-                    <FaPhoneAlt className="h-3.5 w-3.5" aria-hidden />
+                  <span className={iconCircle}>
+                    <FaPhoneAlt className="h-3.5 w-3.5" aria-hidden="true" />
                   </span>
-                  <span className="pt-1.5 font-medium" dir="ltr">{phoneDisplay}</span>
-                </a>
-              </li>
-              <li>
-                <a href={getWhatsAppUrl()} target="_blank" rel="noopener noreferrer" className={contactRow}>
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand/15 text-brand group-hover:bg-brand/25">
-                    <FaWhatsapp className="h-4 w-4" aria-hidden />
+                  <span className="pt-1.5 font-medium text-neutral-200 group-hover:text-brand" dir="ltr">
+                    {phoneDisplay}
                   </span>
-                  <span className="pt-1.5 font-medium">{footer.whatsappLine.replace('{phone}', phoneDisplay)}</span>
                 </a>
               </li>
               <li>
                 <a href={EMAIL_MAILTO} className={contactRow}>
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand/15 text-brand group-hover:bg-brand/25">
-                    <FaEnvelope className="h-3.5 w-3.5" aria-hidden />
+                  <span className={iconCircle}>
+                    <FaEnvelope className="h-3.5 w-3.5" aria-hidden="true" />
                   </span>
-                  <span className="pt-1.5 font-medium break-all">{EMAIL}</span>
+                  <span className="pt-1.5 font-medium text-neutral-200 group-hover:text-brand break-all">
+                    {EMAIL}
+                  </span>
                 </a>
               </li>
             </ul>
           </div>
-        </div>
 
-        <div className="mt-10 flex flex-col items-center gap-4 border-t border-white/10 pt-8 sm:flex-row sm:justify-between">
-          <p className="text-xs font-semibold uppercase tracking-widest text-white/50">{footer.followUs}</p>
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <a
-              href={SOCIAL_LINKS.facebook}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={socialIcon}
-              aria-label={footer.facebook}
-            >
-              <FaFacebookF className="h-4 w-4" />
-            </a>
-            <a
-              href={SOCIAL_LINKS.instagram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={socialIcon}
-              aria-label={footer.instagram}
-            >
-              <FaInstagram className="h-4 w-4" />
-            </a>
-            <a
-              href={getWhatsAppUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={socialIcon}
-              aria-label={footer.whatsapp}
-            >
-              <FaWhatsapp className="h-5 w-5" />
-            </a>
-            <a href={PHONE_TEL} className={socialIcon} aria-label={footer.callUs}>
-              <FaPhoneAlt className="h-4 w-4" />
-            </a>
-            <a
-              href={MAP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={socialIcon}
-              aria-label={footer.viewMap}
-            >
-              <FaMapMarkerAlt className="h-4 w-4" />
-            </a>
-            <a href={EMAIL_MAILTO} className={socialIcon} aria-label={footer.emailUs}>
-              <FaEnvelope className="h-4 w-4" />
-            </a>
+          {/* 2. Logo & Tagline */}
+          <div className="flex flex-col items-center justify-center text-center">
+            <Link to="/" className="inline-block transition hover:opacity-90">
+              <img
+                src={
+                  theme === 'dark'
+                    ? '/image/logo/logo-white.png'
+                    : '/image/logo/leithioo-logo-gold.png'
+                }
+                alt="Lithioo For Perfumes"
+                className="h-16 w-auto max-w-[220px] object-contain drop-shadow-md sm:h-20"
+              />
+            </Link>
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-neutral-300">
+              {footer.tagline}
+            </p>
+          </div>
+
+          {/* 3. Payment Methods */}
+          <div className="flex flex-col items-center sm:items-end">
+            <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-brand">
+              {isRtl ? 'طرق الدفع' : 'Payment Methods'}
+            </h3>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-3.5 backdrop-blur-sm transition hover:border-brand/40">
+              <img
+                src="/image/payment-mmm.svg"
+                alt={isRtl ? 'طرق الدفع المعتمدة' : 'Accepted Payment Methods'}
+                className="h-auto max-w-[220px] sm:max-w-[240px] object-contain"
+                loading="lazy"
+              />
+            </div>
           </div>
         </div>
 
-        <p className="mt-8 text-center text-sm text-white/55">
-          © {new Date().getFullYear()} Lithioo For Perfumes — {footer.rights}
-        </p>
+        {/* Social Media Row Below the 3 Columns */}
+        <div className="mt-12 border-t border-white/10 pt-8 dark:border-neutral-800">
+          <div className="flex flex-col items-center justify-center gap-4">
+            <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400">
+              {footer.followUs || (isRtl ? 'تابعنا على مواقع التواصل' : 'Follow Us')}
+            </p>
+            <SocialLinks className="justify-center" />
+          </div>
+
+          {/* Copyright */}
+          <p className="mt-8 text-center text-xs text-neutral-400 sm:text-sm">
+            © {new Date().getFullYear()} Lithioo For Perfumes — {footer.rights}
+          </p>
+        </div>
       </div>
     </footer>
   );

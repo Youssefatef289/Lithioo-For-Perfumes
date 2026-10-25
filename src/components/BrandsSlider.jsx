@@ -2,9 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../contexts/LanguageContext';
 import { BRAND_LOGOS } from '../data/brands';
-import { getBrandPriceSummary } from '../data/brandPrices';
-import { formatEGP } from '../utils/price';
-import { localizeDigits } from '../utils/digits';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 24, scale: 0.96 },
@@ -18,7 +15,6 @@ const cardVariants = {
 
 const BrandCard = ({ brand, language }) => {
   const label = language === 'ar' ? brand.nameAr : brand.name;
-  const summary = getBrandPriceSummary(brand);
 
   return (
     <motion.article
@@ -38,15 +34,6 @@ const BrandCard = ({ brand, language }) => {
       </div>
       <span className="mt-4 line-clamp-1 block text-[0.66rem] font-semibold uppercase tracking-[0.24em] text-neutral-500 dark:text-neutral-400">
         {label}
-      </span>
-      <span className="mt-1.5 block min-h-[1rem] text-xs font-semibold text-brand">
-        {summary != null && (
-          <span dir="ltr">
-            {summary.min === summary.max
-              ? localizeDigits(formatEGP(summary.min), language)
-              : `${localizeDigits(formatEGP(summary.min), language)} – ${localizeDigits(formatEGP(summary.max), language)}`}
-          </span>
-        )}
       </span>
     </motion.article>
   );

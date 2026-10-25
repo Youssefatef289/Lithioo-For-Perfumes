@@ -27,6 +27,23 @@ export const FOLDER_BY_BRAND_ID = {
   match: 'Match',
   rasasi: 'Rasasi',
   reef: 'Reef',
+  lattafa: 'Lattafa',
+  'al-qurashi': 'Abdul Samad Al Qurashi',
+  'al-mas': 'Al Mas Perfumes',
+  'dkhoon-emirates': 'Dkhoon Emirates',
+  amarah: 'Amarah',
+  Laverne: 'Laverne',
+  lador: "L'ador",
+  lithioo: 'Lithioo',
+  'arabian-oud': 'Arabian Oud',
+  armaf: 'Armaf',
+  'al-khitam': 'Al Khitam',
+  irth: 'Irth',
+  jadayel: 'Jadayel',
+  'lady-sukoon': 'Lady Sukoon',
+  prestige: 'Prestige',
+  'laura-mars': 'Laura Mars',
+  other: 'Other',
 };
 
 const ASSAF_PRICE_BY_NAME = {

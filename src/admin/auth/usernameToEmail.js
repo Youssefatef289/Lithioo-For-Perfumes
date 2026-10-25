@@ -8,20 +8,23 @@
 const DEFAULT_AUTH_DOMAIN = process.env.REACT_APP_AUTH_EMAIL_DOMAIN || 'lithioo.app';
 
 /**
- * Converts a username to the internal email format for Supabase Auth.
+ * Converts a username to a safe internal email format for Supabase Auth.
  * @param {string} username
  * @returns {string}
  */
 export function usernameToEmail(username) {
   if (!username) return '';
-  const cleanUsername = String(username).trim().toLowerCase();
-  return `${cleanUsername}@${DEFAULT_AUTH_DOMAIN}`;
+  const clean = String(username).trim().toLowerCase().replace(/\s+/g, '_');
+  const safe = /^[a-z0-9_.-]+$/.test(clean)
+    ? clean
+    : encodeURIComponent(clean).replace(/%/g, 'x').toLowerCase();
+  return `${safe}@${DEFAULT_AUTH_DOMAIN}`;
 }
 
 /**
  * Validates a username:
- * - Must be lowercase letters, numbers, or underscores
- * - Length between 3 and 30 characters
+ * - Allows Arabic, English, numbers, spaces, and underscores
+ * - Length between 2 and 50 characters
  * @param {string} username
  * @returns {boolean}
  */
@@ -62,11 +65,11 @@ export function validatePhone(phone) {
 
 /**
  * Validates password:
- * Minimum 8 characters.
+ * Minimum 6 characters.
  * @param {string} password
  * @returns {boolean}
  */
 export function validatePassword(password) {
   if (!password || typeof password !== 'string') return false;
-  return password.length >= 8;
+  return password.length >= 6;
 }

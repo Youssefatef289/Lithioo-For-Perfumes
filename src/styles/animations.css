@@ -168,3 +168,50 @@ html {
   }
 }
 
+/* Brand Logo Marquee Animations */
+@keyframes brand-marquee-ltr {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes brand-marquee-rtl {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-brand-marquee-ltr {
+  animation: brand-marquee-ltr 36s linear infinite;
+  will-change: transform;
+}
+
+.animate-brand-marquee-rtl {
+  animation: brand-marquee-rtl 36s linear infinite;
+  will-change: transform;
+}
+
+/* Touch devices: ensure add-to-cart text is visible if device has no hover pointer */
+@media (hover: none) {
+  .cart-btn-text-auto {
+    max-width: 200px !important;
+    opacity: 1 !important;
+    transform: none !important;
+    margin-inline-start: 0.5rem !important;
+    pointer-events: auto !important;
+  }
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .animate-brand-marquee-ltr,
+  .animate-brand-marquee-rtl {
+    animation: none !important;
+  }
+}

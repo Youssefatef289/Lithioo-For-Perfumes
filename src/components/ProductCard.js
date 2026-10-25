@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { FiShoppingCart, FiEye, FiHeart } from 'react-icons/fi';
+import { FiEye, FiHeart } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
@@ -8,18 +8,17 @@ import { useLocalizedProduct } from '../hooks/useLocalizedProduct';
 import ProductDetailsModal from './ProductDetailsModal';
 import PriceDisplay from './PriceDisplay';
 import SizeSelector from './SizeSelector';
+import AddToCartButton from './AddToCartButton';
 import { isOriginalProduct } from '../data/productFactory';
 import { DEFAULT_SIZE_ID, getSizeById, getProductSizePrice } from '../data/sizes';
 import { buildSingleProductMessage, openWhatsApp } from '../utils/whatsapp';
-import { flyToCart } from '../utils/flyToCart';
 
 const ProductCard = ({ product, className = '', animationClass = '', style }) => {
   const { addToCart } = useCart();
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const lp = useLocalizedProduct(product);
   const [selectedSize, setSelectedSize] = useState(DEFAULT_SIZE_ID);
-  const [isAdding, setIsAdding] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const imageRef = useRef(null);
 
@@ -49,11 +48,8 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
   };
 
   const handleAddToCart = (e) => {
-    e.stopPropagation();
-    setIsAdding(true);
-    flyToCart(imageRef.current);
+    e?.stopPropagation?.();
     addToCart(buildLineItem(), 1);
-    setTimeout(() => setIsAdding(false), 600);
   };
 
   const handleOrderNow = (e) => {
@@ -88,45 +84,54 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
               <img
                 src={mainImage}
                 alt={lp.name}
-                className="max-h-full max-w-full object-contain transition-opacity duration-500 ease-out group-hover:opacity-0"
-                loading="lazy"
-              />
-              <img
                 ref={imageRef}
-                src={hoverImage}
-                alt=""
-                aria-hidden
-                className="absolute inset-0 m-auto max-h-[82%] max-w-[82%] object-contain opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100"
                 loading="lazy"
+                decoding="async"
+                className={`max-h-full max-w-full object-contain transition-all duration-700 ease-out ${
+                  hoverImage && hoverImage !== mainImage
+                    ? 'group-hover:scale-95 group-hover:opacity-0'
+                    : 'group-hover:scale-105'
+                }`}
               />
+              {hoverImage && hoverImage !== mainImage && (
+                <img
+                  src={hoverImage}
+                  alt={`${lp.name} alternate view`}
+                  loading="lazy"
+                  decoding="async"
+                  className="pointer-events-none absolute inset-0 m-auto max-h-full max-w-full object-contain p-6 opacity-0 transition-all duration-700 ease-out group-hover:scale-105 group-hover:opacity-100"
+                />
+              )}
             </div>
 
-            <div className="pointer-events-none absolute end-3 top-3 flex flex-col gap-2 opacity-100 translate-x-0 transition-all duration-300 ease-out md:opacity-0 md:translate-x-2 md:rtl:-translate-x-2 md:group-hover:opacity-100 md:group-hover:translate-x-0">
+            <span className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/5 to-transparent dark:from-black/25" />
+
+            <div className="absolute top-3 end-3 z-10 flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={handleWishlistToggle}
+                className={floatingIconBtn}
+                aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+              >
+                <FiHeart
+                  className={`h-5 w-5 transition-colors duration-200 ${
+                    inWishlist ? 'fill-red-500 text-red-500' : ''
+                  }`}
+                />
+              </button>
               <button
                 type="button"
                 onClick={handleOrderNow}
-                className={`${floatingIconBtn} hover:bg-[#25D366] hover:text-white`}
-                aria-label={t.productCard.orderWhatsApp}
+                className={`${floatingIconBtn} text-emerald-600 hover:text-emerald-500 dark:text-emerald-400`}
+                aria-label="Order via WhatsApp"
               >
                 <FaWhatsapp className="h-5 w-5" />
               </button>
               <button
                 type="button"
-                onClick={handleWishlistToggle}
-                className={`${floatingIconBtn} ${
-                  inWishlist
-                    ? 'bg-red-500 text-white hover:bg-red-500 hover:text-white'
-                    : 'hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10'
-                }`}
-                aria-label={inWishlist ? t.productPage.inWishlist : t.productPage.addToWishlist}
-              >
-                <FiHeart className={`h-5 w-5 ${inWishlist ? 'fill-current' : ''}`} />
-              </button>
-              <button
-                type="button"
                 onClick={openDetails}
                 className={floatingIconBtn}
-                aria-label={t.productCard.viewDetails}
+                aria-label="Quick view"
               >
                 <FiEye className="h-5 w-5" />
               </button>
@@ -139,8 +144,6 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
             </h3>
             <PriceDisplay
               price={price}
-              originalPrice={product.originalPrice}
-              discountPercent={product.discountPercent}
               language={language}
               className="mt-0.5"
             />
@@ -157,29 +160,11 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
           </div>
 
           <div className="px-3 pb-3">
-            <button
-              type="button"
+            <AddToCartButton
               onClick={handleAddToCart}
-              className={`group/cart relative flex w-full items-center justify-between gap-3 overflow-hidden rounded-full border border-neutral-200 bg-white px-5 py-3 text-sm font-semibold uppercase tracking-wider text-neutral-800 transition-all duration-300 hover:border-brand hover:text-white hover:shadow-md active:scale-[0.97] dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:border-brand dark:hover:text-white ${
-                isAdding ? 'border-brand text-white' : ''
-              }`}
-              aria-label={t.productCard.addToCart}
-            >
-              <span
-                aria-hidden
-                className={`absolute inset-0 -z-0 origin-left scale-x-0 bg-brand transition-transform duration-500 ease-out group-hover/cart:scale-x-100 ${
-                  isAdding ? 'scale-x-100' : ''
-                }`}
-              />
-              <span className="relative z-10 transition-transform duration-300 group-hover/cart:translate-x-0.5">
-                {isAdding ? t.productPage.added : t.productCard.addToCart}
-              </span>
-              <FiShoppingCart
-                className={`relative z-10 h-5 w-5 shrink-0 transition-all duration-300 group-hover/cart:translate-x-1 group-hover/cart:scale-110 ${
-                  isAdding ? 'translate-x-1 scale-110' : ''
-                }`}
-              />
-            </button>
+              variant="card"
+              className="w-full"
+            />
           </div>
         </div>
       </article>

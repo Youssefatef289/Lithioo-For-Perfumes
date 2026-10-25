@@ -100,14 +100,26 @@ async function saveAccounts(accounts) {
 }
 
 /**
- * Authenticate a user by username and password
+ * Authenticate a user by username or phone and password
  */
 export async function authenticateAdmin(username, password) {
   const accounts = await getAdminAccounts();
   const cleanUsername = String(username || '').trim().toLowerCase();
   const cleanPass = String(password || '');
 
-  const user = accounts.find((a) => a.username.toLowerCase() === cleanUsername);
+  // Strip phone formatting in case user entered a phone number
+  const rawPhone = String(username || '').replace(/[\s\-()]/g, '');
+  const cleanPhone = rawPhone.startsWith('+20') ? '0' + rawPhone.slice(3) : rawPhone;
+
+  const user = accounts.find((a) => {
+    const accU = String(a.username || '').trim().toLowerCase();
+    const accP = String(a.phone || '').replace(/[\s\-()]/g, '');
+    const normP = accP.startsWith('+20') ? '0' + accP.slice(3) : accP;
+    return (
+      accU === cleanUsername ||
+      (cleanPhone.length >= 10 && normP === cleanPhone)
+    );
+  });
 
   if (!user) {
     return { ok: false, error: 'invalid_credentials' };
@@ -199,22 +211,14 @@ export async function updateAdminAccount(id, { full_name, phone, role }) {
   if (full_name !== undefined) accounts[index].full_name = full_name;
   if (phone !== undefined) accounts[index].phone = phone;
   if (role !== undefined) accounts[index].role = role;
+  accounts[index].updated_at = new Date().toISOString();
 
   await saveAccounts(accounts);
-
-  // If updating current active session
-  const current = getActiveSession();
-  if (current && current.id === id) {
-    const updatedCurrent = { ...current, ...accounts[index] };
-    delete updatedCurrent.password;
-    localStorage.setItem(SESSION_KEY, JSON.stringify(updatedCurrent));
-  }
-
-  return { ok: true, account: accounts[index] };
+  return { ok: true, user: accounts[index] };
 }
 
 /**
- * Reset a user's password
+ * Reset account password
  */
 export async function resetAdminPassword(id, newPassword) {
   const accounts = await getAdminAccounts();
@@ -222,54 +226,65 @@ export async function resetAdminPassword(id, newPassword) {
   if (index === -1) return { ok: false, error: 'user_not_found' };
 
   accounts[index].password = newPassword;
+  accounts[index].updated_at = new Date().toISOString();
+
   await saveAccounts(accounts);
   return { ok: true };
 }
 
 /**
- * Toggle active status
+ * Toggle user active/disabled status
  */
-export async function toggleAdminAccountActive(id, is_active) {
+export async function toggleAdminAccountStatus(id, is_active) {
   const accounts = await getAdminAccounts();
   const index = accounts.findIndex((a) => a.id === id);
   if (index === -1) return { ok: false, error: 'user_not_found' };
 
-  accounts[index].is_active = Boolean(is_active);
+  accounts[index].is_active = is_active;
+  accounts[index].updated_at = new Date().toISOString();
+
   await saveAccounts(accounts);
-  return { ok: true, is_active: accounts[index].is_active };
+  return { ok: true, user: accounts[index] };
 }
 
+export const toggleAdminAccountActive = toggleAdminAccountStatus;
+
 /**
- * Delete an account
+ * Delete an admin account
  */
 export async function deleteAdminAccount(id) {
   let accounts = await getAdminAccounts();
+  const target = accounts.find((a) => a.id === id);
+
+  // Prevent deleting the root admin
+  if (target && target.username.toLowerCase() === DEFAULT_SUPER_ADMIN.username.toLowerCase()) {
+    return { ok: false, error: 'cannot_delete_super_admin' };
+  }
+
   accounts = accounts.filter((a) => a.id !== id);
   await saveAccounts(accounts);
   return { ok: true };
 }
 
 /**
- * Get the currently logged in user session
+ * Get active session user
  */
 export function getActiveSession() {
   try {
     const raw = localStorage.getItem(SESSION_KEY);
     if (!raw) return null;
     const user = JSON.parse(raw);
-    if (user && user.is_active !== false) return user;
-    return null;
+    return user && user.is_active !== false ? user : null;
   } catch (_) {
     return null;
   }
 }
 
 /**
- * Clear the current logged in session
+ * Clear active session (Sign Out)
  */
 export function clearActiveSession() {
   try {
     localStorage.removeItem(SESSION_KEY);
   } catch (_) {}
 }
-

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FiShoppingCart, FiHeart, FiStar, FiArrowLeft } from 'react-icons/fi';
+import { FiHeart, FiStar, FiArrowLeft } from 'react-icons/fi';
+import AddToCartButton from '../components/AddToCartButton';
 import { FaWhatsapp } from 'react-icons/fa';
 import SizeSelector from '../components/SizeSelector';
 import PriceDisplay from '../components/PriceDisplay';
@@ -21,8 +22,7 @@ const ProductDetails = () => {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { modal, productPage } = t;
   const [quantity, setQuantity] = useState(1);
-  const [isAdding, setIsAdding] = useState(false);
-  const [isToggling, setIsToggling] = useState(false);
+    const [isToggling, setIsToggling] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(DEFAULT_SIZE_ID);
 
@@ -63,9 +63,7 @@ const ProductDetails = () => {
       };
 
   const handleAddToCart = () => {
-    setIsAdding(true);
     addToCart(lineItem, quantity);
-    setTimeout(() => setIsAdding(false), 500);
   };
 
   const handleWishlist = () => {
@@ -149,9 +147,7 @@ const ProductDetails = () => {
               )}
               <PriceDisplay
                 price={price}
-                originalPrice={product.originalPrice}
-                discountPercent={product.discountPercent}
-                language={language}
+                                language={language}
                 size="lg"
                 className="ms-auto items-end text-end"
               />
@@ -224,15 +220,12 @@ const ProductDetails = () => {
             </button>
 
             <div className="flex flex-col gap-3 sm:flex-row">
-              <button
-                type="button"
+              <AddToCartButton
                 onClick={handleAddToCart}
                 disabled={!product.inStock}
-                className={`btn-primary flex-1 ${isAdding ? 'bg-emerald-600 hover:bg-emerald-600' : ''}`}
-              >
-                <FiShoppingCart className="h-5 w-5" />
-                {isAdding ? productPage.added : productPage.addToCart}
-              </button>
+                variant="details"
+                className="flex-1"
+              />
               <button
                 type="button"
                 onClick={handleWishlist}

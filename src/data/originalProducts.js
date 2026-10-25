@@ -42,178 +42,157 @@ const BRAND_BY_SLUG = {
 };
 
 export const ORIGINAL_IMAGE_CATALOG = [
-  { slug: 'al-khitam-musk', images: ['/image/originals/al-khitam-musk-1.jpg', '/image/originals/al-khitam-musk-2.jpg'] },
-  { slug: 'black-star', images: ['/image/originals/black-star-1.webp'] },
-  { slug: 'blue-diamond-aqua-eau-de-perfume-150ml', images: ['/image/originals/blue-diamond-aqua-eau-de-perfume-150ml-1.jpg'] },
+  { slug: 'al-khitam-musk', images: ['/image/Perfume brands/Al Khitam/al-khitam-musk-1.jpg', '/image/Perfume brands/Al Khitam/al-khitam-musk-2.jpg'] },
+  { slug: 'black-star', images: ['/image/Perfume brands/Ibraq/black-star-1.webp'] },
+  { slug: 'blue-diamond-aqua-eau-de-perfume-150ml', images: ['/image/Perfume brands/Ibraq/blue-diamond-aqua-eau-de-perfume-150ml-1.jpg'] },
   {
-    slug: 'body-musk-arabic-collection',
-    images: ['/image/originals/body-musk-arabic-collection-1.jpg', '/image/originals/body-musk-arabic-collection-2.jpg'],
+    slug: 'body-musk-arabic-collection', images: ['/image/Perfume brands/Arabian Oud/body-musk-arabic-collection-1.jpg', '/image/Perfume brands/Arabian Oud/body-musk-arabic-collection-2.jpg'],
   },
-  { slug: 'body-oud-cardamom', images: ['/image/originals/body-oud-cardamom-1.webp', '/image/originals/body-oud-cardamom-2.webp'] },
+  { slug: 'body-oud-cardamom', images: ['/image/Perfume brands/Arabian Oud/body-oud-cardamom-1.webp', '/image/Perfume brands/Arabian Oud/body-oud-cardamom-2.webp'] },
   {
-    slug: 'candy-musk-al-majed-oud-150',
-    images: [
-      '/image/originals/candy-musk-al-majed-oud-150-1.png',
-      '/image/originals/candy-musk-al-majed-oud-150-2.png',
-      '/image/originals/candy-musk-al-majed-oud-150-3.png',
+    slug: 'candy-musk-al-majed-oud-150', images: [
+      '/image/Perfume brands/Almajed Oud/candy-musk-al-majed-oud-150-1.png',
+      '/image/Perfume brands/Almajed Oud/candy-musk-al-majed-oud-150-2.png',
+      '/image/Perfume brands/Almajed Oud/candy-musk-al-majed-oud-150-3.png',
     ],
   },
-  { slug: 'cedar-of-lebanon', images: ['/image/originals/cedar-of-lebanon-1.jpg', '/image/originals/cedar-of-lebanon-2.jpg'] },
-  { slug: 'emerald-soul', images: ['/image/originals/emerald-soul-1.webp', '/image/originals/emerald-soul-2.webp'] },
+  { slug: 'cedar-of-lebanon', images: ['/image/Perfume brands/Ibraq/cedar-of-lebanon-1.jpg', '/image/Perfume brands/Ibraq/cedar-of-lebanon-2.jpg'] },
+  { slug: 'emerald-soul', images: ['/image/Perfume brands/Ibraq/emerald-soul-1.webp', '/image/Perfume brands/Ibraq/emerald-soul-2.webp'] },
   {
-    slug: 'ibraheem-al-qurashi-brazilian-tobacco-100-ml',
-    images: ['/image/originals/ibraheem-al-qurashi-brazilian-tobacco-100-ml-1.jpg'],
+    slug: 'ibraheem-al-qurashi-brazilian-tobacco-100-ml', images: ['/image/Perfume brands/Ibraq/ibraheem-al-qurashi-brazilian-tobacco-100-ml-1.jpg'],
   },
   {
-    slug: 'ibrahim-al-qurashi-perfume-black-carbon-diamond-200ml-edp-lu',
-    images: ['/image/originals/ibrahim-al-qurashi-perfume-black-carbon-diamond-200ml-edp-lu-1.jpg'],
+    slug: 'ibrahim-al-qurashi-perfume-black-carbon-diamond-200ml-edp-lu', images: ['/image/Perfume brands/Ibraq/ibrahim-al-qurashi-perfume-black-carbon-diamond-200ml-edp-lu-1.jpg'],
   },
   {
-    slug: 'ibraq-diamond-collection-new-collection-mini-10-ml-10-in-1',
-    images: [
-      '/image/originals/ibraq-diamond-collection-new-collection-mini-10-ml-10-in-1-1.jpg',
-      '/image/originals/ibraq-diamond-collection-new-collection-mini-10-ml-10-in-1-2.png',
+    slug: 'ibraq-diamond-collection-new-collection-mini-10-ml-10-in-1', images: [
+      '/image/Perfume brands/Ibraq/ibraq-diamond-collection-new-collection-mini-10-ml-10-in-1-1.jpg',
+      '/image/Perfume brands/Ibraq/ibraq-diamond-collection-new-collection-mini-10-ml-10-in-1-2.png',
     ],
   },
   {
-    slug: 'ibraq-ibrahim-al-qurashi-al-shams-musk-edp75-ml-75',
-    images: [
-      '/image/originals/ibraq-ibrahim-al-qurashi-al-shams-musk-edp75-ml-75-1.jpg',
-      '/image/originals/ibraq-ibrahim-al-qurashi-al-shams-musk-edp75-ml-75-2.jpg',
+    slug: 'ibraq-ibrahim-al-qurashi-al-shams-musk-edp75-ml-75', images: [
+      '/image/Perfume brands/Ibraq/ibraq-ibrahim-al-qurashi-al-shams-musk-edp75-ml-75-1.jpg',
+      '/image/Perfume brands/Ibraq/ibraq-ibrahim-al-qurashi-al-shams-musk-edp75-ml-75-2.jpg',
     ],
   },
   {
-    slug: 'irth-collection-100-ml',
-    images: [
-      '/image/originals/irth-collection-100-ml-1.png',
-      '/image/originals/irth-collection-100-ml-2.png',
-      '/image/originals/irth-collection-100-ml-3.png',
-      '/image/originals/irth-collection-100-ml-4.png',
-      '/image/originals/irth-collection-100-ml-5.png',
-      '/image/originals/irth-collection-100-ml-6.png',
+    slug: 'irth-collection-100-ml', images: [
+      '/image/Perfume brands/Irth/irth-collection-100-ml-1.png',
+      '/image/Perfume brands/Irth/irth-collection-100-ml-2.png',
+      '/image/Perfume brands/Irth/irth-collection-100-ml-3.png',
+      '/image/Perfume brands/Irth/irth-collection-100-ml-4.png',
+      '/image/Perfume brands/Irth/irth-collection-100-ml-5.png',
+      '/image/Perfume brands/Irth/irth-collection-100-ml-6.png',
     ],
   },
   {
-    slug: 'jadayel-hair-length-oil-130ml',
-    images: [
-      '/image/originals/jadayel-hair-length-oil-130ml-1.jpg',
-      '/image/originals/jadayel-hair-length-oil-130ml-2.jpg',
-      '/image/originals/jadayel-hair-length-oil-130ml-3.jpg',
-      '/image/originals/jadayel-hair-length-oil-130ml-4.jpg',
-      '/image/originals/jadayel-hair-length-oil-130ml-5.jpg',
-      '/image/originals/jadayel-hair-length-oil-130ml-6.jpg',
-      '/image/originals/jadayel-hair-length-oil-130ml-7.jpg',
+    slug: 'jadayel-hair-length-oil-130ml', images: [
+      '/image/Perfume brands/Jadayel/jadayel-hair-length-oil-130ml-1.jpg',
+      '/image/Perfume brands/Jadayel/jadayel-hair-length-oil-130ml-2.jpg',
+      '/image/Perfume brands/Jadayel/jadayel-hair-length-oil-130ml-3.jpg',
+      '/image/Perfume brands/Jadayel/jadayel-hair-length-oil-130ml-4.jpg',
+      '/image/Perfume brands/Jadayel/jadayel-hair-length-oil-130ml-5.jpg',
+      '/image/Perfume brands/Jadayel/jadayel-hair-length-oil-130ml-6.jpg',
+      '/image/Perfume brands/Jadayel/jadayel-hair-length-oil-130ml-7.jpg',
     ],
   },
   {
-    slug: 'lady-sukoon-perfume-100ml',
-    images: [
-      '/image/originals/lady-sukoon-perfume-100ml-1.jpg',
-      '/image/originals/lady-sukoon-perfume-100ml-2.jpg',
-      '/image/originals/lady-sukoon-perfume-100ml-3.jpg',
-      '/image/originals/lady-sukoon-perfume-100ml-4.jpg',
+    slug: 'lady-sukoon-perfume-100ml', images: [
+      '/image/Perfume brands/Lady Sukoon/lady-sukoon-perfume-100ml-1.jpg',
+      '/image/Perfume brands/Lady Sukoon/lady-sukoon-perfume-100ml-2.jpg',
+      '/image/Perfume brands/Lady Sukoon/lady-sukoon-perfume-100ml-3.jpg',
+      '/image/Perfume brands/Lady Sukoon/lady-sukoon-perfume-100ml-4.jpg',
     ],
   },
-  { slug: 'musk-collection', images: ['/image/originals/musk-collection-1.jpg', '/image/originals/musk-collection-2.jpg'] },
-  { slug: 'nude-coral-diamond', images: ['/image/originals/nude-coral-diamond-1.jpg', '/image/originals/nude-coral-diamond-2.jpg'] },
+  { slug: 'musk-collection', images: ['/image/Perfume brands/Arabian Oud/musk-collection-1.jpg', '/image/Perfume brands/Arabian Oud/musk-collection-2.jpg'] },
+  { slug: 'nude-coral-diamond', images: ['/image/Perfume brands/Ibraq/nude-coral-diamond-1.jpg', '/image/Perfume brands/Ibraq/nude-coral-diamond-2.jpg'] },
   {
-    slug: 'prestige-black-perfume',
-    images: [
-      '/image/originals/prestige-black-perfume-1.jpg',
-      '/image/originals/prestige-black-perfume-2.jpg',
-      '/image/originals/prestige-black-perfume-3.jpg',
-    ],
-  },
-  {
-    slug: 'ranat-khalkhal-75ml-abdul-samad-alqurashi',
-    images: [
-      '/image/originals/ranat-khalkhal-75ml-abdul-samad-alqurashi-1.jpg',
-      '/image/originals/ranat-khalkhal-75ml-abdul-samad-alqurashi-2.jpg',
-    ],
-  },
-  { slug: 'ranet-khalkhal', images: ['/image/originals/ranet-khalkhal-1.jpg', '/image/originals/ranet-khalkhal-2.jpg'] },
-  {
-    slug: 'rasasi-daarej-pour-homme-eau-de-parfum-edp-spray-for-men-3-4',
-    images: ['/image/originals/rasasi-daarej-pour-homme-eau-de-parfum-edp-spray-for-men-3-4-1.webp'],
-  },
-  {
-    slug: 'rasasi-eau-de-parfum-for-men-royale-blue-75ml-rasasi-perfume',
-    images: [
-      '/image/originals/rasasi-eau-de-parfum-for-men-royale-blue-75ml-rasasi-perfume-1.webp',
-      '/image/originals/rasasi-eau-de-parfum-for-men-royale-blue-75ml-rasasi-perfume-2.webp',
-      '/image/originals/rasasi-eau-de-parfum-for-men-royale-blue-75ml-rasasi-perfume-3.webp',
-    ],
-  },
-  { slug: 'royale-eau-de-toilette-pour-home', images: ['/image/originals/royale-eau-de-toilette-pour-home-1.jpg'] },
-  { slug: 'satin-body-oud', images: ['/image/originals/satin-body-oud-1.webp', '/image/originals/satin-body-oud-2.webp'] },
-  {
-    slug: 'shahra-for-men-eau-de-parfum-by-rasasi-90ml',
-    images: [
-      '/image/originals/shahra-for-men-eau-de-parfum-by-rasasi-90ml-1.jpg',
-      '/image/originals/shahra-for-men-eau-de-parfum-by-rasasi-90ml-2.jpg',
+    slug: 'prestige-black-perfume', images: [
+      '/image/Perfume brands/Prestige/prestige-black-perfume-1.jpg',
+      '/image/Perfume brands/Prestige/prestige-black-perfume-2.jpg',
+      '/image/Perfume brands/Prestige/prestige-black-perfume-3.jpg',
     ],
   },
   {
-    slug: 'spanish-tobacco-100-ml',
-    images: [
-      '/image/originals/spanish-tobacco-100-ml-1.jpg',
-      '/image/originals/spanish-tobacco-100-ml-2.jpg',
-      '/image/originals/spanish-tobacco-100-ml-3.jpg',
-      '/image/originals/spanish-tobacco-100-ml-4.jpg',
-      '/image/originals/spanish-tobacco-100-ml-5.jpg',
+    slug: 'ranat-khalkhal-75ml-abdul-samad-alqurashi', images: [
+      '/image/Perfume brands/Abdul Samad Al Qurashi/ranat-khalkhal-75ml-abdul-samad-alqurashi-1.jpg',
+      '/image/Perfume brands/Abdul Samad Al Qurashi/ranat-khalkhal-75ml-abdul-samad-alqurashi-2.jpg',
+    ],
+  },
+  { slug: 'ranet-khalkhal', images: ['/image/Perfume brands/Abdul Samad Al Qurashi/ranet-khalkhal-1.jpg', '/image/Perfume brands/Abdul Samad Al Qurashi/ranet-khalkhal-2.jpg'] },
+  {
+    slug: 'rasasi-daarej-pour-homme-eau-de-parfum-edp-spray-for-men-3-4', images: ['/image/Perfume brands/Rasasi/rasasi-daarej-pour-homme-eau-de-parfum-edp-spray-for-men-3-4-1.webp'],
+  },
+  {
+    slug: 'rasasi-eau-de-parfum-for-men-royale-blue-75ml-rasasi-perfume', images: [
+      '/image/Perfume brands/Rasasi/rasasi-eau-de-parfum-for-men-royale-blue-75ml-rasasi-perfume-1.webp',
+      '/image/Perfume brands/Rasasi/rasasi-eau-de-parfum-for-men-royale-blue-75ml-rasasi-perfume-2.webp',
+      '/image/Perfume brands/Rasasi/rasasi-eau-de-parfum-for-men-royale-blue-75ml-rasasi-perfume-3.webp',
+    ],
+  },
+  { slug: 'royale-eau-de-toilette-pour-home', images: ['/image/Perfume brands/Rasasi/royale-eau-de-toilette-pour-home-1.jpg'] },
+  { slug: 'satin-body-oud', images: ['/image/Perfume brands/Ibraq/satin-body-oud-1.webp', '/image/Perfume brands/Ibraq/satin-body-oud-2.webp'] },
+  {
+    slug: 'shahra-for-men-eau-de-parfum-by-rasasi-90ml', images: [
+      '/image/Perfume brands/Rasasi/shahra-for-men-eau-de-parfum-by-rasasi-90ml-1.jpg',
+      '/image/Perfume brands/Rasasi/shahra-for-men-eau-de-parfum-by-rasasi-90ml-2.jpg',
     ],
   },
   {
-    slug: 'summer-collection-ibraq',
-    images: [
-      '/image/originals/summer-collection-ibraq-1.jpg',
-      '/image/originals/summer-collection-ibraq-2.jpg',
-      '/image/originals/summer-collection-ibraq-3.jpg',
+    slug: 'spanish-tobacco-100-ml', images: [
+      '/image/Perfume brands/Ibraq/spanish-tobacco-100-ml-1.jpg',
+      '/image/Perfume brands/Ibraq/spanish-tobacco-100-ml-2.jpg',
+      '/image/Perfume brands/Ibraq/spanish-tobacco-100-ml-3.jpg',
+      '/image/Perfume brands/Ibraq/spanish-tobacco-100-ml-4.jpg',
+      '/image/Perfume brands/Ibraq/spanish-tobacco-100-ml-5.jpg',
     ],
   },
   {
-    slug: 'tobacco-collection',
-    images: [
-      '/image/originals/tobacco-collection-1.jpg',
-      '/image/originals/tobacco-collection-2.jpg',
-      '/image/originals/tobacco-collection-3.jpg',
-      '/image/originals/tobacco-collection-4.jpg',
-      '/image/originals/tobacco-collection-5.jpg',
-    ],
-  },
-  { slug: 'tobacoo-body-oud', images: ['/image/originals/tobacoo-body-oud-1.webp', '/image/originals/tobacoo-body-oud-2.webp'] },
-  {
-    slug: 'vintage-tobacco',
-    images: [
-      '/image/originals/vintage-tobacco-1.jpg',
-      '/image/originals/vintage-tobacco-2.jpg',
-      '/image/originals/vintage-tobacco-3.jpg',
-      '/image/originals/vintage-tobacco-4.jpg',
-      '/image/originals/vintage-tobacco-5.jpg',
-      '/image/originals/vintage-tobacco-6.jpg',
-      '/image/originals/vintage-tobacco-7.jpg',
+    slug: 'summer-collection-ibraq', images: [
+      '/image/Perfume brands/Ibraq/summer-collection-ibraq-1.jpg',
+      '/image/Perfume brands/Ibraq/summer-collection-ibraq-2.jpg',
+      '/image/Perfume brands/Ibraq/summer-collection-ibraq-3.jpg',
     ],
   },
   {
-    slug: 'white-regent-diamond',
-    images: ['/image/originals/white-regent-diamond-1.webp', '/image/originals/white-regent-diamond-2.webp'],
+    slug: 'tobacco-collection', images: [
+      '/image/Perfume brands/Arabian Oud/tobacco-collection-1.jpg',
+      '/image/Perfume brands/Arabian Oud/tobacco-collection-2.jpg',
+      '/image/Perfume brands/Arabian Oud/tobacco-collection-3.jpg',
+      '/image/Perfume brands/Arabian Oud/tobacco-collection-4.jpg',
+      '/image/Perfume brands/Arabian Oud/tobacco-collection-5.jpg',
+    ],
   },
+  { slug: 'tobacoo-body-oud', images: ['/image/Perfume brands/Ibraq/tobacoo-body-oud-1.webp', '/image/Perfume brands/Ibraq/tobacoo-body-oud-2.webp'] },
   {
-    slug: 'prestige-ruby',
-    images: [
-      '/image/originals/prestige-ruby-1.jpg',
-      '/image/originals/prestige-ruby-2.jpg',
-      '/image/originals/prestige-ruby-3.jpg',
+    slug: 'vintage-tobacco', images: [
+      '/image/Perfume brands/Arabian Oud/vintage-tobacco-1.jpg',
+      '/image/Perfume brands/Arabian Oud/vintage-tobacco-2.jpg',
+      '/image/Perfume brands/Arabian Oud/vintage-tobacco-3.jpg',
+      '/image/Perfume brands/Arabian Oud/vintage-tobacco-4.jpg',
+      '/image/Perfume brands/Arabian Oud/vintage-tobacco-5.jpg',
+      '/image/Perfume brands/Arabian Oud/vintage-tobacco-6.jpg',
+      '/image/Perfume brands/Arabian Oud/vintage-tobacco-7.jpg',
     ],
   },
   {
-    slug: 'serious',
-    images: [
-      '/image/originals/serious-1.jpg',
-      '/image/originals/serious-2.jpg',
-      '/image/originals/serious-3.jpg',
-      '/image/originals/serious-4.jpg',
-      '/image/originals/serious-5.jpg',
+    slug: 'white-regent-diamond', images: ['/image/Perfume brands/Ibraq/white-regent-diamond-1.webp', '/image/Perfume brands/Ibraq/white-regent-diamond-2.webp'],
+  },
+  {
+    slug: 'prestige-ruby', images: [
+      '/image/Perfume brands/Prestige/prestige-ruby-1.jpg',
+      '/image/Perfume brands/Prestige/prestige-ruby-2.jpg',
+      '/image/Perfume brands/Prestige/prestige-ruby-3.jpg',
+    ],
+  },
+  {
+    slug: 'serious', images: [
+      '/image/Perfume brands/Prestige/serious-1.jpg',
+      '/image/Perfume brands/Prestige/serious-2.jpg',
+      '/image/Perfume brands/Prestige/serious-3.jpg',
+      '/image/Perfume brands/Prestige/serious-4.jpg',
+      '/image/Perfume brands/Prestige/serious-5.jpg',
     ],
   },
 ];

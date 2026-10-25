@@ -7,6 +7,7 @@ import CartToast from './components/CartToast';
 import FloatingContactButton from './components/FloatingContactButton';
 import Home from './pages/Home';
 import Products from './pages/Products';
+import BrandPage from './pages/BrandPage';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import ProductDetails from './pages/ProductDetails';
@@ -42,6 +43,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/products" element={<Products />} />
+              <Route path="/brand/:brandId" element={<BrandPage />} />
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/about" element={<About />} />
@@ -56,4 +58,3 @@ function App() {
 }
 
 export default App;
-

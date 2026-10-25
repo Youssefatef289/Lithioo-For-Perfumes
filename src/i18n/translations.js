@@ -183,16 +183,6 @@ export const translations = {
       email: 'Email',
       followFacebook: 'Follow Lithioo on Facebook',
     },
-    promotional: {
-      title: 'Our Exclusive Offers',
-      subtitle: 'Special deals on all bottle sizes',
-      shopNow: 'Shop Now',
-      offers: [
-        { id: 'buy2get1', text: 'Buy two bottles and get the third free — all sizes', badge: '3+1' },
-        { id: 'halfprice', text: 'Buy one bottle, get the second at half price — all sizes', badge: '50%' },
-        { id: 'discount30', text: '30% off on all sizes', badge: '30%' },
-      ],
-    },
     newLuxury: {
       title: 'New Luxury Products',
       subtitle: 'A handpicked selection of our latest luxury arrivals',
@@ -501,16 +491,6 @@ export const translations = {
       whatsapp: 'واتساب',
       email: 'البريد الإلكتروني',
       followFacebook: 'تابع ليثيو على فيسبوك',
-    },
-    promotional: {
-      title: 'عروضنا الحصرية',
-      subtitle: 'صفقات خاصة على جميع الأحجام',
-      shopNow: 'تسوق الآن',
-      offers: [
-        { id: 'buy2get1', text: 'اشترِ زجاجتين واحصل على الثالثة مجاناً — جميع الأحجام', badge: '3+1' },
-        { id: 'halfprice', text: 'اشترِ زجاجة واحصل على الثانية بنصف السعر — جميع الأحجام', badge: '50%' },
-        { id: 'discount30', text: 'خصم 30% على جميع الأحجام', badge: '30%' },
-      ],
     },
     newLuxury: {
       title: 'منتجات فاخرة جديدة',

@@ -1,6 +1,5 @@
 import { getBrandIdByName } from './brands';
 
-const base = '/image/products/new-luxury';
 
 const make = (config) => ({
   id: config.id,
@@ -42,8 +41,8 @@ export const NEW_LUXURY_PRODUCTS = [
     categoryAr: 'عطر نسائي',
     size: '150ml',
     price: 2300,
-    image: `${base}/pink-diamond-sakura-1.webp`,
-    imageHover: `${base}/pink-diamond-sakura-2.webp`,
+    image: `/image/Perfume brands/Ibraq/pink-diamond-sakura-1.webp`,
+    imageHover: `/image/Perfume brands/Ibraq/pink-diamond-sakura-2.webp`,
     description:
       'A captivating floral fragrance inspired by Japanese cherry blossoms. Soft, romantic and elegant with a refined powdery finish that lingers all day.',
     descriptionAr:
@@ -71,8 +70,8 @@ export const NEW_LUXURY_PRODUCTS = [
     categoryAr: 'عطر للجنسين',
     size: '150ml',
     price: 2300,
-    image: `${base}/grey-pearl-1.jpg`,
-    imageHover: `${base}/grey-pearl-2.webp`,
+    image: `/image/Perfume brands/Ibraq/grey-pearl-1.jpg`,
+    imageHover: `/image/Perfume brands/Ibraq/grey-pearl-2.webp`,
     description:
       'A sophisticated unisex composition with smoky elegance and modern warmth. A signature scent crafted for true connoisseurs of luxury.',
     descriptionAr:
@@ -100,8 +99,8 @@ export const NEW_LUXURY_PRODUCTS = [
     categoryAr: 'عطر نسائي',
     size: '150ml',
     price: 2300,
-    image: `${base}/balas-rose-1.jpeg`,
-    imageHover: `${base}/balas-rose-2.jpeg`,
+    image: `/image/Perfume brands/Ibraq/balas-rose-1.jpeg`,
+    imageHover: `/image/Perfume brands/Ibraq/balas-rose-2.jpeg`,
     description:
       'An opulent rose perfume crafted from the finest Damascene petals, paired with rich oriental accords for a timeless and luxurious signature.',
     descriptionAr:
@@ -129,8 +128,8 @@ export const NEW_LUXURY_PRODUCTS = [
     categoryAr: 'عطر رجالي',
     size: '150ml',
     price: 2300,
-    image: `${base}/sapphire-leather-1.jpeg`,
-    imageHover: `${base}/sapphire-leather-2.jpg`,
+    image: `/image/Perfume brands/Ibraq/sapphire-leather-1.jpeg`,
+    imageHover: `/image/Perfume brands/Ibraq/sapphire-leather-2.jpg`,
     description:
       'A bold leather fragrance with smooth modern facets. Confident, refined and unmistakably luxurious — a true statement scent.',
     descriptionAr:
@@ -157,8 +156,8 @@ export const NEW_LUXURY_PRODUCTS = [
     category: 'Oriental Niche',
     categoryAr: 'عطر شرقي راقٍ',
     price: 2300,
-    image: `${base}/black-diamond-incense-1.webp`,
-    imageHover: `${base}/black-diamond-incense-2.webp`,
+    image: `/image/Perfume brands/Ibraq/black-diamond-incense-1.webp`,
+    imageHover: `/image/Perfume brands/Ibraq/black-diamond-incense-2.webp`,
     description:
       'A mysterious incense composition steeped in oriental tradition. Deep, smoky and ceremonial — a tribute to the heritage of Arabian perfumery.',
     descriptionAr:
@@ -186,8 +185,8 @@ export const NEW_LUXURY_PRODUCTS = [
     categoryAr: 'مجموعة هدايا',
     size: '3 Pcs',
     price: 3800,
-    image: `${base}/diamond-set-1.jpg`,
-    imageHover: `${base}/diamond-set-2.jpg`,
+    image: `/image/Perfume brands/Ibraq/diamond-set-1.jpg`,
+    imageHover: `/image/Perfume brands/Ibraq/diamond-set-2.jpg`,
     description:
       'A curated trio of luxurious oriental fragrances. The perfect gift for the modern connoisseur who appreciates depth and craftsmanship.',
     descriptionAr:
@@ -215,8 +214,8 @@ export const NEW_LUXURY_PRODUCTS = [
     categoryAr: 'مجموعة هدايا',
     size: '3 × 75ml',
     price: 4200,
-    image: `${base}/maroon-diamond-1.jpeg`,
-    imageHover: `${base}/maroon-diamond-2.jpg`,
+    image: `/image/Perfume brands/Ibraq/maroon-diamond-1.jpeg`,
+    imageHover: `/image/Perfume brands/Ibraq/maroon-diamond-2.jpg`,
     description:
       'Three exquisite scents inspired by luxury and heritage. A complete olfactory journey delivered in one elegant set.',
     descriptionAr:
@@ -244,13 +243,13 @@ export const NEW_LUXURY_PRODUCTS = [
     categoryAr: 'مجموعة هدايا',
     size: '10 × 20ml',
     price: 5000,
-    image: `${base}/mini-diamond-collection-1.jpeg`,
-    imageHover: `${base}/mini-diamond-collection-2.jpeg`,
+    image: `/image/Perfume brands/Ibraq/mini-diamond-collection-1.jpeg`,
+    imageHover: `/image/Perfume brands/Ibraq/mini-diamond-collection-2.jpeg`,
     detailImages: [
-      `${base}/mini-diamond-collection-1.jpeg`,
-      `${base}/mini-diamond-collection-2.jpeg`,
-      `${base}/mini-diamond-collection-3.jpeg`,
-      `${base}/mini-diamond-collection-4.jpeg`,
+      `/image/Perfume brands/Ibraq/mini-diamond-collection-1.jpeg`,
+      `/image/Perfume brands/Ibraq/mini-diamond-collection-2.jpeg`,
+      `/image/Perfume brands/Ibraq/mini-diamond-collection-3.jpeg`,
+      `/image/Perfume brands/Ibraq/mini-diamond-collection-4.jpeg`,
     ],
     description: 'A premium 10-piece mini diamond collection of unisex Eau de Parfum. Also available individually at 500 EGP per piece.',
     descriptionAr:
@@ -278,13 +277,13 @@ export const NEW_LUXURY_PRODUCTS = [
     categoryAr: 'مجموعة هدايا',
     size: '75ml / 100ml / 150ml',
     price: 3500,
-    image: `${base}/moon-collection-1.webp`,
-    imageHover: `${base}/moon-collection-2.webp`,
+    image: `/image/Perfume brands/Ibraq/moon-collection-1.webp`,
+    imageHover: `/image/Perfume brands/Ibraq/moon-collection-2.webp`,
     detailImages: [
-      `${base}/moon-collection-1.webp`,
-      `${base}/moon-collection-2.webp`,
-      `${base}/moon-collection-3.webp`,
-      `${base}/moon-collection-4.webp`,
+      `/image/Perfume brands/Ibraq/moon-collection-1.webp`,
+      `/image/Perfume brands/Ibraq/moon-collection-2.webp`,
+      `/image/Perfume brands/Ibraq/moon-collection-3.webp`,
+      `/image/Perfume brands/Ibraq/moon-collection-4.webp`,
     ],
     description: 'A luxurious moon-inspired collection crafted in three bottle sizes for a rich, long-lasting fragrance journey.',
     descriptionAr:
@@ -312,13 +311,13 @@ export const NEW_LUXURY_PRODUCTS = [
     categoryAr: 'مجموعة هدايا',
     size: '225ml',
     price: 4000,
-    image: `${base}/grey-diamond-collection-1.jpg`,
-    imageHover: `${base}/grey-diamond-collection-2.jpg`,
+    image: `/image/Perfume brands/Ibraq/grey-diamond-collection-1.jpg`,
+    imageHover: `/image/Perfume brands/Ibraq/grey-diamond-collection-2.jpg`,
     detailImages: [
-      `${base}/grey-diamond-collection-1.jpg`,
-      `${base}/grey-diamond-collection-2.jpg`,
-      `${base}/grey-diamond-collection-3.jpg`,
-      `${base}/grey-diamond-collection-4.jpg`,
+      `/image/Perfume brands/Ibraq/grey-diamond-collection-1.jpg`,
+      `/image/Perfume brands/Ibraq/grey-diamond-collection-2.jpg`,
+      `/image/Perfume brands/Ibraq/grey-diamond-collection-3.jpg`,
+      `/image/Perfume brands/Ibraq/grey-diamond-collection-4.jpg`,
     ],
     description: 'A striking grey diamond collection presented as a luxurious 225 ml gift set with premium unisex character.',
     descriptionAr:
@@ -346,13 +345,13 @@ export const NEW_LUXURY_PRODUCTS = [
     categoryAr: 'مجموعة هدايا',
     size: '225ml',
     price: 400,
-    image: `${base}/maroon-diamond-box-1.jpg`,
-    imageHover: `${base}/maroon-diamond-box-2.jpg`,
+    image: `/image/Perfume brands/Ibraq/maroon-diamond-box-1.jpg`,
+    imageHover: `/image/Perfume brands/Ibraq/maroon-diamond-box-2.jpg`,
     detailImages: [
-      `${base}/maroon-diamond-box-1.jpg`,
-      `${base}/maroon-diamond-box-2.jpg`,
-      `${base}/maroon-diamond-box-3.jpg`,
-      `${base}/maroon-diamond-box-4.jpg`,
+      `/image/Perfume brands/Ibraq/maroon-diamond-box-1.jpg`,
+      `/image/Perfume brands/Ibraq/maroon-diamond-box-2.jpg`,
+      `/image/Perfume brands/Ibraq/maroon-diamond-box-3.jpg`,
+      `/image/Perfume brands/Ibraq/maroon-diamond-box-4.jpg`,
     ],
     description: 'A maroon diamond box featuring a refined trio-style presentation and a compact 225 ml luxury gift profile.',
     descriptionAr:
@@ -379,8 +378,8 @@ export const NEW_LUXURY_PRODUCTS = [
     category: 'Unisex Fragrance',
     categoryAr: 'عطر للجنسين',
     price: 500,
-    image: `${base}/musk-abazh-1.jpg`,
-    imageHover: `${base}/musk-abazh-2.jpg`,
+    image: `/image/Perfume brands/Ibraq/musk-abazh-1.jpg`,
+    imageHover: `/image/Perfume brands/Ibraq/musk-abazh-2.jpg`,
     description:
       'A fresh musky composition with juicy pomegranate top notes. Light, modern and irresistibly clean — perfect for everyday luxury.',
     descriptionAr:
@@ -408,8 +407,8 @@ export const NEW_LUXURY_PRODUCTS = [
     categoryAr: 'عطر للجنسين',
     size: '75ml',
     price: 500,
-    image: `${base}/musk-al-fajr-1.webp`,
-    imageHover: `${base}/musk-al-fajr-2.webp`,
+    image: `/image/Perfume brands/Ibraq/musk-al-fajr-1.webp`,
+    imageHover: `/image/Perfume brands/Ibraq/musk-al-fajr-2.webp`,
     description:
       'The serenity of dawn captured in a bottle. A pristine white musk with floral whispers and a soft, soothing aura.',
     descriptionAr:
@@ -437,8 +436,8 @@ export const NEW_LUXURY_PRODUCTS = [
     categoryAr: 'عطر للجنسين',
     size: '75ml',
     price: 500,
-    image: `${base}/powder-musk-1.webp`,
-    imageHover: `${base}/powder-musk-2.webp`,
+    image: `/image/Perfume brands/Ibraq/powder-musk-1.webp`,
+    imageHover: `/image/Perfume brands/Ibraq/powder-musk-2.webp`,
     description:
       'A soft powdery musk that wraps the skin in elegant comfort. Subtle, sophisticated and timeless.',
     descriptionAr:
@@ -465,8 +464,8 @@ export const NEW_LUXURY_PRODUCTS = [
     category: "Men's Fragrance",
     categoryAr: 'عطر رجالي',
     price: 1500,
-    image: `${base}/splandid-1.webp`,
-    imageHover: `${base}/splandid-2.webp`,
+    image: `/image/Perfume brands/Laura Mars/splandid-1.webp`,
+    imageHover: `/image/Perfume brands/Laura Mars/splandid-2.webp`,
     description:
       'A masculine fragrance built for the modern gentleman. Fresh, magnetic and confidently refined.',
     descriptionAr:
@@ -493,8 +492,8 @@ export const NEW_LUXURY_PRODUCTS = [
     category: "Women's Fragrance",
     categoryAr: 'عطر نسائي',
     price: 900,
-    image: `${base}/lady-reef-1.jpg`,
-    imageHover: `${base}/lady-reef-2.jpg`,
+    image: `/image/Perfume brands/Reef/lady-reef-1.jpg`,
+    imageHover: `/image/Perfume brands/Reef/lady-reef-2.jpg`,
     description:
       'A graceful feminine scent inspired by ocean breezes and tropical blooms. Light, airy and delightful.',
     descriptionAr:
@@ -521,8 +520,8 @@ export const NEW_LUXURY_PRODUCTS = [
     category: 'Aquatic Fragrance',
     categoryAr: 'عطر مائي',
     price: 900,
-    image: `${base}/reef-bluest-1.jpg`,
-    imageHover: `${base}/reef-bluest-2.jpg`,
+    image: `/image/Perfume brands/Reef/reef-bluest-1.jpg`,
+    imageHover: `/image/Perfume brands/Reef/reef-bluest-2.jpg`,
     description:
       'An aquatic adventure in a bottle — fresh, cool and revitalizing. Like a deep breath of sea air.',
     descriptionAr:
@@ -549,8 +548,8 @@ export const NEW_LUXURY_PRODUCTS = [
     category: 'Unisex Fragrance',
     categoryAr: 'عطر للجنسين',
     price: 950,
-    image: `${base}/reef-33-1.webp`,
-    imageHover: `${base}/reef-33-2.webp`,
+    image: `/image/Perfume brands/Reef/reef-33-1.webp`,
+    imageHover: `/image/Perfume brands/Reef/reef-33-2.webp`,
     description:
       'A clean modern white perfume. Effortless elegance for every occasion.',
     descriptionAr:
@@ -577,8 +576,8 @@ export const NEW_LUXURY_PRODUCTS = [
     category: "Women's Fragrance",
     categoryAr: 'عطر نسائي',
     price: 900,
-    image: `${base}/reef-summer-pink-1.jpg`,
-    imageHover: `${base}/reef-summer-pink-2.jpg`,
+    image: `/image/Perfume brands/Reef/reef-summer-pink-1.jpg`,
+    imageHover: `/image/Perfume brands/Reef/reef-summer-pink-2.jpg`,
     description:
       'A cheerful summer scent blooming with playful pink petals. Sweet, fresh and irresistibly fun.',
     descriptionAr:
@@ -606,8 +605,8 @@ export const NEW_LUXURY_PRODUCTS = [
     categoryAr: 'حجم سفر',
     size: '15ml',
     price: 450,
-    image: `${base}/reef-29-1.jpg`,
-    imageHover: `${base}/reef-29-2.jpg`,
+    image: `/image/Perfume brands/Reef/reef-29-1.jpg`,
+    imageHover: `/image/Perfume brands/Reef/reef-29-2.jpg`,
     description:
       'A compact perfume with a powerful signature. Travel-ready and ever ready to impress.',
     descriptionAr:
@@ -635,8 +634,8 @@ export const NEW_LUXURY_PRODUCTS = [
     categoryAr: 'عطر شرقي',
     size: '100ml',
     price: 1100,
-    image: `${base}/rif-arab-1.png`,
-    imageHover: `${base}/rif-arab-2.png`,
+    image: `/image/Perfume brands/Reef/rif-arab-1.png`,
+    imageHover: `/image/Perfume brands/Reef/rif-arab-2.png`,
     description:
       'A warm Arabian-inspired oriental fragrance. Rich, traditional and deeply evocative of the heritage of Arabian perfumery.',
     descriptionAr:
@@ -663,8 +662,8 @@ export const NEW_LUXURY_PRODUCTS = [
     category: 'Body Spray',
     categoryAr: 'بخاخ جسم',
     price: 700,
-    image: `${base}/arab-obaya-1.webp`,
-    imageHover: `${base}/arab-obaya-2.webp`,
+    image: `/image/Perfume brands/Reef/arab-obaya-1.webp`,
+    imageHover: `/image/Perfume brands/Reef/arab-obaya-2.webp`,
     description:
       'A clean modern body spray with an Arabian touch. Fresh, lasting and confidently you.',
     descriptionAr:

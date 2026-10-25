@@ -10,6 +10,12 @@
  */
 export const BRAND_LOGOS = [
   {
+    id: 'afnan',
+    name: 'Afnan',
+    nameAr: 'أفنان',
+    logo: '/image/brands/Afnan.png',
+  },
+  {
     id: 'assaf',
     name: 'Assaf',
     nameAr: 'عساف',
@@ -55,7 +61,7 @@ export const BRAND_LOGOS = [
     id: 'dkhoon-emirates',
     name: 'Dkhoon Emirates',
     nameAr: 'دخون الإمارات',
-    logo: '/image/brands/Dkhoon Emirates.jpg',
+    logo: '/image/brands/Dkhoon Emirates.png',
   },
   {
     id: 'amarah',
@@ -73,12 +79,12 @@ export const BRAND_LOGOS = [
     id: 'Laverne',
     name: 'Laverne',
     nameAr: 'لافيرن',
-    logo: '/image/brands/Laverne.jpeg',
+    logo: '/image/brands/Laverne.png',
   },
   {
     id: 'match',
     name: 'Match',
-    nameAr: ' ماتش',
+    nameAr: 'ماتش',
     logo: '/image/brands/match.png',
   },
 ];
