@@ -2,8 +2,9 @@ import React, { useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FiArrowLeft, FiPackage } from 'react-icons/fi';
 import { useLanguage } from '../contexts/LanguageContext';
-import { BRAND_LOGOS, getBrandById, getBrandLabel } from '../data/brands';
+import { BRAND_LOGOS, getBrandById, getBrandLabel, getBrandIdByName } from '../data/brands';
 import { allProducts } from '../data/products';
+import { getBrandGalleryProducts } from '../data/brandPrices';
 import ProductCard from '../components/ProductCard';
 
 const BrandPage = () => {
@@ -26,15 +27,69 @@ const BrandPage = () => {
 
   const brandProducts = useMemo(() => {
     if (!brand) return [];
+    const brandIdNorm = brand.id.toLowerCase();
     const brandNameLower = brand.name?.trim().toLowerCase();
     const brandArLower = (brand.nameAr || '').trim().toLowerCase();
 
-    return allProducts.filter((product) => {
-      if (product.brandId === brand.id) return true;
+    // 1. Catalog products matching this brand
+    const catalogMatches = allProducts.filter((product) => {
+      const pBrandId = (product.brandId || getBrandIdByName(product.brand) || '').toLowerCase();
+      if (pBrandId === brandIdNorm) return true;
       if (!product.brand) return false;
       const pb = product.brand.trim().toLowerCase();
       return pb === brandNameLower || (brandArLower && pb === brandArLower);
     });
+
+    // 2. Gallery products for this brand
+    const galleryMatches = getBrandGalleryProducts(brand.id) || [];
+
+    // Helper for normalizing product titles
+    const cleanKey = (str) =>
+      (str || '')
+        .toLowerCase()
+        .replace(/\b(?:edp|eau de parfum|eau de toilette|for men|for women|unisex|perfume|100ml|150ml|200ml|by assaf|by ibraq|by afnan)\b/g, '')
+        .replace(/[^a-z0-9\u0600-\u06FF]/g, '')
+        .trim();
+
+    const catalogKeys = new Set(
+      catalogMatches.map((p) => cleanKey(p.nameEn || p.name))
+    );
+
+    // 3. Convert gallery products not in catalog to full product cards
+    const extraGalleryCards = galleryMatches
+      .filter((gp) => {
+        const key = cleanKey(gp.name);
+        return !catalogKeys.has(key);
+      })
+      .map((gp, index) => ({
+        id: `brand-gallery-${brand.id}-${index}-${gp.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+        name: gp.name,
+        nameEn: gp.name,
+        nameAr: gp.name,
+        brand: brand.name,
+        brandAr: brand.nameAr || brand.name,
+        brandId: brand.id,
+        section: 'original',
+        category: brand.name,
+        categoryAr: brand.nameAr || brand.name,
+        price: gp.price || 0,
+        image: gp.images[0],
+        imageHover: gp.images[1] || gp.images[0],
+        detailImages: gp.images,
+        description: `${gp.name} by ${brand.name}.`,
+        descriptionAr: `${gp.name} من ${brand.nameAr || brand.name}.`,
+        ingredients: ['Natural Oils', 'Signature Accords', 'Luxury Base Notes'],
+        ingredientsAr: ['زيوت عطرية نقية', 'نفحات مميزة', 'قاعدة شرقية فاخرة'],
+        benefits: ['Long lasting fragrance', 'Authentic brand packaging'],
+        benefitsAr: ['ثبات عالي يدوم طويلاً', 'تغليف أصلي معتمد'],
+        hideSizes: true,
+        sizes: [],
+        inStock: true,
+        rating: 4.8,
+        reviews: 35 + ((index * 7) % 40),
+      }));
+
+    return [...catalogMatches, ...extraGalleryCards];
   }, [brand]);
 
   const displayName = brand ? getBrandLabel(brand, language) : '';

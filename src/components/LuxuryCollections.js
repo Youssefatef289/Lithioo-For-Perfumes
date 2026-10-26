@@ -1,123 +1,88 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiArrowRight } from 'react-icons/fi';
 import { useLanguage } from '../contexts/LanguageContext';
-
-const IMAGE_BY_ID = {
-  diamond: '/image/luxury/diamond.webp',
-  musk: '/image/luxury/musk.webp',
-  tobacco: '/image/luxury/tobacco.webp',
-  rose: '/image/luxury/rose.webp',
-  leather: '/image/luxury/leather.webp',
-  oud: '/image/luxury/oud.webp',
-  ruby: '/image/luxury/ruby.webp',
-};
+import { FEATURED_BRANDS, getBrandLabel } from '../data/brands';
 
 const LuxuryCollections = () => {
-  const { t, isRtl } = useLanguage();
-  const trackRef = useRef(null);
-  const [canPrev, setCanPrev] = useState(false);
-  const [canNext, setCanNext] = useState(true);
-
-  const items = t.luxury.items;
-
-  const updateArrows = () => {
-    const el = trackRef.current;
-    if (!el) return;
-    const max = el.scrollWidth - el.clientWidth;
-    const pos = Math.abs(el.scrollLeft);
-    setCanPrev(pos > 8);
-    setCanNext(pos < max - 8);
-  };
-
-  useEffect(() => {
-    updateArrows();
-    const el = trackRef.current;
-    if (!el) return undefined;
-    el.addEventListener('scroll', updateArrows, { passive: true });
-    window.addEventListener('resize', updateArrows);
-    return () => {
-      el.removeEventListener('scroll', updateArrows);
-      window.removeEventListener('resize', updateArrows);
-    };
-  }, []);
-
-  const scrollBy = (dir) => {
-    const el = trackRef.current;
-    if (!el) return;
-    const step = Math.max(280, Math.floor(el.clientWidth * 0.7));
-    const ltrDir = isRtl ? -dir : dir;
-    el.scrollBy({ left: ltrDir * step, behavior: 'smooth' });
-  };
+  const { t, language, isRtl } = useLanguage();
 
   return (
-    <section className="relative w-full bg-white py-12 dark:bg-neutral-950 sm:py-16">
+    <section
+      className="relative w-full border-b border-neutral-100 bg-white py-12 dark:border-neutral-800/80 dark:bg-neutral-950 sm:py-16"
+      aria-labelledby="featured-brands-heading"
+    >
       <div className="section-inner max-w-wide">
+        {/* Section Header */}
         <div className="mb-8 text-center sm:mb-10">
-          <h2 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-4xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-brand">
+            {isRtl ? 'بيوت العطور المختارة' : 'Curated Fragrance Houses'}
+          </p>
+          <h2
+            id="featured-brands-heading"
+            className="mt-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-white sm:text-3xl md:text-4xl"
+          >
             {t.luxury.title}
           </h2>
-          <p className="mt-3 text-sm text-neutral-500 dark:text-neutral-400 sm:text-base">
+          <p className="mx-auto mt-2.5 max-w-2xl text-sm text-neutral-500 dark:text-neutral-400 sm:text-base">
             {t.luxury.subtitle}
           </p>
-          <div className="mx-auto mt-4 flex items-center justify-center gap-2 text-neutral-300 dark:text-neutral-700">
-            <span className="h-px w-16 bg-current sm:w-24" />
-            <span className="h-2 w-2 rounded-full border-2 border-current" />
-            <span className="h-px w-16 bg-current sm:w-24" />
-          </div>
         </div>
 
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => scrollBy(-1)}
-            className={`absolute start-0 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white/95 p-2 text-neutral-700 shadow-lg ring-1 ring-neutral-200 transition hover:text-brand dark:bg-neutral-800/95 dark:text-neutral-200 dark:ring-neutral-700 md:flex ${
-              canPrev ? 'opacity-100' : 'pointer-events-none opacity-0'
-            }`}
-            aria-label={t.a11y.prevSlide}
-          >
-            {isRtl ? <FiChevronRight className="h-5 w-5" /> : <FiChevronLeft className="h-5 w-5" />}
-          </button>
+        {/* Brands Text-Only Cards Grid: 2 columns on mobile, 3 on sm, 4 on lg */}
+        <div
+          className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4"
+          role="list"
+          aria-label={isRtl ? 'قائمة البراندات' : 'Brands list'}
+        >
+          {FEATURED_BRANDS.map((brand, index) => {
+            const primaryName = getBrandLabel(brand, language);
+            const secondaryName = language === 'ar' ? brand.name : brand.nameAr;
 
-          <div
-            ref={trackRef}
-            className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-4 pt-2 sm:gap-8"
-          >
-            {items.map((item) => (
-              <Link
-                key={item.id}
-                to="/products?section=original"
-                className="group flex w-[150px] shrink-0 snap-start flex-col items-center sm:w-[240px] lg:w-[270px]"
-                aria-label={item.label}
+            return (
+              <div
+                key={brand.id}
+                role="listitem"
+                className="group relative flex flex-col justify-between rounded-xl border border-neutral-200/90 bg-neutral-50/60 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-brand hover:bg-white hover:shadow-lg dark:border-neutral-800/90 dark:bg-neutral-900/60 dark:hover:border-brand dark:hover:bg-neutral-900 dark:hover:shadow-brand/5 sm:p-5"
+                style={{
+                  animationDelay: `${Math.min(index, 10) * 40}ms`,
+                }}
               >
-                <div className="relative flex h-[200px] w-full items-center justify-center sm:h-[230px] lg:h-[360px]">
-                  <span
-                    className="pointer-events-none absolute inset-x-0 select-none whitespace-nowrap text-center text-6xl font-extrabold tracking-tight text-brand/90 drop-shadow-sm sm:text-7xl lg:text-[5rem]"
-                    aria-hidden
-                  >
-                    {item.label}
-                  </span>
-                  <img
-                    src={IMAGE_BY_ID[item.id]}
-                    alt={item.label}
-                    className="relative z-10 h-full w-auto object-cover drop-shadow-xl transition-transform duration-500 group-hover:-translate-y-1 group-hover:scale-[1.03]"
-                    loading="lazy"
-                  />
-                </div>
-              </Link>
-            ))}
-          </div>
+                {/* Brand Text Header */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-semibold uppercase tracking-widest text-brand">
+                      {isRtl ? 'علامة أصلية' : 'OFFICIAL'}
+                    </span>
+                    <span className="text-xs font-mono text-neutral-400 dark:text-neutral-500">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                  </div>
 
-          <button
-            type="button"
-            onClick={() => scrollBy(1)}
-            className={`absolute end-0 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white/95 p-2 text-neutral-700 shadow-lg ring-1 ring-neutral-200 transition hover:text-brand dark:bg-neutral-800/95 dark:text-neutral-200 dark:ring-neutral-700 md:flex ${
-              canNext ? 'opacity-100' : 'pointer-events-none opacity-0'
-            }`}
-            aria-label={t.a11y.nextSlide}
-          >
-            {isRtl ? <FiChevronLeft className="h-5 w-5" /> : <FiChevronRight className="h-5 w-5" />}
-          </button>
+                  <h3 className="text-base font-bold text-neutral-900 transition-colors duration-200 group-hover:text-brand dark:text-white sm:text-lg">
+                    {primaryName}
+                  </h3>
+
+                  {secondaryName && secondaryName !== primaryName ? (
+                    <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                      {secondaryName}
+                    </p>
+                  ) : null}
+                </div>
+
+                {/* Enter Button */}
+                <div className="mt-4 pt-3 border-t border-neutral-200/60 dark:border-neutral-800/60">
+                  <Link
+                    to={`/brand/${brand.id}`}
+                    className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg border border-neutral-300/80 bg-white px-3 py-2 text-xs font-semibold text-neutral-800 shadow-sm transition-all duration-200 group-hover:border-brand group-hover:bg-brand group-hover:text-white dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:group-hover:border-brand dark:group-hover:bg-brand dark:group-hover:text-white sm:text-sm"
+                  >
+                    <span>{t.luxury.enter || (isRtl ? 'دخول' : 'Enter')}</span>
+                    <FiArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5" />
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -113,12 +113,88 @@ export const BRAND_LOGOS = [
   },
 ];
 
-export const getBrandById = (brandId) => BRAND_LOGOS.find((brand) => brand.id === brandId);
+export const FEATURED_BRAND_IDS = [
+  'assaf',
+  'ibraq',
+  'dkhoon-emirates',
+  'al-qurashi',
+  'match',
+  'afnan',
+  'rasasi',
+  'al-majed-oud',
+  'Laverne',
+  'jean-antoine',
+  'reef',
+];
+
+export const FEATURED_BRANDS = FEATURED_BRAND_IDS.map((id) =>
+  BRAND_LOGOS.find((b) => b.id.toLowerCase() === id.toLowerCase())
+).filter(Boolean);
+
+export const getBrandById = (brandId) => {
+  if (!brandId) return null;
+  const target = String(brandId).trim().toLowerCase();
+  return BRAND_LOGOS.find((brand) => brand.id.toLowerCase() === target) || null;
+};
+
+const BRAND_ALIASES = {
+  ibraq: [
+    'ibraq',
+    'إبراق',
+    'ابراق',
+    'ibrahim al qurashi',
+    'ibraheem al qurashi',
+    'ibrahim al-qurashi',
+    'ibraheem al. qurashi',
+    'إبراهيم القرشي',
+    'ابراهيم القرشي',
+    'diamond collection',
+  ],
+  'al-majed-oud': [
+    'al majed oud',
+    'almajed oud',
+    'al-majed-oud',
+    'المجد للعود',
+    'الماجد للعود',
+    'ماجد العود',
+  ],
+  'al-qurashi': [
+    'abdul samad al qurashi',
+    'abdul samad alqurashi',
+    'al-qurashi',
+    'عبد الصمد القرشي',
+    'عبدالصمد القرشي',
+  ],
+  'dkhoon-emirates': [
+    'dkhoon emirates',
+    'dkhoon-emirates',
+    'دخون الإمارات',
+    'دخون الامارات',
+    'دخون الاماراتية',
+    'دخون الإماراتية',
+  ],
+  Laverne: ['laverne', 'لافيرن'],
+  'jean-antoine': ['jean antoine', 'jean-antoine', 'جان أنطوان', 'جان انطوان'],
+  match: ['match', 'ماتش'],
+  assaf: ['assaf', 'عساف'],
+  afnan: ['afnan', 'أفنان', 'افنان'],
+  rasasi: ['rasasi', 'رساسي'],
+  reef: ['reef', 'ريف'],
+};
 
 export const getBrandIdByName = (brandName) => {
   if (!brandName) return null;
 
-  const normalized = brandName.trim().toLowerCase();
+  const normalized = String(brandName).trim().toLowerCase();
+
+  // 1. Check known aliases for key brands
+  for (const [id, aliases] of Object.entries(BRAND_ALIASES)) {
+    if (aliases.some((alias) => alias.toLowerCase() === normalized)) {
+      return id;
+    }
+  }
+
+  // 2. Exact match in BRAND_LOGOS
   const matched = BRAND_LOGOS.find((brand) =>
     [brand.name, brand.nameAr].filter(Boolean).some((label) => label.trim().toLowerCase() === normalized)
   );

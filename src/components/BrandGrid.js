@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
-import { getBrandLabel } from '../data/brands';
+import { getBrandLabel, FEATURED_BRANDS } from '../data/brands';
 
-const BrandGrid = ({ brands, activeBrandId = null, onBrandChange, className = '' }) => {
+const BrandGrid = ({ brands = FEATURED_BRANDS, activeBrandId = null, onBrandChange, className = '' }) => {
   const { language, isRtl } = useLanguage();
 
   return (

@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { allProducts, PRODUCT_SECTIONS } from '../data/products';
-import { BRAND_LOGOS } from '../data/brands';
+import { FEATURED_BRANDS, FEATURED_BRAND_IDS, getBrandIdByName } from '../data/brands';
 import ProductCard from './ProductCard';
 import ProductSectionTabs from './ProductSectionTabs';
 import BrandGrid from './BrandGrid';
@@ -28,6 +28,18 @@ const ProductCatalog = () => {
     }
   }, [brandFromUrl, navigate]);
 
+  const allowedBrandIdSet = useMemo(
+    () => new Set(FEATURED_BRAND_IDS.map((id) => id.toLowerCase())),
+    []
+  );
+
+  const catalogProducts = useMemo(() => {
+    return allProducts.filter((product) => {
+      const brandId = (product.brandId || getBrandIdByName(product.brand) || '').toLowerCase();
+      return allowedBrandIdSet.has(brandId);
+    });
+  }, [allowedBrandIdSet]);
+
   const sectionMatches = (product, sectionId) => {
     if (sectionId === 'all') return true;
     if (sectionId === 'original') return product.section === 'original' || product.section === 'new-luxury';
@@ -36,15 +48,15 @@ const ProductCatalog = () => {
 
   const counts = useMemo(() => {
     const sectionCounts = PRODUCT_SECTIONS.reduce((acc, section) => {
-      acc[section.id] = allProducts.filter((p) => sectionMatches(p, section.id)).length;
+      acc[section.id] = catalogProducts.filter((p) => sectionMatches(p, section.id)).length;
       return acc;
     }, {});
-    return { all: allProducts.length, ...sectionCounts };
-  }, []);
+    return { all: catalogProducts.length, ...sectionCounts };
+  }, [catalogProducts]);
 
   const sectionProducts = useMemo(
-    () => allProducts.filter((p) => sectionMatches(p, activeSection)),
-    [activeSection]
+    () => catalogProducts.filter((p) => sectionMatches(p, activeSection)),
+    [catalogProducts, activeSection]
   );
 
   const totalPages = Math.max(1, Math.ceil(sectionProducts.length / PRODUCTS_PER_PAGE));
@@ -100,7 +112,7 @@ const ProductCatalog = () => {
             </div>
           </div>
           <BrandGrid
-            brands={BRAND_LOGOS}
+            brands={FEATURED_BRANDS}
             onBrandChange={(brandId) => {
               navigate(`/brand/${brandId}`);
             }}

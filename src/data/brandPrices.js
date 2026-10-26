@@ -33,6 +33,7 @@ export const FOLDER_BY_BRAND_ID = {
   'dkhoon-emirates': 'Dkhoon Emirates',
   amarah: 'Amarah',
   Laverne: 'Laverne',
+  laverne: 'Laverne',
   lador: "L'ador",
   lithioo: 'Lithioo',
   'arabian-oud': 'Arabian Oud',

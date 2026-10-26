@@ -102,7 +102,7 @@ const OriginalProducts = () => {
               className={arrowBtn}
               onClick={() => scrollByCard(-1)}
               disabled={!canPrev}
-              aria-label={t.newLuxury.prev}
+              aria-label={t.newDiverse.prev}
             >
               <FiChevronLeft className="h-5 w-5 rtl:rotate-180" />
             </button>
@@ -111,7 +111,7 @@ const OriginalProducts = () => {
               className={arrowBtn}
               onClick={() => scrollByCard(1)}
               disabled={!canNext}
-              aria-label={t.newLuxury.next}
+              aria-label={t.newDiverse.next}
             >
               <FiChevronRight className="h-5 w-5 rtl:rotate-180" />
             </button>
