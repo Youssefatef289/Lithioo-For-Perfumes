@@ -22,6 +22,18 @@ export const BRAND_LOGOS = [
     logo: '/image/brands/assaf.png',
   },
   {
+    id: 'reef',
+    name: 'Reef',
+    nameAr: 'ريف',
+    logo: '/image/brands/reef.png',
+  },
+  {
+    id: 'arabian-oud',
+    name: 'Arabian Oud',
+    nameAr: 'العربية للعود',
+    logo: '/image/brands/arabian-oud.png',
+  },
+  {
     id: 'ibraq',
     name: 'Ibraq',
     nameAr: 'إبراق',
@@ -37,7 +49,7 @@ export const BRAND_LOGOS = [
     id: 'lattafa',
     name: 'Lattafa',
     nameAr: 'لطافة',
-    logo: '/image/brands/lattafa.webp',
+    logo: '/image/brands/lattafa.png',
   },
   {
     id: 'al-majed-oud',
@@ -67,13 +79,13 @@ export const BRAND_LOGOS = [
     id: 'amarah',
     name: 'Amarah',
     nameAr: 'أمارة',
-    logo: '/image/brands/amarah.webp',
+    logo: '/image/brands/amarah.png',
   },
   {
     id: 'jean-antoine',
     name: 'Jean Antoine',
     nameAr: 'جان أنطوان',
-    logo: '/image/brands/jean antone.webp',
+    logo: '/image/brands/jean-antoine.png',
   },
   {
     id: 'Laverne',
@@ -86,6 +98,18 @@ export const BRAND_LOGOS = [
     name: 'Match',
     nameAr: 'ماتش',
     logo: '/image/brands/match.png',
+  },
+  {
+    id: 'armaf',
+    name: 'Armaf',
+    nameAr: 'أرماف',
+    logo: '/image/brands/armaf.png',
+  },
+  {
+    id: 'lithioo',
+    name: 'Lithioo',
+    nameAr: 'ليثيو',
+    logo: '/image/brands/lithioo.png',
   },
 ];
 

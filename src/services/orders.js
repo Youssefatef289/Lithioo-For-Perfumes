@@ -114,3 +114,51 @@ export function subscribeToOrders(callback) {
   return () => supabase.removeChannel(channel);
 }
 
+
+/**
+ * Fetch last order customer details by phone number (for auto-filling checkout).
+ */
+export async function fetchLastOrderByPhone(phone) {
+  if (!isSupabaseConfigured || !phone) return null;
+  const cleanPhone = phone.trim();
+  if (!cleanPhone) return null;
+  try {
+    const { data, error } = await supabase
+      .from('orders')
+      .select('customer_name, phone, address, city')
+      .eq('phone', cleanPhone)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error || !data) return null;
+    return {
+      name: data.customer_name || '',
+      phone: data.phone || cleanPhone,
+      address: data.address || '',
+      city: data.city || '',
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Fetch current authenticated Supabase user profile for auto-filling checkout.
+ */
+export async function getCurrentCustomerData() {
+  if (!isSupabaseConfigured || !supabase) return null;
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+    const meta = user.user_metadata || {};
+    return {
+      name: meta.full_name || meta.name || '',
+      phone: meta.phone || user.phone || '',
+      address: meta.address || '',
+      city: meta.city || '',
+    };
+  } catch {
+    return null;
+  }
+}

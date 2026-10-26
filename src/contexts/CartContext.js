@@ -100,6 +100,11 @@ export const CartProvider = ({ children }) => {
     setCartItems((prevItems) => prevItems.filter((item) => item.cartKey !== cartKey));
   };
 
+  const removeItemsFromCart = (cartKeys) => {
+    const keySet = new Set(cartKeys);
+    setCartItems((prevItems) => prevItems.filter((item) => !keySet.has(item.cartKey)));
+  };
+
   const updateQuantity = (cartKey, quantity) => {
     if (quantity <= 0) {
       removeFromCart(cartKey);
@@ -127,6 +132,7 @@ export const CartProvider = ({ children }) => {
     cartItems,
     addToCart,
     removeFromCart,
+    removeItemsFromCart,
     updateQuantity,
     clearCart,
     getCartTotal,

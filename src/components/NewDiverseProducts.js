@@ -100,9 +100,7 @@ const NewDiverseProducts = () => {
                   animationClass="animate-catalog-fade opacity-0"
                   style={{ animationDelay: `${index * 60}ms` }}
                 />
-                <span className="pointer-events-none absolute end-5 top-5 z-10 rounded-full bg-brand/95 px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-white shadow-sm">
-                  {t.newDiverse.newTag || 'New'}
-                </span>
+                
               </div>
             ))}
           </div>

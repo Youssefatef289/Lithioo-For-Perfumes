@@ -9,6 +9,15 @@ const PriceDisplay = ({
   size = 'sm',
 }) => {
   const numericPrice = parsePrice(price);
+
+  if (!numericPrice || numericPrice <= 0) {
+    return (
+      <p className={`m-0 font-medium text-neutral-500 dark:text-neutral-400 ${size === 'lg' ? 'text-base' : 'text-xs sm:text-sm'} ${className}`}>
+        {language === 'ar' ? 'غير متوفر' : 'Not Available'}
+      </p>
+    );
+  }
+
   const fmt = (amount) => localizeDigits(formatEGP(amount), language);
 
   const priceClass =

@@ -5,6 +5,8 @@ import Footer from './components/Footer';
 import CartSidebar from './components/CartSidebar';
 import CartToast from './components/CartToast';
 import FloatingContactButton from './components/FloatingContactButton';
+import BackButton from './components/BackButton';
+import MobileBottomNav from './components/MobileBottomNav';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import BrandPage from './pages/BrandPage';
@@ -27,31 +29,39 @@ function App() {
     <Router>
       <Routes>
         {/* ── Admin dashboard (completely separate shell) ─── */}
-        <Route path="/admin/*" element={
-          <Suspense fallback={<AdminSuspense />}>
-            <AdminApp />
-          </Suspense>
-        } />
+        <Route
+          path="/admin/*"
+          element={
+            <Suspense fallback={<AdminSuspense />}>
+              <AdminApp />
+            </Suspense>
+          }
+        />
 
         {/* ── Storefront ──────────────────────────────────── */}
-        <Route path="/*" element={
-          <div className="app-shell pb-24 md:pb-0">
-            <Header />
-            <CartSidebar />
-            <CartToast />
-            <FloatingContactButton />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/brand/:brandId" element={<BrandPage />} />
-              <Route path="/product/:id" element={<ProductDetails />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-            </Routes>
-            <Footer />
-          </div>
-        } />
+        <Route
+          path="/*"
+          element={
+            <div className="app-shell pb-28 md:pb-0">
+              <Header />
+              <BackButton />
+              <CartSidebar />
+              <CartToast />
+              <FloatingContactButton />
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/brand/:brandId" element={<BrandPage />} />
+                <Route path="/product/:id" element={<ProductDetails />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+              </Routes>
+              <Footer />
+              <MobileBottomNav />
+            </div>
+          }
+        />
       </Routes>
     </Router>
   );
