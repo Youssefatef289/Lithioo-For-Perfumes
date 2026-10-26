@@ -101,7 +101,7 @@ export const PRODUCT_IMAGES = {
   Tuxedo: single('Yves Saint Laurent (YSL)', 'tuxedo', 'webp'),
   'Sweet Musk': single('Lithioo', 'sweet-musk', 'webp'),
   'Hersh Laheeb': single('Lithioo', 'hersh-laheeb', 'webp'),
-  Khamrah: single('Lattafa', 'khamrah', 'jpg'),
+  Khamrah: brandImages('Lattafa', 'khamrah', 2, 'jpg'),
   Percival: single('Parfums de Marly', 'percival', 'webp'),
   'Deja Vu': single('Gissah', 'deja-vu', 'webp'),
   'Stronger With You Amber': single('Armani', 'stronger-with-you-amber', 'jpg'),

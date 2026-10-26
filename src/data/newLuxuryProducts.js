@@ -466,6 +466,12 @@ export const NEW_LUXURY_PRODUCTS = [
     price: 1500,
     image: `/image/Perfume brands/Laura Mars/splandid-1.webp`,
     imageHover: `/image/Perfume brands/Laura Mars/splandid-2.webp`,
+    detailImages: [
+      `/image/Perfume brands/Laura Mars/splandid-1.webp`,
+      `/image/Perfume brands/Laura Mars/splandid-2.webp`,
+      `/image/Perfume brands/Laura Mars/splandid-3.webp`,
+      `/image/Perfume brands/Laura Mars/splandid-4.webp`,
+    ],
     description:
       'A masculine fragrance built for the modern gentleman. Fresh, magnetic and confidently refined.',
     descriptionAr:
@@ -522,6 +528,11 @@ export const NEW_LUXURY_PRODUCTS = [
     price: 900,
     image: `/image/Perfume brands/Reef/reef-bluest-1.jpg`,
     imageHover: `/image/Perfume brands/Reef/reef-bluest-2.jpg`,
+    detailImages: [
+      `/image/Perfume brands/Reef/reef-bluest-1.jpg`,
+      `/image/Perfume brands/Reef/reef-bluest-2.jpg`,
+      `/image/Perfume brands/Reef/reef-bluest-3.jpg`,
+    ],
     description:
       'An aquatic adventure in a bottle — fresh, cool and revitalizing. Like a deep breath of sea air.',
     descriptionAr:
@@ -550,6 +561,11 @@ export const NEW_LUXURY_PRODUCTS = [
     price: 950,
     image: `/image/Perfume brands/Reef/reef-33-1.webp`,
     imageHover: `/image/Perfume brands/Reef/reef-33-2.webp`,
+    detailImages: [
+      `/image/Perfume brands/Reef/reef-33-1.webp`,
+      `/image/Perfume brands/Reef/reef-33-2.webp`,
+      `/image/Perfume brands/Reef/reef-33-3.webp`,
+    ],
     description:
       'A clean modern white perfume. Effortless elegance for every occasion.',
     descriptionAr:
@@ -578,6 +594,11 @@ export const NEW_LUXURY_PRODUCTS = [
     price: 900,
     image: `/image/Perfume brands/Reef/reef-summer-pink-1.jpg`,
     imageHover: `/image/Perfume brands/Reef/reef-summer-pink-2.jpg`,
+    detailImages: [
+      `/image/Perfume brands/Reef/reef-summer-pink-1.jpg`,
+      `/image/Perfume brands/Reef/reef-summer-pink-2.jpg`,
+      `/image/Perfume brands/Reef/reef-summer-pink-3.jpg`,
+    ],
     description:
       'A cheerful summer scent blooming with playful pink petals. Sweet, fresh and irresistibly fun.',
     descriptionAr:
@@ -607,6 +628,11 @@ export const NEW_LUXURY_PRODUCTS = [
     price: 450,
     image: `/image/Perfume brands/Reef/reef-29-1.jpg`,
     imageHover: `/image/Perfume brands/Reef/reef-29-2.jpg`,
+    detailImages: [
+      `/image/Perfume brands/Reef/reef-29-1.jpg`,
+      `/image/Perfume brands/Reef/reef-29-2.jpg`,
+      `/image/Perfume brands/Reef/reef-29-3.jpg`,
+    ],
     description:
       'A compact perfume with a powerful signature. Travel-ready and ever ready to impress.',
     descriptionAr:
