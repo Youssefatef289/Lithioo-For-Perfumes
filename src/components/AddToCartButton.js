@@ -102,10 +102,10 @@ const AddToCartButton = ({
       disabled={disabled}
       dir={isRtl ? 'rtl' : 'ltr'}
       className={[
-        'group/cart relative isolate inline-flex items-center justify-center overflow-hidden rounded-full py-2.5 px-4 text-xs sm:text-sm font-semibold uppercase tracking-wider select-none transition-all duration-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 border-0 bg-transparent min-h-[44px]',
+        'group/cart relative isolate inline-flex items-center justify-center overflow-hidden rounded-none py-2.5 px-4 text-xs sm:text-sm font-semibold uppercase tracking-wider select-none transition-all duration-300 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 border-0 min-h-[44px]',
         isAdded
-          ? 'text-white shadow-md'
-          : 'text-neutral-700 dark:text-neutral-200 hover:text-brand dark:hover:text-brand hover:bg-neutral-100/80 dark:hover:bg-neutral-800/80 group-hover:text-brand group-hover:bg-neutral-50 dark:group-hover:bg-neutral-800/50',
+          ? 'bg-emerald-600 text-white shadow-none'
+          : 'bg-brand text-white hover:bg-brand-dark dark:bg-brand dark:hover:bg-brand-dark shadow-none',
         className,
       ].join(' ')}
       aria-label={isAdded ? addedLabel : label}
@@ -124,7 +124,7 @@ const AddToCartButton = ({
               height: `${ripple.size}px`,
               transform: 'translate(-50%, -50%)',
             }}
-            className="pointer-events-none z-0 rounded-full bg-white/35 animate-ping"
+            className="pointer-events-none z-0 rounded-none bg-white/35 animate-ping"
           />
         ))}
 
@@ -152,7 +152,7 @@ const AddToCartButton = ({
         style={{
           transformOrigin: isRtl ? 'right center' : 'left center',
         }}
-        className="pointer-events-none absolute inset-0 z-0 bg-emerald-600 rounded-full"
+        className="pointer-events-none absolute inset-0 z-0 bg-emerald-600 rounded-none"
       />
 
       {/* Button content (Icon + Text) */}

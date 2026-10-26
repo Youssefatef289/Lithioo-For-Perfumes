@@ -51,7 +51,7 @@ const BrandPage = () => {
 
   if (!brand) {
     return (
-      <main className="page-main min-h-[70vh] bg-white px-4 py-16 dark:bg-neutral-950 sm:px-6 lg:px-8">
+      <main className="page-main min-h-[70vh] bg-white px-4 py-16 pt-24 dark:bg-neutral-950 sm:px-6 sm:pt-28 md:pt-32 lg:px-8">
         <div className="section-inner max-w-3xl text-center">
           <h1 className="heading-section">
             {isRtl ? 'البراند غير موجود' : 'Brand Not Found'}
@@ -62,7 +62,7 @@ const BrandPage = () => {
               : 'Sorry, we could not find this brand. Please explore our full fragrance catalog.'}
           </p>
           <div className="mt-8">
-            <Link to="/products" className="btn-primary">
+            <Link to="/products" className="btn-primary rounded-none shadow-none">
               {isRtl ? 'تصفح كل المنتجات' : 'Browse All Products'}
             </Link>
           </div>
@@ -72,7 +72,7 @@ const BrandPage = () => {
   }
 
   return (
-    <main className="page-main min-h-screen bg-white pb-20 pt-6 dark:bg-neutral-950 sm:pt-8 md:pt-10">
+    <main className="page-main min-h-screen bg-white pb-20 pt-24 dark:bg-neutral-950 sm:pt-28 md:pt-32">
       <div className="section-inner max-w-wide">
         {/* Back button to Products */}
         <div className="mb-6">
@@ -86,11 +86,11 @@ const BrandPage = () => {
         </div>
 
         {/* Brand Header Banner */}
-        <div className="relative mb-10 overflow-hidden rounded-3xl border border-neutral-100/90 bg-gradient-to-br from-neutral-50 via-white to-brand/5 p-6 shadow-sm dark:border-neutral-800 dark:from-neutral-900 dark:via-neutral-900/90 dark:to-brand/10 sm:p-8 md:p-10">
+        <div className="relative mb-10 overflow-hidden rounded-none border border-neutral-200 bg-transparent p-6 dark:border-neutral-800 sm:p-8 md:p-10">
           <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:items-center sm:text-start">
             {/* Brand Logo */}
             {brand.logo ? (
-              <div className="flex h-28 w-32 shrink-0 items-center justify-center rounded-2xl border border-neutral-100/80 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-800/90 sm:h-32 sm:w-40 md:h-36 md:w-44">
+              <div className="flex h-28 w-32 shrink-0 items-center justify-center rounded-none border border-neutral-200 bg-transparent p-4 dark:border-neutral-800 sm:h-32 sm:w-40 md:h-36 md:w-44">
                 <img
                   src={brand.logo}
                   alt={displayName}
@@ -106,7 +106,7 @@ const BrandPage = () => {
                   {isRtl ? 'دار عطور مميزة' : 'Luxury Fragrance House'}
                 </span>
                 {secondaryName && secondaryName !== displayName && (
-                  <span className="rounded-full bg-neutral-200/60 px-2.5 py-0.5 text-xs font-medium text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
+                  <span className="rounded-none bg-neutral-200/60 px-2.5 py-0.5 text-xs font-medium text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
                     {secondaryName}
                   </span>
                 )}
@@ -117,7 +117,7 @@ const BrandPage = () => {
               </h1>
 
               <div className="pt-1">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-3.5 py-1 text-xs font-semibold text-brand dark:bg-brand/20 sm:text-sm">
+                <span className="inline-flex items-center gap-1.5 rounded-none bg-brand/10 px-3.5 py-1 text-xs font-semibold text-brand dark:bg-brand/20 sm:text-sm">
                   <FiPackage className="h-4 w-4" />
                   <span>
                     {brandProducts.length}{' '}
@@ -144,7 +144,7 @@ const BrandPage = () => {
           </div>
         ) : (
           /* Empty State */
-          <div className="my-12 rounded-3xl border border-dashed border-neutral-200 p-10 text-center dark:border-neutral-800 sm:p-14">
+          <div className="my-12 rounded-none border border-dashed border-neutral-200 p-10 text-center dark:border-neutral-800 sm:p-14">
             <FiPackage className="mx-auto h-12 w-12 text-neutral-400 dark:text-neutral-600" />
             <h3 className="mt-4 text-lg font-semibold text-neutral-900 dark:text-white sm:text-xl">
               {isRtl ? 'لا توجد منتجات متوفرة حالياً' : 'No Products Available'}
@@ -155,7 +155,7 @@ const BrandPage = () => {
                 : `Currently no products available for "${displayName}". Please check our other collections.`}
             </p>
             <div className="mt-6">
-              <Link to="/products" className="btn-primary">
+              <Link to="/products" className="btn-primary rounded-none shadow-none">
                 {isRtl ? 'تصفح كل المنتجات' : 'Browse All Products'}
               </Link>
             </div>
@@ -167,4 +167,3 @@ const BrandPage = () => {
 };
 
 export default BrandPage;
-

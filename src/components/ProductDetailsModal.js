@@ -285,7 +285,7 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
             type="button"
             onClick={() => toggleWishlist({ ...product, price })}
             aria-label={inWishlist ? t.modal.saved : t.modal.wishlist}
-            className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full border transition ${
+            className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-none border transition ${
               inWishlist
                 ? 'border-red-300 bg-red-50 text-red-500'
                 : 'border-neutral-200 text-neutral-500 hover:border-brand hover:text-brand dark:border-neutral-700'

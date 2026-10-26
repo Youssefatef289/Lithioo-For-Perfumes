@@ -229,7 +229,7 @@ const ProductDetails = () => {
               <button
                 type="button"
                 onClick={handleWishlist}
-                className={`btn-outline flex-1 ${inWishlist ? 'border-brand bg-brand/10' : ''} ${isToggling ? 'animate-heart-pulse' : ''}`}
+                className={`btn-outline !rounded-none !shadow-none flex-1 ${inWishlist ? 'border-brand bg-brand/10' : ''} ${isToggling ? 'animate-heart-pulse' : ''}`}
               >
                 <FiHeart className={`h-5 w-5 ${inWishlist ? 'fill-current' : ''}`} />
                 {inWishlist ? productPage.inWishlist : productPage.addToWishlist}

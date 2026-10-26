@@ -68,18 +68,18 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
   };
 
   const floatingIconBtn =
-    'pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-white text-neutral-700 shadow-md ring-1 ring-black/5 transition-all duration-300 hover:scale-110 hover:text-brand dark:bg-neutral-800 dark:text-neutral-200 dark:ring-white/10';
+    'pointer-events-auto flex h-9 w-9 items-center justify-center rounded-none border border-neutral-200/90 bg-white/90 text-neutral-700 transition-all duration-200 hover:border-brand hover:text-brand dark:border-neutral-700/90 dark:bg-neutral-900/90 dark:text-neutral-200 dark:hover:border-brand dark:hover:text-brand';
 
   if (!lp) return null;
 
   return (
     <>
       <article
-        className={`group relative w-full transition-transform duration-500 ease-out hover:-translate-y-1 ${animationClass} ${className}`}
+        className={`group relative w-full transition-transform duration-300 ease-out hover:-translate-y-1 ${animationClass} ${className}`}
         style={style}
       >
-        <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-300 bg-white shadow-card transition-all duration-300 group-hover:border-brand/60 group-hover:shadow-card-hover dark:border-neutral-700 dark:bg-neutral-800 dark:shadow-black/40 dark:group-hover:border-brand/60">
-          <div className="relative overflow-hidden bg-white pt-[105%] dark:bg-neutral-800">
+        <div className="flex h-full flex-col overflow-hidden rounded-none border border-neutral-200 bg-transparent transition-colors duration-300 group-hover:border-brand/70 dark:border-neutral-800 dark:group-hover:border-brand/70">
+          <div className="relative overflow-hidden bg-transparent pt-[105%]">
             <div className="absolute inset-0 flex items-center justify-center p-6">
               <img
                 src={mainImage}
@@ -104,8 +104,6 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
               )}
             </div>
 
-            <span className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/5 to-transparent dark:from-black/25" />
-
             <div className="absolute top-3 end-3 z-10 flex flex-col gap-2">
               <button
                 type="button"
@@ -114,7 +112,7 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
                 aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
               >
                 <FiHeart
-                  className={`h-5 w-5 transition-colors duration-200 ${
+                  className={`h-4 w-4 transition-colors duration-200 ${
                     inWishlist ? 'fill-red-500 text-red-500' : ''
                   }`}
                 />
@@ -125,7 +123,7 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
                 className={`${floatingIconBtn} text-emerald-600 hover:text-emerald-500 dark:text-emerald-400`}
                 aria-label="Order via WhatsApp"
               >
-                <FaWhatsapp className="h-5 w-5" />
+                <FaWhatsapp className="h-4 w-4" />
               </button>
               <button
                 type="button"
@@ -133,7 +131,7 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
                 className={floatingIconBtn}
                 aria-label="Quick view"
               >
-                <FiEye className="h-5 w-5" />
+                <FiEye className="h-4 w-4" />
               </button>
             </div>
           </div>

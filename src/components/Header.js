@@ -132,10 +132,10 @@ const Header = () => {
   const headerBar = [
     'fixed inset-x-0 top-0 z-[980] flex items-center overflow-visible transition-all duration-500 md:z-[1000]',
     overHero
-      ? 'min-h-[68px] bg-transparent border-b border-transparent shadow-none md:min-h-[104px]'
+      ? 'min-h-[76px] bg-transparent border-b border-transparent shadow-none md:min-h-[110px]'
       : scrolled
-      ? 'min-h-[60px] bg-white/95 backdrop-blur-md border-b border-neutral-200 shadow-lg md:min-h-[78px]'
-      : 'min-h-[64px] bg-white/95 backdrop-blur-md border-b border-neutral-200 shadow-md md:min-h-[96px]',
+      ? 'min-h-[68px] bg-white/95 backdrop-blur-md border-b border-neutral-200 shadow-md md:min-h-[84px] dark:bg-neutral-900/95 dark:border-neutral-800'
+      : 'min-h-[76px] bg-white/95 backdrop-blur-md border-b border-neutral-200 shadow-sm md:min-h-[104px] dark:bg-neutral-900/95 dark:border-neutral-800',
   ].join(' ');
 
   const iconBtn = [
@@ -172,12 +172,12 @@ const Header = () => {
             <img
               src={logoSrc}
               alt="Lithioo Perfume"
-              className={`w-auto object-cover transition-all duration-500 group-hover:scale-105 ${
+              className={`w-auto object-contain transition-all duration-500 group-hover:scale-105 ${
                 overHero
-                  ? 'h-14 sm:h-12 md:h-[4.5rem] lg:h-[5.5rem] drop-shadow-md'
+                  ? 'h-16 sm:h-20 md:h-24 lg:h-28 drop-shadow-md'
                   : scrolled
-                  ? 'h-9 sm:h-10 md:h-14'
-                  : 'h-10 sm:h-11 md:h-[4.5rem] lg:h-20'
+                  ? 'h-12 sm:h-13 md:h-16 lg:h-20'
+                  : 'h-14 sm:h-16 md:h-20 lg:h-24'
               }`}
             />
             <span className="sr-only">Lithioo</span>

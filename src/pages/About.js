@@ -22,7 +22,7 @@ const About = () => {
 
   return (
     <main className="page-main w-full bg-white dark:bg-neutral-950">
-      <section className="relative overflow-hidden border-b border-neutral-100 bg-gradient-to-br from-brand/10 via-surface-cream/60 to-white px-4 py-16 dark:border-neutral-800 dark:from-brand/5 dark:via-neutral-900 dark:to-neutral-950 sm:py-20">
+      <section className="relative overflow-hidden border-b border-neutral-100 bg-gradient-to-br from-brand/10 via-surface-cream/60 to-white px-4 pb-16 pt-28 sm:pb-20 sm:pt-32 dark:border-neutral-800 dark:from-brand/5 dark:via-neutral-900 dark:to-neutral-950 sm:py-20">
         <div className="pointer-events-none absolute -end-20 top-0 h-56 w-56 rounded-full bg-brand/15 blur-3xl" aria-hidden />
         <div className="section-inner relative max-w-3xl text-center">
           <img

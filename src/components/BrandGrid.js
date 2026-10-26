@@ -27,15 +27,15 @@ const BrandGrid = ({ brands, activeBrandId = null, onBrandChange, className = ''
               }
             }}
             className={[
-              'group min-w-[148px] rounded-3xl border bg-white p-3 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand hover:shadow-lg sm:min-w-0 dark:bg-neutral-900',
+              'group min-w-[148px] rounded-none border bg-transparent p-3 text-center transition-all duration-300 hover:-translate-y-1 hover:border-brand sm:min-w-0',
               isActive
-                ? 'border-brand ring-2 ring-brand/15'
-                : 'border-neutral-100 dark:border-neutral-800',
+                ? 'border-brand ring-1 ring-brand/30'
+                : 'border-neutral-200 dark:border-neutral-800',
               'animate-catalog-fade opacity-0',
             ].join(' ')}
             style={{ animationDelay: `${Math.min(index, 10) * 45}ms` }}
           >
-            <div className="flex min-h-[110px] items-center justify-center rounded-2xl bg-neutral-50 p-4 transition-colors duration-300 group-hover:bg-brand/5 dark:bg-neutral-950 dark:group-hover:bg-brand/10">
+            <div className="flex min-h-[110px] items-center justify-center rounded-none bg-transparent p-4 transition-colors duration-300 group-hover:bg-brand/5 dark:group-hover:bg-brand/10">
               <img
                 src={brand.logo}
                 alt={label}
