@@ -256,3 +256,4 @@ if (lastBracket === -1) {
 const updated = code.slice(0, lastBracket) + formatted + '\n];\n';
 fs.writeFileSync(filePath, updated, 'utf8');
 console.log('Successfully appended 10 new products to NEW_DIVERSE_PRODUCTS!');
+
