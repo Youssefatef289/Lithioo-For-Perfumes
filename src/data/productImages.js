@@ -3,7 +3,7 @@
  * The first image is used on hover. All images are used in detail/modal galleries.
  * If a product is not listed here, it falls back to the default placeholder.
  */
-const brandPath = (brand, slug, n, ext) => `/image/Perfume brands/${brand}/${slug}-${n}.${ext}`;
+const brandPath = (brand, slug, n, ext) => encodeURI(`/image/Perfume brands/${brand}/${slug}-${n}.${ext}`);
 const brandImages = (brand, slug, count, ext) =>
   Array.from({ length: count }, (_, i) => brandPath(brand, slug, i + 1, ext));
 const single = (brand, slug, ext) => brandImages(brand, slug, 1, ext);

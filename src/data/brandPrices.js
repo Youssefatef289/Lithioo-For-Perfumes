@@ -20,7 +20,7 @@ const BRAND_IMAGE_CONTEXT = require.context(
 
 export const FOLDER_BY_BRAND_ID = {
   afnan: 'Afnan',
-  'al-majed-oud': 'Almajed Oud',
+  'al-majed-oud': 'Al Majed Oud',
   assaf: 'Assaf',
   ibraq: 'Ibraq',
   'jean-antoine': 'Jean Antoine',

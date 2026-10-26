@@ -51,9 +51,9 @@ export const ORIGINAL_IMAGE_CATALOG = [
   { slug: 'body-oud-cardamom', images: ['/image/Perfume brands/Arabian Oud/body-oud-cardamom-1.webp', '/image/Perfume brands/Arabian Oud/body-oud-cardamom-2.webp'] },
   {
     slug: 'candy-musk-al-majed-oud-150', images: [
-      '/image/Perfume brands/Almajed Oud/candy-musk-al-majed-oud-150-1.png',
-      '/image/Perfume brands/Almajed Oud/candy-musk-al-majed-oud-150-2.png',
-      '/image/Perfume brands/Almajed Oud/candy-musk-al-majed-oud-150-3.png',
+      '/image/Perfume brands/Al Majed Oud/candy-musk-al-majed-oud-150-1.png',
+      '/image/Perfume brands/Al Majed Oud/candy-musk-al-majed-oud-150-2.png',
+      '/image/Perfume brands/Al Majed Oud/candy-musk-al-majed-oud-150-3.png',
     ],
   },
   { slug: 'cedar-of-lebanon', images: ['/image/Perfume brands/Ibraq/cedar-of-lebanon-1.jpg', '/image/Perfume brands/Ibraq/cedar-of-lebanon-2.jpg'] },
