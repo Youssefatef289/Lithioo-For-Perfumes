@@ -7,10 +7,11 @@
  */
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
+import { usernameToEmail } from '../auth/usernameToEmail';
 
 const AdminAuthContext = createContext(null);
 
-const emailForUsername = (username) => `${String(username || '').trim().toLowerCase()}@lithioo.app`;
+const emailForUsername = (username) => usernameToEmail(username) || `${String(username || '').trim().toLowerCase()}@lithioo.app`;
 
 async function getProfile(user) {
   if (!user || !supabase) return null;
@@ -91,15 +92,101 @@ export function AdminAuthProvider({ children }) {
   };
 
   /**
-   * Create account / Sign Up
+   * Create account / Sign Up with Supabase
    * @param {object} param0
    */
   const signUp = async ({ fullName, username, phone, password, role = 'admin' }) => {
     setAuthError(null);
-    // Staff accounts are created only by an authenticated administrator from
-    // the Team page. Public registration must never create dashboard access.
-    setAuthError('registration_disabled');
-    return { ok: false, error: 'registration_disabled' };
+    try {
+      if (!isSupabaseConfigured || !supabase) throw new Error('supabase_not_configured');
+
+      const cleanUsername = String(username || '').trim().toLowerCase();
+      const email = emailForUsername(cleanUsername);
+
+      // 1. Check if username already exists in profiles
+      const { data: existingUser } = await supabase
+        .from('profiles')
+        .select('id, username')
+        .eq('username', cleanUsername)
+        .maybeSingle();
+
+      if (existingUser) {
+        return { ok: false, error: 'username_taken_or_invalid' };
+      }
+
+      // 2. Sign up user via Supabase Auth
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: cleanUsername,
+            full_name: fullName ? fullName.trim() : cleanUsername,
+            phone: phone ? String(phone).trim() : '',
+            role: role || 'admin',
+          },
+        },
+      });
+
+      if (error) {
+        const msg = (error.message || '').toLowerCase();
+        if (msg.includes('already registered') || msg.includes('user already exists')) {
+          return { ok: false, error: 'username_taken_or_invalid' };
+        }
+        throw error;
+      }
+
+      if (!data?.user) {
+        throw new Error('signup_failed');
+      }
+
+      // 3. Auto sign-in if session was not returned immediately
+      if (!data.session) {
+        try {
+          await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+        } catch (_) {}
+      }
+
+      // 4. Ensure profile row exists in public.profiles with active admin role
+      try {
+        await supabase.from('profiles').upsert({
+          id: data.user.id,
+          full_name: fullName ? fullName.trim() : cleanUsername,
+          username: cleanUsername,
+          phone: phone ? String(phone).trim() : '',
+          role: role || 'admin',
+          is_active: true,
+        }, { onConflict: 'id' });
+      } catch (upsertErr) {
+        console.warn('Profile upsert fallback:', upsertErr);
+      }
+
+      // 5. Retrieve next profile
+      let nextProfile = await getProfile(data.user);
+      if (!nextProfile) {
+        nextProfile = {
+          id: data.user.id,
+          full_name: fullName ? fullName.trim() : cleanUsername,
+          username: cleanUsername,
+          phone: phone ? String(phone).trim() : '',
+          role: role || 'admin',
+          is_active: true,
+        };
+      }
+
+      setProfile(nextProfile);
+      return { ok: true, profile: nextProfile, user: data.user };
+    } catch (err) {
+      console.error('SignUp Error:', err);
+      const code = err?.message === 'supabase_not_configured'
+        ? 'supabase_not_configured'
+        : err?.message || 'signup_failed';
+      setAuthError(code);
+      return { ok: false, error: code };
+    }
   };
 
   /**
