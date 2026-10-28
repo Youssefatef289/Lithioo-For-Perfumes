@@ -22,7 +22,9 @@ Deno.serve(async (req) => {
 
   const url = Deno.env.get('SUPABASE_URL')!
   const anonKey = Deno.env.get('SUPABASE_ANON_KEY')!
-  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  const serviceKey = Deno.env.get('SUPABASE_SECRET_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+  const emailDomain = Deno.env.get('REACT_APP_AUTH_EMAIL_DOMAIN') || Deno.env.get('AUTH_EMAIL_DOMAIN') || 'lithiooperfumes.com'
+
   const callerClient = createClient(url, anonKey, { global: { headers: { Authorization: authorization } } })
   const adminClient = createClient(url, serviceKey)
   const token = authorization.replace(/^Bearer\s+/i, '')
@@ -44,19 +46,31 @@ Deno.serve(async (req) => {
       const username = String(data.username || '').trim().toLowerCase()
       const password = String(data.password || '')
       const role = String(data.role || 'staff')
-      if (!usernamePattern.test(username) || password.length < 8 || !validRoles.has(role)) {
+      const fullName = String(data.full_name || data.fullName || username)
+      const phone = String(data.phone || '')
+
+      if (!usernamePattern.test(username) || password.length < 6 || !validRoles.has(role)) {
         return json({ error: 'invalid_input' }, 400)
       }
+      const email = `${username}@${emailDomain}`
       const { data: created, error } = await adminClient.auth.admin.createUser({
-        email: `${username}@lithioo.app`, password, email_confirm: true,
-        user_metadata: { username },
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: { username, full_name: fullName, phone, role },
       })
       if (error || !created.user) return json({ error: error?.message || 'create_failed' }, 400)
-      const { data: profile, error: profileError } = await adminClient.from('profiles').update({
-        username, role, is_active: true,
-      }).eq('id', created.user.id).select('id, username, role, is_active, created_at').single()
+      const { data: profile, error: profileError } = await adminClient.from('profiles').upsert({
+        id: created.user.id,
+        username,
+        full_name: fullName,
+        phone,
+        role,
+        is_active: true,
+        updated_at: new Date().toISOString(),
+      }).select('id, username, full_name, phone, role, is_active, created_at').single()
       if (profileError) return json({ error: profileError.message }, 400)
-      return json({ user: profile }, 201)
+      return json({ ok: true, user: profile }, 201)
     }
 
     const id = String(data.id || '')
@@ -64,24 +78,26 @@ Deno.serve(async (req) => {
     if (action === 'update') {
       const role = String(data.role || '')
       if (!validRoles.has(role)) return json({ error: 'invalid_input' }, 400)
-      const { data: profile, error } = await adminClient.from('profiles').update({
-        role,
-      }).eq('id', id).select('id, username, role, is_active, created_at').single()
+      const updateData: Record<string, unknown> = { role }
+      if (data.full_name) updateData.full_name = data.full_name
+      if (data.phone) updateData.phone = data.phone
+      const { data: profile, error } = await adminClient.from('profiles').update(updateData)
+        .eq('id', id).select('id, username, full_name, phone, role, is_active, created_at').single()
       if (error) return json({ error: error.message }, 400)
-      return json({ user: profile })
+      return json({ ok: true, user: profile })
     }
     if (action === 'reset_password') {
       const password = String(data.password || '')
-      if (password.length < 8) return json({ error: 'invalid_password' }, 400)
+      if (password.length < 6) return json({ error: 'invalid_password' }, 400)
       const { error } = await adminClient.auth.admin.updateUserById(id, { password })
       if (error) return json({ error: error.message }, 400)
       return json({ ok: true })
     }
     if (action === 'set_active') {
       const { data: profile, error } = await adminClient.from('profiles').update({ is_active: Boolean(data.is_active) })
-        .eq('id', id).select('id, username, role, is_active, created_at').single()
+        .eq('id', id).select('id, username, full_name, phone, role, is_active, created_at').single()
       if (error) return json({ error: error.message }, 400)
-      return json({ user: profile })
+      return json({ ok: true, user: profile })
     }
     if (action === 'delete') {
       const { error } = await adminClient.auth.admin.deleteUser(id)

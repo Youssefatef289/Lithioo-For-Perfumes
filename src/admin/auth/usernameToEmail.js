@@ -5,7 +5,8 @@
  * Supports Arabic, English, spaces, and numbers naturally.
  */
 
-const DEFAULT_AUTH_DOMAIN = process.env.REACT_APP_AUTH_EMAIL_DOMAIN || 'lithioo.app';
+// Fallback to owned brand domain if environment variable is not provided
+const DEFAULT_AUTH_DOMAIN = process.env.REACT_APP_AUTH_EMAIL_DOMAIN || 'lithiooperfumes.com';
 
 /**
  * Converts any user display name (Arabic, English, with spaces, symbols)

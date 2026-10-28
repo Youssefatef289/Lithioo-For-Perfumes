@@ -2,27 +2,26 @@
  * src/admin/contexts/AdminAuthContext.js
  * 
  * Provides unified authentication and profile session for the admin dashboard.
- * Eliminates reliance on manual registration through the Supabase Dashboard.
- * Stores and manages accounts directly using cloud database storage and local persistence.
+ * Uses client-safe Supabase Auth only.
+ * Privileged actions are handled exclusively through server-side Edge Functions.
  */
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { supabase, supabaseAdmin, isSupabaseConfigured } from '../../lib/supabaseClient';
+import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { usernameToEmail, nameToUsernameSlug } from '../auth/usernameToEmail';
 
 const AdminAuthContext = createContext(null);
 
-const emailForUsername = (username) => usernameToEmail(username) || `${String(username || '').trim().toLowerCase()}@lithioo.app`;
+const emailForUsername = (username) => usernameToEmail(username);
 
 async function getProfile(user) {
   if (!user || !supabase) return null;
-  const client = supabaseAdmin || supabase;
-  const { data, error } = await client
+  const { data, error } = await supabase
     .from('profiles')
     .select('id, full_name, username, phone, role, is_active')
     .eq('id', user.id)
     .maybeSingle();
   if (error) {
-    console.warn('getProfile error:', error);
+    console.warn('getProfile notice:', error.message);
     return null;
   }
   return data;
@@ -33,8 +32,7 @@ export function AdminAuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
 
-  // Restore the Supabase Auth session. Dashboard access is never trusted from
-  // browser storage alone: the matching profile and active role are required.
+  // Restore the Supabase Auth session.
   useEffect(() => {
     if (!isSupabaseConfigured || !supabase) {
       setLoading(false);
@@ -60,7 +58,7 @@ export function AdminAuthProvider({ children }) {
 
     return () => {
       mounted = false;
-      subscription.subscription.unsubscribe();
+      subscription?.subscription?.unsubscribe();
     };
   }, []);
 
@@ -76,37 +74,18 @@ export function AdminAuthProvider({ children }) {
       const cleanInput = String(usernameOrEmail || '').trim();
       if (!cleanInput) throw new Error('invalid_credentials');
 
-      // Candidate emails to check
+      // Build candidate emails to check
       const candidateEmails = [];
 
       if (cleanInput.includes('@')) {
         candidateEmails.push(cleanInput.toLowerCase());
       } else {
-        // Look up by profile full_name or username if supabaseAdmin is available
-        if (supabaseAdmin) {
-          try {
-            const { data: matchedProfiles } = await supabaseAdmin
-              .from('profiles')
-              .select('id, full_name, username, phone')
-              .or(`username.ilike.${cleanInput},full_name.ilike.%${cleanInput}%`);
-
-            if (matchedProfiles && matchedProfiles.length > 0) {
-              for (const p of matchedProfiles) {
-                const { data: uData } = await supabaseAdmin.auth.admin.getUserById(p.id);
-                if (uData?.user?.email && !candidateEmails.includes(uData.user.email)) {
-                  candidateEmails.push(uData.user.email);
-                }
-              }
-            }
-          } catch (_) {}
-        }
-
         const safeSlug = nameToUsernameSlug(cleanInput);
         const derived = [
           usernameToEmail(cleanInput),
-          `${safeSlug}@lithioo.app`,
+          `${safeSlug}@lithiooperfumes.com`,
+          `${cleanInput.toLowerCase().replace(/\s+/g, '_')}@lithiooperfumes.com`,
           `${cleanInput.toLowerCase().replace(/\s+/g, '_')}@lithioo.app`,
-          `${cleanInput.toLowerCase().replace(/\s+/g, '_')}@lithioo.email`,
         ];
 
         for (const em of derived) {
@@ -171,83 +150,42 @@ export function AdminAuthProvider({ children }) {
       const cleanPhone = phone ? String(phone).trim() : '';
       const cleanFullName = rawName || cleanSlug;
 
-      let createdUser = null;
-
-      // 1. If supabaseAdmin is available, create user via admin API with email_confirm: true
-      if (supabaseAdmin) {
-        const { data: adminCreated, error: adminErr } = await supabaseAdmin.auth.admin.createUser({
-          email,
-          password,
-          email_confirm: true,
-          user_metadata: {
+      // Standard client auth signUp (secure, no service role key on browser)
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
             username: cleanSlug,
             full_name: cleanFullName,
             phone: cleanPhone,
             role: role || 'admin',
           },
-        });
+        },
+      });
 
-        if (adminErr) {
-          const msg = (adminErr.message || '').toLowerCase();
-          if (msg.includes('already registered') || msg.includes('user already exists')) {
-            return { ok: false, error: 'username_taken_or_invalid' };
-          }
-          throw adminErr;
+      if (error) {
+        const msg = (error.message || '').toLowerCase();
+        if (msg.includes('already registered') || msg.includes('user already exists')) {
+          return { ok: false, error: 'username_taken_or_invalid' };
         }
-
-        createdUser = adminCreated?.user;
-      } else {
-        // Fallback: standard client auth signUp
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              username: cleanSlug,
-              full_name: cleanFullName,
-              phone: cleanPhone,
-              role: role || 'admin',
-            },
-          },
-        });
-
-        if (error) {
-          const msg = (error.message || '').toLowerCase();
-          if (msg.includes('already registered') || msg.includes('user already exists')) {
-            return { ok: false, error: 'username_taken_or_invalid' };
-          }
-          throw error;
+        if (msg.includes('is invalid') || msg.includes('domain') || msg.includes('valid email')) {
+          return { ok: false, error: 'invalid_email_domain', originalMessage: error.message };
         }
-
-        createdUser = data?.user;
+        throw error;
       }
 
+      const createdUser = data?.user;
       if (!createdUser) {
         throw new Error('signup_failed');
       }
 
-      // 2. Ensure profile row exists in public.profiles with active admin role
-      const profileClient = supabaseAdmin || supabase;
-      try {
-        await profileClient.from('profiles').upsert({
-          id: createdUser.id,
-          full_name: cleanFullName,
-          username: cleanSlug,
-          phone: cleanPhone,
-          role: role || 'admin',
-          is_active: true,
-        }, { onConflict: 'id' });
-      } catch (upsertErr) {
-        console.warn('Profile upsert notice:', upsertErr);
-      }
-
-      // 3. Immediately establish active session with signInWithPassword
+      // Automatically sign in the user
       const { data: loginData } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      // 4. Retrieve next profile
       let nextProfile = await getProfile(loginData?.user || createdUser);
       if (!nextProfile) {
         nextProfile = {
@@ -264,11 +202,19 @@ export function AdminAuthProvider({ children }) {
       return { ok: true, profile: nextProfile, user: createdUser };
     } catch (err) {
       console.error('SignUp Error:', err);
-      const code = err?.message === 'supabase_not_configured'
-        ? 'supabase_not_configured'
-        : err?.message || 'signup_failed';
+      const msg = (err?.message || '').toLowerCase();
+      let code = 'signup_failed';
+
+      if (msg.includes('supabase_not_configured')) {
+        code = 'supabase_not_configured';
+      } else if (msg.includes('is invalid') || msg.includes('domain')) {
+        code = 'invalid_email_domain';
+      } else if (msg.includes('already registered') || msg.includes('already exists')) {
+        code = 'username_taken_or_invalid';
+      }
+
       setAuthError(code);
-      return { ok: false, error: code };
+      return { ok: false, error: code, originalMessage: err?.message };
     }
   };
 

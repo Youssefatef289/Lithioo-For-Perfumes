@@ -166,6 +166,12 @@ export default function LoginPage() {
         setTimeout(() => {
           navigate(from, { replace: true });
         }, 1000);
+      } else if (res.error === 'invalid_email_domain') {
+        setErrorMsg(
+          language === 'ar'
+            ? 'صيغة البريد الإلكتروني أو دومين الحساب غير مقبولة لدى خادم المصادقة. يرجى التحقق من ضبط دومين البريد (REACT_APP_AUTH_EMAIL_DOMAIN).'
+            : 'The email address or domain was rejected by the authentication server. Please verify your domain configuration.'
+        );
       } else if (res.error === 'username_taken_or_invalid') {
         setErrorMsg(
           language === 'ar'
@@ -179,15 +185,33 @@ export default function LoginPage() {
             : 'Supabase connection is not configured.'
         );
       } else {
-        setErrorMsg(
-          res.error ||
-            (language === 'ar'
-              ? 'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة ثانية.'
-              : 'Failed to create account. Please try again.')
-        );
+        const raw = String(res.error || res.originalMessage || '');
+        if (raw.toLowerCase().includes('is invalid') || raw.toLowerCase().includes('domain')) {
+          setErrorMsg(
+            language === 'ar'
+              ? 'صيغة البريد الإلكتروني أو دومين الحساب غير مقبولة لدى خادم المصادقة. يرجى التأكد من ضبط دومين بريد صالح.'
+              : 'The email address or domain was rejected by the authentication server.'
+          );
+        } else {
+          setErrorMsg(
+            res.error ||
+              (language === 'ar'
+                ? 'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة ثانية.'
+                : 'Failed to create account. Please try again.')
+          );
+        }
       }
     } catch (err) {
-      setErrorMsg(err.message || (language === 'ar' ? 'حدث خطأ في الخادم.' : 'Server error occurred.'));
+      const msg = (err?.message || '').toLowerCase();
+      if (msg.includes('is invalid') || msg.includes('domain')) {
+        setErrorMsg(
+          language === 'ar'
+            ? 'صيغة البريد الإلكتروني أو دومين الحساب غير مقبولة لدى خادم المصادقة.'
+            : 'The email address or domain was rejected by the authentication server.'
+        );
+      } else {
+        setErrorMsg(err.message || (language === 'ar' ? 'حدث خطأ في الخادم.' : 'Server error occurred.'));
+      }
     } finally {
       setLoading(false);
     }
@@ -268,7 +292,7 @@ export default function LoginPage() {
 
           {/* ── FORM 1: SIGN IN ────────────────────────────────────── */}
           {mode === 'signin' && (
-            <form onSubmit={handleSignIn} className="space-y-4">
+            <form onSubmit={handleSignIn} autoComplete="off" className="space-y-4">
               <div>
                 <label className="mb-1 block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
                   {language === 'ar' ? 'الاسم أو البريد الإلكتروني' : 'Name or Email'}
@@ -277,6 +301,7 @@ export default function LoginPage() {
                   <Input
                     type="text"
                     required
+                    autoComplete="off"
                     value={signInUsername}
                     onChange={(e) => setSignInUsername(e.target.value)}
                     placeholder={language === 'ar' ? 'اكتب اسمك الذي سجلت به أو بريدك' : 'Enter your name or email'}
@@ -295,6 +320,7 @@ export default function LoginPage() {
                   <Input
                     type={showSignInPass ? 'text' : 'password'}
                     required
+                    autoComplete="current-password"
                     value={signInPassword}
                     onChange={(e) => setSignInPassword(e.target.value)}
                     placeholder="••••••••"
@@ -341,7 +367,7 @@ export default function LoginPage() {
 
           {/* ── FORM 2: SIGN UP ────────────────────────────────────── */}
           {mode === 'signup' && (
-            <form onSubmit={handleSignUp} className="space-y-3.5">
+            <form onSubmit={handleSignUp} autoComplete="off" className="space-y-3.5">
               {/* Name */}
               <div>
                 <label className="mb-1 block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
@@ -351,6 +377,7 @@ export default function LoginPage() {
                   <Input
                     type="text"
                     required
+                    autoComplete="off"
                     value={signUpName}
                     onChange={(e) => setSignUpName(e.target.value)}
                     placeholder={language === 'ar' ? 'اكتب اسمك (مثال: يوسف عاطف أو أحمد)' : 'Enter your name (e.g. John Doe)'}
