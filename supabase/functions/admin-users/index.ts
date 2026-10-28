@@ -49,12 +49,12 @@ Deno.serve(async (req) => {
       }
       const { data: created, error } = await adminClient.auth.admin.createUser({
         email: `${username}@lithioo.app`, password, email_confirm: true,
-        user_metadata: { username, full_name: String(data.full_name || username), phone: String(data.phone || ''), role },
+        user_metadata: { username },
       })
       if (error || !created.user) return json({ error: error?.message || 'create_failed' }, 400)
       const { data: profile, error: profileError } = await adminClient.from('profiles').update({
-        full_name: String(data.full_name || username), username, phone: String(data.phone || ''), role, is_active: true,
-      }).eq('id', created.user.id).select('id, full_name, username, phone, role, is_active, created_at').single()
+        username, role, is_active: true,
+      }).eq('id', created.user.id).select('id, username, role, is_active, created_at').single()
       if (profileError) return json({ error: profileError.message }, 400)
       return json({ user: profile }, 201)
     }
@@ -65,8 +65,8 @@ Deno.serve(async (req) => {
       const role = String(data.role || '')
       if (!validRoles.has(role)) return json({ error: 'invalid_input' }, 400)
       const { data: profile, error } = await adminClient.from('profiles').update({
-        full_name: String(data.full_name || ''), phone: String(data.phone || ''), role,
-      }).eq('id', id).select('id, full_name, username, phone, role, is_active, created_at').single()
+        role,
+      }).eq('id', id).select('id, username, role, is_active, created_at').single()
       if (error) return json({ error: error.message }, 400)
       return json({ user: profile })
     }
@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
     }
     if (action === 'set_active') {
       const { data: profile, error } = await adminClient.from('profiles').update({ is_active: Boolean(data.is_active) })
-        .eq('id', id).select('id, full_name, username, phone, role, is_active, created_at').single()
+        .eq('id', id).select('id, username, role, is_active, created_at').single()
       if (error) return json({ error: error.message }, 400)
       return json({ user: profile })
     }

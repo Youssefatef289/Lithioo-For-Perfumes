@@ -2,12 +2,10 @@
  * src/admin/services/adminAccounts.js
  * 
  * Manages admin dashboard accounts and authentication.
- * Legacy local-storage code remains below for migration compatibility only.
- * All active dashboard paths use Supabase Auth and the admin-users function.
+ * Uses Supabase Auth and admin functions.
  */
-import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
+import { supabase, supabaseAdmin, isSupabaseConfigured } from '../../lib/supabaseClient';
 
-const STORAGE_KEY = 'lithioo_admin_accounts';
 const SESSION_KEY = 'lithioo_admin_session';
 
 // Built-in initial super admin account
@@ -26,11 +24,15 @@ async function invokeAdminUsers(action, data = {}) {
   if (!isSupabaseConfigured || !supabase) {
     return { ok: false, error: 'supabase_not_configured' };
   }
-  const { data: result, error } = await supabase.functions.invoke('admin-users', {
-    body: { action, data },
-  });
-  if (error || result?.error) return { ok: false, error: result?.error || error.message || 'request_failed' };
-  return { ok: true, ...result };
+  try {
+    const { data: result, error } = await supabase.functions.invoke('admin-users', {
+      body: { action, data },
+    });
+    if (error || result?.error) return { ok: false, error: result?.error || error?.message || 'request_failed' };
+    return { ok: true, ...result };
+  } catch (err) {
+    return { ok: false, error: err.message || 'request_failed' };
+  }
 }
 
 /**
@@ -38,242 +40,149 @@ async function invokeAdminUsers(action, data = {}) {
  */
 export async function getAdminAccounts() {
   if (!isSupabaseConfigured || !supabase) return [];
-  const { data, error } = await supabase
+  const client = supabaseAdmin || supabase;
+  const { data, error } = await client
     .from('profiles')
-    .select('id, full_name, username, phone, role, is_active, created_at')
+    .select('id, username, full_name, phone, role, is_active, created_at')
     .order('created_at', { ascending: true });
-  if (error) throw error;
+  if (error) {
+    console.error('getAdminAccounts error:', error);
+    return [];
+  }
   return data ?? [];
-
-  let accounts = [];
-
-  // 1. Try to read from localStorage
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      accounts = JSON.parse(raw);
-    }
-  } catch (err) {
-    console.warn('Failed to parse local admin accounts:', err);
-  }
-
-  // Ensure default super admin is in the list
-  if (!accounts.some((a) => a.username.toLowerCase() === DEFAULT_SUPER_ADMIN.username.toLowerCase())) {
-    accounts.unshift(DEFAULT_SUPER_ADMIN);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(accounts));
-    } catch (_) {}
-  }
-
-  // 2. If Supabase is available, attempt to sync accounts from cloud storage
-  if (isSupabaseConfigured) {
-    try {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('value')
-        .eq('key', 'admin_accounts_registry')
-        .maybeSingle();
-
-      if (!error && data?.value && Array.isArray(data.value) && data.value.length > 0) {
-        // Merge cloud accounts with local accounts
-        const map = new Map();
-        [...accounts, ...data.value].forEach((acc) => {
-          if (acc && acc.username) {
-            map.set(acc.username.toLowerCase(), acc);
-          }
-        });
-        accounts = Array.from(map.values());
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(accounts));
-        } catch (_) {}
-      }
-    } catch (e) {
-      // Ignore background sync errors
-    }
-  }
-
-  return accounts;
-}
-
-/**
- * Persist accounts list to local storage and sync to Supabase
- */
-async function saveAccounts(accounts) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(accounts));
-  } catch (err) {
-    console.error('Failed to save accounts locally:', err);
-  }
-
-  // Sync to Supabase site_settings if available
-  if (isSupabaseConfigured) {
-    try {
-      await supabase.from('site_settings').upsert({
-        key: 'admin_accounts_registry',
-        value: accounts,
-        is_public: true,
-        updated_at: new Date().toISOString(),
-      });
-    } catch (_) {}
-  }
-}
-
-/**
- * Authenticate a user by username or phone and password
- */
-export async function authenticateAdmin(username, password) {
-  return { ok: false, error: 'use_supabase_auth' };
-
-  const accounts = await getAdminAccounts();
-  const cleanUsername = String(username || '').trim().toLowerCase();
-  const cleanPass = String(password || '');
-
-  // Strip phone formatting in case user entered a phone number
-  const rawPhone = String(username || '').replace(/[\s\-()]/g, '');
-  const cleanPhone = rawPhone.startsWith('+20') ? '0' + rawPhone.slice(3) : rawPhone;
-
-  const user = accounts.find((a) => {
-    const accU = String(a.username || '').trim().toLowerCase();
-    const accP = String(a.phone || '').replace(/[\s\-()]/g, '');
-    const normP = accP.startsWith('+20') ? '0' + accP.slice(3) : accP;
-    return (
-      accU === cleanUsername ||
-      (cleanPhone.length >= 10 && normP === cleanPhone)
-    );
-  });
-
-  if (!user) {
-    return { ok: false, error: 'invalid_credentials' };
-  }
-
-  // Check password (for default admin, accept either 'admin' or custom password)
-  const matchesPassword =
-    user.password === cleanPass ||
-    (user.username === 'admin' && (cleanPass === 'admin' || cleanPass === 'admin123' || cleanPass === 'Password123!'));
-
-  if (!matchesPassword) {
-    return { ok: false, error: 'invalid_credentials' };
-  }
-
-  if (user.is_active === false) {
-    return { ok: false, error: 'account_disabled' };
-  }
-
-  // Save session
-  const safeSessionUser = {
-    id: user.id,
-    full_name: user.full_name,
-    username: user.username,
-    phone: user.phone,
-    role: user.role,
-    is_active: user.is_active,
-  };
-
-  try {
-    localStorage.setItem(SESSION_KEY, JSON.stringify(safeSessionUser));
-  } catch (_) {}
-
-  return { ok: true, user: safeSessionUser };
 }
 
 /**
  * Register a new admin account
  */
-export async function createAdminAccount({ full_name, username, phone, password, role = 'admin' }) {
-  return invokeAdminUsers('create', { full_name, username, phone, password, role });
+export async function createAdminAccount({ username, password, role = 'staff', phone, full_name }) {
+  // Try edge function first
+  const res = await invokeAdminUsers('create', { username, password, role, phone, full_name });
+  if (res?.ok) return res;
 
-  const accounts = await getAdminAccounts();
-  const cleanUsername = String(username || '').trim();
-  const cleanPhone = String(phone || '').trim();
-  const cleanName = String(full_name || '').trim();
+  // Fallback to supabaseAdmin direct creation
+  if (supabaseAdmin) {
+    try {
+      const cleanUsername = String(username || '').trim().toLowerCase();
+      const email = `${cleanUsername}@lithioo.app`;
+      const { data: created, error: createError } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true,
+        user_metadata: {
+          username: cleanUsername,
+          full_name: full_name || cleanUsername,
+          phone: phone || '',
+          role: role || 'staff',
+        },
+      });
 
-  // Check username collision (case-insensitive)
-  if (accounts.some((a) => String(a.username || '').trim().toLowerCase() === cleanUsername.toLowerCase())) {
-    return { ok: false, error: 'username_taken_or_invalid' };
+      if (createError) {
+        return { ok: false, error: createError.message };
+      }
+
+      const { data: profile, error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .upsert({
+          id: created.user.id,
+          username: cleanUsername,
+          full_name: full_name || cleanUsername,
+          phone: phone || '',
+          role: role || 'staff',
+          is_active: true,
+          updated_at: new Date().toISOString(),
+        })
+        .select('id, username, full_name, phone, role, is_active, created_at')
+        .single();
+
+      if (profileError) {
+        return { ok: false, error: profileError.message };
+      }
+
+      return { ok: true, user: profile };
+    } catch (err) {
+      return { ok: false, error: err.message };
+    }
   }
 
-  const newAccount = {
-    id: `acc-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    full_name: cleanName || cleanUsername,
-    username: cleanUsername,
-    phone: cleanPhone,
-    password: String(password || ''),
-    role: role || 'admin',
-    is_active: true,
-    created_at: new Date().toISOString(),
-  };
-
-  accounts.push(newAccount);
-  await saveAccounts(accounts);
-
-  // Also auto-login the newly created user
-  const safeSessionUser = {
-    id: newAccount.id,
-    full_name: newAccount.full_name,
-    username: newAccount.username,
-    phone: newAccount.phone,
-    role: newAccount.role,
-    is_active: true,
-  };
-
-  try {
-    localStorage.setItem(SESSION_KEY, JSON.stringify(safeSessionUser));
-  } catch (_) {}
-
-  return { ok: true, user: safeSessionUser };
+  return res;
 }
 
 /**
  * Update an existing account's details
  */
-export async function updateAdminAccount(id, { full_name, phone, role }) {
-  return invokeAdminUsers('update', { id, full_name, phone, role });
+export async function updateAdminAccount(id, { role, full_name, phone } = {}) {
+  const res = await invokeAdminUsers('update', { id, role, full_name, phone });
+  if (res?.ok) return res;
 
-  const accounts = await getAdminAccounts();
-  const index = accounts.findIndex((a) => a.id === id);
-  if (index === -1) return { ok: false, error: 'user_not_found' };
+  if (supabaseAdmin) {
+    try {
+      const updateData = {};
+      if (role !== undefined) updateData.role = role;
+      if (full_name !== undefined) updateData.full_name = full_name;
+      if (phone !== undefined) updateData.phone = phone;
 
-  if (full_name !== undefined) accounts[index].full_name = full_name;
-  if (phone !== undefined) accounts[index].phone = phone;
-  if (role !== undefined) accounts[index].role = role;
-  accounts[index].updated_at = new Date().toISOString();
+      const { data: profile, error } = await supabaseAdmin
+        .from('profiles')
+        .update(updateData)
+        .eq('id', id)
+        .select('id, username, full_name, phone, role, is_active, created_at')
+        .single();
 
-  await saveAccounts(accounts);
-  return { ok: true, user: accounts[index] };
+      if (error) return { ok: false, error: error.message };
+      return { ok: true, user: profile };
+    } catch (err) {
+      return { ok: false, error: err.message };
+    }
+  }
+
+  return res;
 }
 
 /**
  * Reset account password
  */
 export async function resetAdminPassword(id, newPassword) {
-  return invokeAdminUsers('reset_password', { id, password: newPassword });
+  const res = await invokeAdminUsers('reset_password', { id, password: newPassword });
+  if (res?.ok) return res;
 
-  const accounts = await getAdminAccounts();
-  const index = accounts.findIndex((a) => a.id === id);
-  if (index === -1) return { ok: false, error: 'user_not_found' };
+  if (supabaseAdmin) {
+    try {
+      const { error } = await supabaseAdmin.auth.admin.updateUserById(id, { password: newPassword });
+      if (error) return { ok: false, error: error.message };
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, error: err.message };
+    }
+  }
 
-  accounts[index].password = newPassword;
-  accounts[index].updated_at = new Date().toISOString();
-
-  await saveAccounts(accounts);
-  return { ok: true };
+  return res;
 }
 
 /**
  * Toggle user active/disabled status
  */
 export async function toggleAdminAccountStatus(id, is_active) {
-  return invokeAdminUsers('set_active', { id, is_active });
+  const res = await invokeAdminUsers('set_active', { id, is_active });
+  if (res?.ok) return res;
 
-  const accounts = await getAdminAccounts();
-  const index = accounts.findIndex((a) => a.id === id);
-  if (index === -1) return { ok: false, error: 'user_not_found' };
+  if (supabaseAdmin) {
+    try {
+      const { data: profile, error } = await supabaseAdmin
+        .from('profiles')
+        .update({ is_active: Boolean(is_active) })
+        .eq('id', id)
+        .select('id, username, full_name, phone, role, is_active, created_at')
+        .single();
 
-  accounts[index].is_active = is_active;
-  accounts[index].updated_at = new Date().toISOString();
+      if (error) return { ok: false, error: error.message };
+      return { ok: true, user: profile };
+    } catch (err) {
+      return { ok: false, error: err.message };
+    }
+  }
 
-  await saveAccounts(accounts);
-  return { ok: true, user: accounts[index] };
+  return res;
 }
 
 export const toggleAdminAccountActive = toggleAdminAccountStatus;
@@ -282,23 +191,24 @@ export const toggleAdminAccountActive = toggleAdminAccountStatus;
  * Delete an admin account
  */
 export async function deleteAdminAccount(id) {
-  return invokeAdminUsers('delete', { id });
+  const res = await invokeAdminUsers('delete', { id });
+  if (res?.ok) return res;
 
-  let accounts = await getAdminAccounts();
-  const target = accounts.find((a) => a.id === id);
-
-  // Prevent deleting the root admin
-  if (target && target.username.toLowerCase() === DEFAULT_SUPER_ADMIN.username.toLowerCase()) {
-    return { ok: false, error: 'cannot_delete_super_admin' };
+  if (supabaseAdmin) {
+    try {
+      const { error } = await supabaseAdmin.auth.admin.deleteUser(id);
+      if (error) return { ok: false, error: error.message };
+      return { ok: true };
+    } catch (err) {
+      return { ok: false, error: err.message };
+    }
   }
 
-  accounts = accounts.filter((a) => a.id !== id);
-  await saveAccounts(accounts);
-  return { ok: true };
+  return res;
 }
 
 /**
- * Get active session user
+ * Get active session user (legacy fallback helper)
  */
 export function getActiveSession() {
   try {
@@ -312,10 +222,14 @@ export function getActiveSession() {
 }
 
 /**
- * Clear active session (Sign Out)
+ * Clear active session (legacy fallback helper)
  */
 export function clearActiveSession() {
   try {
     localStorage.removeItem(SESSION_KEY);
   } catch (_) {}
+}
+
+export async function authenticateAdmin(username, password) {
+  return { ok: false, error: 'use_supabase_auth' };
 }

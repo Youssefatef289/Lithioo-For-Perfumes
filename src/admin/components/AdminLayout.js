@@ -117,7 +117,7 @@ export function AdminLayout({ children, newOrders = 0, onThemeToggle, isDark }) 
         </button>
         {!collapsed && profile && (
           <div className="mt-2 rounded-xl bg-neutral-50 px-3 py-2 dark:bg-neutral-800">
-            <p className="text-xs font-semibold text-neutral-700 dark:text-neutral-200 truncate">{profile.full_name || 'Admin'}</p>
+            <p className="text-xs font-semibold text-neutral-700 dark:text-neutral-200 truncate">{profile.username || 'admin'}</p>
             <p className="text-[11px] text-brand font-mono">@{profile.username || 'admin'}</p>
             <p className="text-[10px] text-neutral-400 capitalize">{profile.role}</p>
           </div>
@@ -192,11 +192,11 @@ export function AdminLayout({ children, newOrders = 0, onThemeToggle, isDark }) 
                 title="User menu"
               >
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand text-white text-xs font-bold">
-                  {profile?.full_name?.[0]?.toUpperCase() ?? 'A'}
+                  {profile?.username?.[0]?.toUpperCase() ?? 'A'}
                 </div>
                 <div className="hidden sm:block text-start leading-tight">
                   <p className="text-xs font-semibold text-neutral-800 dark:text-neutral-200 truncate max-w-[120px]">
-                    {profile?.full_name || 'Admin'}
+                    {profile?.username || 'admin'}
                   </p>
                   <p className="text-[10px] text-brand font-mono truncate max-w-[120px]">
                     @{profile?.username || 'admin'}
@@ -210,7 +210,7 @@ export function AdminLayout({ children, newOrders = 0, onThemeToggle, isDark }) 
                   <div className="absolute end-0 top-full mt-2 z-40 w-52 rounded-2xl border border-neutral-200 bg-white p-2 shadow-xl dark:border-neutral-800 dark:bg-neutral-900">
                     <div className="px-3 py-2 border-b border-neutral-100 dark:border-neutral-800">
                       <p className="text-xs font-bold text-neutral-900 dark:text-white truncate">
-                        {profile?.full_name || 'Admin'}
+                        {profile?.username || 'admin'}
                       </p>
                       <p className="text-[11px] text-brand font-mono">
                         @{profile?.username || 'admin'}

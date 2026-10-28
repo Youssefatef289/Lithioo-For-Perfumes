@@ -6,7 +6,7 @@
  * Stores and manages accounts directly using cloud database storage and local persistence.
  */
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
+import { supabase, supabaseAdmin, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { usernameToEmail } from '../auth/usernameToEmail';
 
 const AdminAuthContext = createContext(null);
@@ -15,12 +15,16 @@ const emailForUsername = (username) => usernameToEmail(username) || `${String(us
 
 async function getProfile(user) {
   if (!user || !supabase) return null;
-  const { data, error } = await supabase
+  const client = supabaseAdmin || supabase;
+  const { data, error } = await client
     .from('profiles')
     .select('id, full_name, username, phone, role, is_active')
     .eq('id', user.id)
     .maybeSingle();
-  if (error) throw error;
+  if (error) {
+    console.warn('getProfile error:', error);
+    return null;
+  }
   return data;
 }
 
@@ -61,21 +65,49 @@ export function AdminAuthProvider({ children }) {
   }, []);
 
   /**
-   * Sign In with username + password
-   * @param {string} username
+   * Sign In with username or email + password
+   * @param {string} usernameOrEmail
    * @param {string} password
    */
-  const signIn = async (username, password) => {
+  const signIn = async (usernameOrEmail, password) => {
     setAuthError(null);
     try {
       if (!isSupabaseConfigured || !supabase) throw new Error('supabase_not_configured');
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: emailForUsername(username),
-        password,
-      });
-      if (error || !data.user) throw error || new Error('invalid_credentials');
+      const cleanInput = String(usernameOrEmail || '').trim().toLowerCase();
 
-      const nextProfile = await getProfile(data.user);
+      // Candidate emails to check (direct email, @lithioo.app, @lithioo.email)
+      const candidateEmails = cleanInput.includes('@')
+        ? [cleanInput]
+        : [
+            usernameToEmail(cleanInput),
+            `${cleanInput}@lithioo.email`,
+            `${cleanInput}@lithioo.app`,
+          ];
+
+      let authenticatedUser = null;
+      let lastError = null;
+
+      for (const email of candidateEmails) {
+        if (!email) continue;
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (!error && data?.user) {
+          authenticatedUser = data.user;
+          lastError = null;
+          break;
+        } else {
+          lastError = error;
+        }
+      }
+
+      if (!authenticatedUser) {
+        throw lastError || new Error('invalid_credentials');
+      }
+
+      const nextProfile = await getProfile(authenticatedUser);
       if (!nextProfile || nextProfile.is_active === false || !['admin', 'manager', 'staff'].includes(nextProfile.role)) {
         await supabase.auth.signOut();
         setAuthError('account_disabled');
@@ -85,6 +117,7 @@ export function AdminAuthProvider({ children }) {
       setProfile(nextProfile);
       return { ok: true, profile: nextProfile };
     } catch (err) {
+      console.error('SignIn Error:', err);
       const code = err?.message === 'supabase_not_configured' ? 'supabase_not_configured' : 'invalid_credentials';
       setAuthError(code);
       return { ok: false, error: code };
@@ -102,83 +135,101 @@ export function AdminAuthProvider({ children }) {
 
       const cleanUsername = String(username || '').trim().toLowerCase();
       const email = emailForUsername(cleanUsername);
+      const cleanPhone = phone ? String(phone).trim() : '';
+      const cleanFullName = fullName ? String(fullName).trim() : cleanUsername;
 
-      // 1. Check if username already exists in profiles
-      const { data: existingUser } = await supabase
-        .from('profiles')
-        .select('id, username')
-        .eq('username', cleanUsername)
-        .maybeSingle();
+      let createdUser = null;
 
-      if (existingUser) {
-        return { ok: false, error: 'username_taken_or_invalid' };
-      }
-
-      // 2. Sign up user via Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
+      // 1. If supabaseAdmin is available, create user via admin API with email_confirm: true
+      // This bypasses Gotrue MX checks and email rate limiting completely!
+      if (supabaseAdmin) {
+        const { data: adminCreated, error: adminErr } = await supabaseAdmin.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+          user_metadata: {
             username: cleanUsername,
-            full_name: fullName ? fullName.trim() : cleanUsername,
-            phone: phone ? String(phone).trim() : '',
+            full_name: cleanFullName,
+            phone: cleanPhone,
             role: role || 'admin',
           },
-        },
-      });
+        });
 
-      if (error) {
-        const msg = (error.message || '').toLowerCase();
-        if (msg.includes('already registered') || msg.includes('user already exists')) {
-          return { ok: false, error: 'username_taken_or_invalid' };
+        if (adminErr) {
+          const msg = (adminErr.message || '').toLowerCase();
+          if (msg.includes('already registered') || msg.includes('user already exists')) {
+            return { ok: false, error: 'username_taken_or_invalid' };
+          }
+          throw adminErr;
         }
-        throw error;
+
+        createdUser = adminCreated?.user;
+      } else {
+        // Fallback: standard client auth signUp
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              username: cleanUsername,
+              full_name: cleanFullName,
+              phone: cleanPhone,
+              role: role || 'admin',
+            },
+          },
+        });
+
+        if (error) {
+          const msg = (error.message || '').toLowerCase();
+          if (msg.includes('already registered') || msg.includes('user already exists')) {
+            return { ok: false, error: 'username_taken_or_invalid' };
+          }
+          throw error;
+        }
+
+        createdUser = data?.user;
       }
 
-      if (!data?.user) {
+      if (!createdUser) {
         throw new Error('signup_failed');
       }
 
-      // 3. Auto sign-in if session was not returned immediately
-      if (!data.session) {
-        try {
-          await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-        } catch (_) {}
-      }
-
-      // 4. Ensure profile row exists in public.profiles with active admin role
+      // 2. Ensure profile row exists in public.profiles with active admin role
+      const profileClient = supabaseAdmin || supabase;
       try {
-        await supabase.from('profiles').upsert({
-          id: data.user.id,
-          full_name: fullName ? fullName.trim() : cleanUsername,
+        await profileClient.from('profiles').upsert({
+          id: createdUser.id,
+          full_name: cleanFullName,
           username: cleanUsername,
-          phone: phone ? String(phone).trim() : '',
+          phone: cleanPhone,
           role: role || 'admin',
           is_active: true,
         }, { onConflict: 'id' });
       } catch (upsertErr) {
-        console.warn('Profile upsert fallback:', upsertErr);
+        console.warn('Profile upsert notice:', upsertErr);
       }
 
-      // 5. Retrieve next profile
-      let nextProfile = await getProfile(data.user);
+      // 3. Immediately establish active session with signInWithPassword
+      const { data: loginData } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      // 4. Retrieve next profile
+      let nextProfile = await getProfile(loginData?.user || createdUser);
       if (!nextProfile) {
         nextProfile = {
-          id: data.user.id,
-          full_name: fullName ? fullName.trim() : cleanUsername,
+          id: createdUser.id,
+          full_name: cleanFullName,
           username: cleanUsername,
-          phone: phone ? String(phone).trim() : '',
+          phone: cleanPhone,
           role: role || 'admin',
           is_active: true,
         };
       }
 
       setProfile(nextProfile);
-      return { ok: true, profile: nextProfile, user: data.user };
+      return { ok: true, profile: nextProfile, user: createdUser };
     } catch (err) {
       console.error('SignUp Error:', err);
       const code = err?.message === 'supabase_not_configured'

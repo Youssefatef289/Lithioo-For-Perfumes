@@ -14,7 +14,6 @@ import { z } from 'zod';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
 import { useAdminLang } from '../contexts/AdminLangContext';
 import { Button, Input, Select, Switch, Card, Modal, ConfirmDialog, Skeleton, useToast } from '../components/ui';
-import { validatePhone, normalizePhone } from '../auth/usernameToEmail';
 import {
   getAdminAccounts,
   createAdminAccount,
@@ -26,21 +25,17 @@ import {
 
 // Zod schemas
 const createUserSchema = z.object({
-  full_name: z.string().trim().min(2, { message: 'invalid_name' }),
-  username: z.string().trim().min(2, { message: 'invalid_username' }),
-  phone: z.string().refine((val) => validatePhone(val), { message: 'invalid_phone' }),
-  password: z.string().min(6, { message: 'weak_password' }),
+  username: z.string().trim().regex(/^[a-z0-9_]{3,30}$/, { message: 'invalid_username' }),
+  password: z.string().min(8, { message: 'weak_password' }),
   role: z.enum(['admin', 'manager', 'staff']),
 });
 
 const updateUserSchema = z.object({
-  full_name: z.string().trim().min(2, { message: 'invalid_name' }),
-  phone: z.string().refine((val) => !val || validatePhone(val), { message: 'invalid_phone' }),
   role: z.enum(['admin', 'manager', 'staff']),
 });
 
 const resetPasswordSchema = z.object({
-  password: z.string().min(6, { message: 'weak_password' }),
+  password: z.string().min(8, { message: 'weak_password' }),
 });
 
 function generateSecurePassword(length = 12) {
@@ -69,9 +64,7 @@ export default function TeamPage() {
 
   // Form states
   const [addForm, setAddForm] = useState({
-    full_name: '',
     username: '',
-    phone: '',
     password: '',
     role: 'staff',
   });
@@ -79,7 +72,7 @@ export default function TeamPage() {
   const [addFormSubmitting, setAddFormSubmitting] = useState(false);
   const [copiedAddPass, setCopiedAddPass] = useState(false);
 
-  const [editForm, setEditForm] = useState({ full_name: '', phone: '', role: 'staff' });
+  const [editForm, setEditForm] = useState({ role: 'staff' });
   const [editFormErrors, setEditFormErrors] = useState({});
   const [editFormSubmitting, setEditFormSubmitting] = useState(false);
 
@@ -151,9 +144,7 @@ export default function TeamPage() {
   const handleOpenAdd = () => {
     const generated = generateSecurePassword();
     setAddForm({
-      full_name: '',
       username: '',
-      phone: '',
       password: generated,
       role: 'staff',
     });
@@ -167,8 +158,7 @@ export default function TeamPage() {
 
     const normalizedData = {
       ...addForm,
-      username: addForm.username.trim(),
-      phone: normalizePhone(addForm.phone),
+      username: addForm.username.trim().toLowerCase(),
     };
 
     const validation = createUserSchema.safeParse(normalizedData);
@@ -186,9 +176,7 @@ export default function TeamPage() {
 
     try {
       const res = await createAdminAccount({
-        full_name: normalizedData.full_name,
         username: normalizedData.username,
-        phone: normalizedData.phone,
         password: normalizedData.password,
         role: normalizedData.role,
       });
@@ -215,8 +203,6 @@ export default function TeamPage() {
     }
     setEditingUser(user);
     setEditForm({
-      full_name: user.full_name || '',
-      phone: user.phone || '',
       role: user.role || 'staff',
     });
     setEditFormErrors({});
@@ -226,10 +212,7 @@ export default function TeamPage() {
     e.preventDefault();
     setEditFormErrors({});
 
-    const normalizedData = {
-      ...editForm,
-      phone: normalizePhone(editForm.phone),
-    };
+    const normalizedData = editForm;
 
     const validation = updateUserSchema.safeParse(normalizedData);
     if (!validation.success) {
@@ -246,8 +229,6 @@ export default function TeamPage() {
 
     try {
       const res = await updateAdminAccount(editingUser.id, {
-        full_name: normalizedData.full_name,
-        phone: normalizedData.phone,
         role: normalizedData.role,
       });
 
@@ -425,9 +406,7 @@ export default function TeamPage() {
               <table className="w-full text-sm text-start">
                 <thead className="border-b border-neutral-100 bg-neutral-50/80 text-xs uppercase tracking-wider text-neutral-500 dark:border-neutral-800 dark:bg-neutral-800/40 dark:text-neutral-400">
                   <tr>
-                    <th className="px-5 py-3.5 text-start">{t.team.name}</th>
                     <th className="px-4 py-3.5 text-start">{t.team.username}</th>
-                    <th className="px-4 py-3.5 text-start">{t.team.phone}</th>
                     <th className="px-4 py-3.5 text-start">{t.team.role}</th>
                     <th className="px-4 py-3.5 text-center">{t.team.status}</th>
                     <th className="px-4 py-3.5 text-start">{t.team.createdAt}</th>
@@ -444,28 +423,15 @@ export default function TeamPage() {
                           !p.is_active ? 'opacity-60 bg-neutral-50/30 dark:bg-neutral-900/20' : ''
                         }`}
                       >
-                        {/* Name + Me badge */}
-                        <td className="px-5 py-4">
+                        <td className="px-5 py-4 font-mono text-xs text-neutral-600 dark:text-neutral-300">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-neutral-900 dark:text-white">
-                              {p.full_name || '—'}
-                            </span>
+                            <span>@{p.username || '—'}</span>
                             {isMe && (
                               <span className="rounded-md bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-brand">
                                 {language === 'ar' ? 'أنت' : 'You'}
                               </span>
                             )}
                           </div>
-                        </td>
-
-                        {/* Username */}
-                        <td className="px-4 py-4 font-mono text-xs text-neutral-600 dark:text-neutral-300">
-                          {p.username ? `@${p.username}` : '—'}
-                        </td>
-
-                        {/* Phone */}
-                        <td className="px-4 py-4 font-mono text-xs text-neutral-600 dark:text-neutral-300">
-                          {p.phone || '—'}
                         </td>
 
                         {/* Role badge */}
@@ -540,18 +506,13 @@ export default function TeamPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-neutral-900 dark:text-white">
-                            {p.full_name || '—'}
-                          </span>
+                          <span className="font-mono text-xs text-neutral-700 dark:text-neutral-200">@{p.username || '—'}</span>
                           {isMe && (
                             <span className="rounded-md bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-brand">
                               {language === 'ar' ? 'أنت' : 'You'}
                             </span>
                           )}
                         </div>
-                        <p className="font-mono text-xs text-neutral-500 mt-0.5">
-                          {p.username ? `@${p.username}` : '—'} · {p.phone || '—'}
-                        </p>
                       </div>
                       <div>{renderRoleBadge(p.role)}</div>
                     </div>
@@ -635,32 +596,12 @@ export default function TeamPage() {
       >
         <form onSubmit={handleSubmitAdd} className="space-y-4">
           <Input
-            label={t.team.name}
-            required
-            placeholder={language === 'ar' ? 'مثال: أحمد محمد' : 'e.g. John Doe'}
-            value={addForm.full_name}
-            onChange={(e) => setAddForm({ ...addForm, full_name: e.target.value })}
-            error={addFormErrors.full_name}
-          />
-
-          <Input
             label={t.team.username}
             required
             placeholder={language === 'ar' ? 'اسم المستخدم' : 'username'}
             value={addForm.username}
             onChange={(e) => setAddForm({ ...addForm, username: e.target.value })}
             error={addFormErrors.username}
-          />
-
-          <Input
-            label={t.team.phone}
-            type="tel"
-            required
-            placeholder="01012345678"
-            value={addForm.phone}
-            onChange={(e) => setAddForm({ ...addForm, phone: e.target.value })}
-            hint={language === 'ar' ? 'رقم هاتف محمول مصري (11 رقم يبدأ بـ 01)' : 'Egyptian mobile phone number (e.g. 01012345678)'}
-            error={addFormErrors.phone}
           />
 
           <div className="space-y-1.5">
@@ -711,7 +652,7 @@ export default function TeamPage() {
               </Button>
             </div>
             <p className="text-xs text-neutral-400">
-              {language === 'ar' ? 'يجب ألا يقل عن 6 أحرف. يرجى نسخ كلمة المرور وإعطاؤها للمستخدم.' : 'Min 6 chars. Please copy and share this password with the user.'}
+              {language === 'ar' ? 'يجب ألا تقل عن 8 أحرف. يرجى نسخ كلمة المرور وإعطاؤها للمستخدم.' : 'Min 8 chars. Please copy and share this password with the user.'}
             </p>
           </div>
 
@@ -759,26 +700,10 @@ export default function TeamPage() {
             <span className="font-mono font-medium">@{editingUser?.username}</span>
           </div>
 
-          <Input
-            label={t.team.name}
-            required
-            value={editForm.full_name}
-            onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
-            error={editFormErrors.full_name}
-          />
-
-          <Input
-            label={t.team.phone}
-            type="tel"
-            value={editForm.phone}
-            onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-            hint={language === 'ar' ? 'رقم هاتف محمول مصري' : 'Egyptian mobile number'}
-            error={editFormErrors.phone}
-          />
-
           <Select
             label={t.team.role}
             value={editForm.role}
+            error={editFormErrors.role}
             onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
           >
             <option value="staff">{t.team.staff}</option>
@@ -814,18 +739,8 @@ export default function TeamPage() {
       >
         <form onSubmit={handleSubmitReset} className="space-y-4">
           <div className="rounded-xl bg-neutral-50 p-3 text-xs text-neutral-600 dark:bg-neutral-800/50 dark:text-neutral-400">
-            <div>
-              <span className="font-semibold text-neutral-800 dark:text-neutral-200">
-                {t.team.name}:
-              </span>{' '}
-              {resettingUser?.full_name}
-            </div>
-            <div className="mt-1">
-              <span className="font-semibold text-neutral-800 dark:text-neutral-200">
-                {t.team.username}:
-              </span>{' '}
-              <span className="font-mono font-medium">@{resettingUser?.username}</span>
-            </div>
+            <span className="font-semibold text-neutral-800 dark:text-neutral-200">{t.team.username}: </span>
+            <span className="font-mono font-medium">@{resettingUser?.username}</span>
           </div>
 
           {resetError && (
@@ -880,8 +795,8 @@ export default function TeamPage() {
             </div>
             <p className="text-xs text-neutral-400">
               {language === 'ar'
-                ? 'يجب ألا تقل كلمة المرور عن 6 أحرف.'
-                : 'Password must be at least 6 characters long.'}
+                ? 'يجب ألا تقل كلمة المرور عن 8 أحرف.'
+                : 'Password must be at least 8 characters long.'}
             </p>
           </div>
         </form>
@@ -893,7 +808,7 @@ export default function TeamPage() {
         onClose={() => !deleteSubmitting && setDeletingUser(null)}
         onConfirm={handleConfirmDelete}
         title={language === 'ar' ? 'تأكيد حذف المستخدم' : 'Confirm Delete User'}
-        message={`${t.team.confirmDelete} (${deletingUser?.full_name || ''} - @${deletingUser?.username || ''})`}
+        message={`${t.team.confirmDelete} (@${deletingUser?.username || ''})`}
         confirmLabel={deleteSubmitting ? t.common.loading : t.common.delete}
         dangerous
       />

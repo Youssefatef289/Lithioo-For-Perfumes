@@ -30,6 +30,7 @@ export default function LoginPage() {
   const [signUpPassword, setSignUpPassword] = useState('');
   const [signUpConfirmPass, setSignUpConfirmPass] = useState('');
   const [showSignUpPass, setShowSignUpPass] = useState(false);
+  const [showSignUpConfirmPass, setShowSignUpConfirmPass] = useState(false);
 
   // Status
   const [loading, setLoading] = useState(false);
@@ -68,7 +69,7 @@ export default function LoginPage() {
     e.preventDefault();
     if (cooldown > 0) return;
 
-    const cleanUsername = signInUsername.trim().toLowerCase();
+    const cleanUsername = signInUsername.trim();
     if (!cleanUsername || !signInPassword) return;
 
     setLoading(true);
@@ -136,8 +137,8 @@ export default function LoginPage() {
     if (!/^[a-z0-9_]{3,30}$/.test(cleanUsername)) {
       setErrorMsg(
         language === 'ar'
-          ? 'اسم المستخدم يجب أن يكون باللغة الإنجليزية بين 3 و 30 حرفاً (أحرف، أرقام، أو _ فقط بدون مسافات).'
-          : 'Username must be 3-30 lowercase alphanumeric characters or underscore.'
+          ? 'اسم المستخدم يجب أن يكون باللغة الإنجليزية (3-30 حرف أو رقم أو _ بدون مسافات).'
+          : 'Username must be 3-30 lowercase letters, numbers, or underscores without spaces.'
       );
       return;
     }
@@ -173,16 +174,33 @@ export default function LoginPage() {
       });
 
       if (res.ok) {
-        setSuccessMsg(language === 'ar' ? 'تم إنشاء الحساب وربطه بـ Supabase بنجاح! جاري تحويلك للوحة التحكم...' : 'Account created & connected to Supabase successfully! Redirecting…');
+        setSuccessMsg(
+          language === 'ar'
+            ? 'تم إنشاء الحساب بنجاح وربطه بـ Supabase! جاري تحويلك للوحة التحكم...'
+            : 'Account created and linked to Supabase! Redirecting…'
+        );
         setTimeout(() => {
           navigate(from, { replace: true });
         }, 1200);
       } else if (res.error === 'username_taken_or_invalid') {
-        setErrorMsg(language === 'ar' ? 'اسم المستخدم هذا مستخدم بالفعل. يرجى اختيار اسم آخر.' : 'This username is already taken. Please choose another one.');
+        setErrorMsg(
+          language === 'ar'
+            ? 'اسم المستخدم هذا مستخدم بالفعل. يرجى اختيار اسم آخر.'
+            : 'This username is already taken. Please choose another one.'
+        );
       } else if (res.error === 'supabase_not_configured') {
-        setErrorMsg(language === 'ar' ? 'تعذر الاتصال بـ Supabase. يرجى التحقق من إعدادات الاتصال.' : 'Supabase connection is not configured.');
+        setErrorMsg(
+          language === 'ar'
+            ? 'تعذر الاتصال بـ Supabase. يرجى مراجعة إعدادات الاتصال.'
+            : 'Supabase connection is not configured.'
+        );
       } else {
-        setErrorMsg(res.error || (language === 'ar' ? 'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة ثانية.' : 'Failed to create account. Please try again.'));
+        setErrorMsg(
+          res.error ||
+            (language === 'ar'
+              ? 'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة ثانية.'
+              : 'Failed to create account. Please try again.')
+        );
       }
     } catch (err) {
       setErrorMsg(err.message || (language === 'ar' ? 'حدث خطأ في الخادم.' : 'Server error occurred.'));
@@ -244,8 +262,8 @@ export default function LoginPage() {
           {mode === 'signup' && (
             <p className="mb-4 rounded-xl bg-amber-500/10 p-2.5 text-center text-xs text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
               {language === 'ar'
-                ? 'يتم إنشاء الحساب وربطه تلقائياً بقاعدة بيانات Supabase بصلاحيات المشرف.'
-                : 'Account will be created and connected to Supabase with admin permissions.'}
+                ? 'يتم تسجيل الحساب وربطه مباشرة بقاعدة بيانات Supabase بصلاحيات المشرف.'
+                : 'Account will be created and connected to Supabase with admin privileges.'}
             </p>
           )}
 
@@ -269,7 +287,7 @@ export default function LoginPage() {
             <form onSubmit={handleSignIn} className="space-y-4">
               <div>
                 <label className="mb-1 block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                  {t.login?.username || (language === 'ar' ? 'اسم المستخدم' : 'Username')}
+                  {t.login?.username || (language === 'ar' ? 'اسم المستخدم أو البريد الإلكتروني' : 'Username or Email')}
                 </label>
                 <div className="relative">
                   <Input
@@ -277,7 +295,7 @@ export default function LoginPage() {
                     required
                     value={signInUsername}
                     onChange={(e) => setSignInUsername(e.target.value)}
-                    placeholder={language === 'ar' ? 'اسم المستخدم (مثال: admin)' : 'username (e.g. admin)'}
+                    placeholder={language === 'ar' ? 'اسم المستخدم أو البريد' : 'username or email'}
                     className="ps-9"
                     disabled={isLocked || loading}
                   />
@@ -370,7 +388,7 @@ export default function LoginPage() {
                     required
                     value={signUpUsername}
                     onChange={(e) => setSignUpUsername(e.target.value)}
-                    placeholder={language === 'ar' ? 'اسم المستخدم' : 'username'}
+                    placeholder={language === 'ar' ? 'مثال: admin_lithioo' : 'e.g. admin_lithioo'}
                     className="ps-9"
                     disabled={loading}
                   />
@@ -432,7 +450,7 @@ export default function LoginPage() {
                 </label>
                 <div className="relative">
                   <Input
-                    type={showSignUpPass ? 'text' : 'password'}
+                    type={showSignUpConfirmPass ? 'text' : 'password'}
                     required
                     value={signUpConfirmPass}
                     onChange={(e) => setSignUpConfirmPass(e.target.value)}
@@ -443,12 +461,12 @@ export default function LoginPage() {
                   <FiLock className="absolute start-3 top-3 text-neutral-400" size={16} />
                   <button
                     type="button"
-                    onClick={() => setShowSignUpPass((s) => !s)}
+                    onClick={() => setShowSignUpConfirmPass((s) => !s)}
                     className="absolute end-3 top-3 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
-                    title={showSignUpPass ? 'Hide password' : 'Show password'}
+                    title={showSignUpConfirmPass ? 'Hide password' : 'Show password'}
                     tabIndex={-1}
                   >
-                    {showSignUpPass ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                    {showSignUpConfirmPass ? <FiEyeOff size={16} /> : <FiEye size={16} />}
                   </button>
                 </div>
               </div>
@@ -458,7 +476,7 @@ export default function LoginPage() {
                 loading={loading}
                 className="w-full mt-2"
               >
-                {t.login?.signUp || (language === 'ar' ? 'إنشاء حساب المشرف' : 'Create Admin Account')}
+                {t.login?.signUp || (language === 'ar' ? 'إنشاء حساب المشرف والربط بـ Supabase' : 'Create Account & Link to Supabase')}
               </Button>
 
               <div className="pt-2 text-center">
