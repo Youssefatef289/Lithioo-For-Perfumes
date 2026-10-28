@@ -213,31 +213,9 @@ export default function LoginPage() {
 
         {/* Card */}
         <Card className="shadow-xl border border-neutral-200/80 dark:border-neutral-800">
-          {/* Mode Switcher Tabs */}
-          <div className="mb-6 grid grid-cols-2 gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-neutral-800/60">
-            <button
-              type="button"
-              onClick={() => switchMode('signin')}
-              className={`rounded-lg py-2 text-xs font-semibold transition ${
-                mode === 'signin'
-                  ? 'bg-white text-neutral-900 shadow-sm dark:bg-neutral-900 dark:text-white'
-                  : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200'
-              }`}
-            >
-              {t.login?.signIn || (language === 'ar' ? 'تسجيل الدخول' : 'Sign In')}
-            </button>
-            <button
-              type="button"
-              onClick={() => switchMode('signup')}
-              className={`rounded-lg py-2 text-xs font-semibold transition ${
-                mode === 'signup'
-                  ? 'bg-white text-neutral-900 shadow-sm dark:bg-neutral-900 dark:text-white'
-                  : 'text-neutral-500 hover:text-neutral-700 dark:text-neutral-400 dark:hover:text-neutral-200'
-              }`}
-            >
-              {t.login?.signUp || (language === 'ar' ? 'إنشاء حساب جديد' : 'Create Account')}
-            </button>
-          </div>
+          <p className="mb-6 rounded-xl bg-neutral-100 p-3 text-center text-xs text-neutral-600 dark:bg-neutral-800/60 dark:text-neutral-300">
+            {language === 'ar' ? 'حسابات لوحة التحكم ينشئها مدير النظام من قسم الفريق.' : 'Dashboard accounts are created by a system administrator from Team.'}
+          </p>
 
           {/* Error & Success Messages */}
           {errorMsg && (
@@ -315,15 +293,6 @@ export default function LoginPage() {
                   : t.login?.signIn || (language === 'ar' ? 'تسجيل الدخول' : 'Sign In')}
               </Button>
 
-              <div className="pt-2 text-center">
-                <button
-                  type="button"
-                  onClick={() => switchMode('signup')}
-                  className="text-xs font-medium text-brand hover:underline"
-                >
-                  {t.login?.noAccount || (language === 'ar' ? 'ليس لديك حساب؟ إنشاء حساب مشرف جديد' : "Don't have an account? Create one")}
-                </button>
-              </div>
             </form>
           )}
 

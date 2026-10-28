@@ -9,3 +9,9 @@ export const parsePrice = (price) => {
   const n = parseFloat(str);
   return Number.isNaN(n) ? 0 : n;
 };
+
+export const getDiscountedPrice = (price, discountPercent = 0) => {
+  const original = parsePrice(price);
+  const discount = Math.max(0, Math.min(100, Number(discountPercent) || 0));
+  return Math.round(original * (100 - discount)) / 100;
+};

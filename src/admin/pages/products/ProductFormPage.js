@@ -41,6 +41,8 @@ export default function ProductFormPage() {
     section_id: '',
     category_id: '',
     base_price: '',
+    discount_percent: 0,
+    discount_label: '',
     hide_sizes: true,
     description_en: '',
     description_ar: '',
@@ -99,6 +101,8 @@ export default function ProductFormPage() {
               section_id: prod.section_id || '',
               category_id: prod.category_id || '',
               base_price: prod.base_price ?? '',
+              discount_percent: prod.discount_percent ?? 0,
+              discount_label: prod.discount_label || '',
               hide_sizes: prod.hide_sizes !== false,
               description_en: prod.description_en || '',
               description_ar: prod.description_ar || '',
@@ -178,6 +182,8 @@ export default function ProductFormPage() {
         section_id: formData.section_id || null,
         category_id: formData.category_id || null,
         base_price: formData.base_price !== '' ? Number(formData.base_price) : null,
+        discount_percent: Math.max(0, Math.min(100, Number(formData.discount_percent) || 0)),
+        discount_label: formData.discount_label?.trim() || null,
         hide_sizes: formData.hide_sizes,
         description_en: formData.description_en || null,
         description_ar: formData.description_ar || null,
@@ -416,6 +422,24 @@ export default function ProductFormPage() {
                 </div>
               </div>
             )}
+
+            <div className="grid max-w-xl grid-cols-1 gap-4 rounded-xl border border-dashed border-brand/40 p-4 sm:grid-cols-2">
+              <Input
+                label={language === 'ar' ? 'الخصم (%)' : 'Discount (%)'}
+                type="number"
+                min="0"
+                max="100"
+                value={formData.discount_percent}
+                onChange={(e) => handleChange('discount_percent', e.target.value)}
+                hint={language === 'ar' ? 'يطبّق على كل الأحجام' : 'Applies to every size'}
+              />
+              <Input
+                label={language === 'ar' ? 'عنوان العرض' : 'Offer label'}
+                value={formData.discount_label}
+                onChange={(e) => handleChange('discount_label', e.target.value)}
+                placeholder={language === 'ar' ? 'خصم لفترة محدودة' : 'Limited-time offer'}
+              />
+            </div>
           </div>
         )}
 

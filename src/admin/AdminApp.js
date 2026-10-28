@@ -25,6 +25,7 @@ const HeroPage        = React.lazy(() => import('./pages/HeroPage'));
 const ReviewsPage     = React.lazy(() => import('./pages/ReviewsPage'));
 const SubscribersPage = React.lazy(() => import('./pages/SubscribersPage'));
 const SettingsPage    = React.lazy(() => import('./pages/SettingsPage'));
+const SectionsPage    = React.lazy(() => import('./pages/SectionsPage'));
 const TeamPage        = React.lazy(() => import('./pages/TeamPage'));
 
 const queryClient = new QueryClient({
@@ -152,6 +153,7 @@ export default function AdminApp() {
                   <SettingsPage />
                 </AdminWithLayout>
               } />
+              <Route path="sections" element={<AdminWithLayout newOrders={newOrders} onThemeToggle={toggleTheme} isDark={isDark}><SectionsPage /></AdminWithLayout>} />
 
               <Route path="team" element={
                 <AdminWithLayout newOrders={newOrders} onThemeToggle={toggleTheme} isDark={isDark}>

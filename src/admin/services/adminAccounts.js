@@ -2,8 +2,8 @@
  * src/admin/services/adminAccounts.js
  * 
  * Manages admin dashboard accounts and authentication.
- * Stores accounts in Supabase database and local storage.
- * Eliminates reliance on Supabase Dashboard for user creation.
+ * Legacy local-storage code remains below for migration compatibility only.
+ * All active dashboard paths use Supabase Auth and the admin-users function.
  */
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 
@@ -18,14 +18,33 @@ export const DEFAULT_SUPER_ADMIN = {
   phone: '01000000000',
   role: 'admin',
   is_active: true,
-  password: 'admin', // default password
+  password: null,
   created_at: new Date('2026-01-01').toISOString(),
 };
+
+async function invokeAdminUsers(action, data = {}) {
+  if (!isSupabaseConfigured || !supabase) {
+    return { ok: false, error: 'supabase_not_configured' };
+  }
+  const { data: result, error } = await supabase.functions.invoke('admin-users', {
+    body: { action, data },
+  });
+  if (error || result?.error) return { ok: false, error: result?.error || error.message || 'request_failed' };
+  return { ok: true, ...result };
+}
 
 /**
  * Retrieve all registered admin accounts
  */
 export async function getAdminAccounts() {
+  if (!isSupabaseConfigured || !supabase) return [];
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, full_name, username, phone, role, is_active, created_at')
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return data ?? [];
+
   let accounts = [];
 
   // 1. Try to read from localStorage
@@ -103,6 +122,8 @@ async function saveAccounts(accounts) {
  * Authenticate a user by username or phone and password
  */
 export async function authenticateAdmin(username, password) {
+  return { ok: false, error: 'use_supabase_auth' };
+
   const accounts = await getAdminAccounts();
   const cleanUsername = String(username || '').trim().toLowerCase();
   const cleanPass = String(password || '');
@@ -159,6 +180,8 @@ export async function authenticateAdmin(username, password) {
  * Register a new admin account
  */
 export async function createAdminAccount({ full_name, username, phone, password, role = 'admin' }) {
+  return invokeAdminUsers('create', { full_name, username, phone, password, role });
+
   const accounts = await getAdminAccounts();
   const cleanUsername = String(username || '').trim();
   const cleanPhone = String(phone || '').trim();
@@ -204,6 +227,8 @@ export async function createAdminAccount({ full_name, username, phone, password,
  * Update an existing account's details
  */
 export async function updateAdminAccount(id, { full_name, phone, role }) {
+  return invokeAdminUsers('update', { id, full_name, phone, role });
+
   const accounts = await getAdminAccounts();
   const index = accounts.findIndex((a) => a.id === id);
   if (index === -1) return { ok: false, error: 'user_not_found' };
@@ -221,6 +246,8 @@ export async function updateAdminAccount(id, { full_name, phone, role }) {
  * Reset account password
  */
 export async function resetAdminPassword(id, newPassword) {
+  return invokeAdminUsers('reset_password', { id, password: newPassword });
+
   const accounts = await getAdminAccounts();
   const index = accounts.findIndex((a) => a.id === id);
   if (index === -1) return { ok: false, error: 'user_not_found' };
@@ -236,6 +263,8 @@ export async function resetAdminPassword(id, newPassword) {
  * Toggle user active/disabled status
  */
 export async function toggleAdminAccountStatus(id, is_active) {
+  return invokeAdminUsers('set_active', { id, is_active });
+
   const accounts = await getAdminAccounts();
   const index = accounts.findIndex((a) => a.id === id);
   if (index === -1) return { ok: false, error: 'user_not_found' };
@@ -253,6 +282,8 @@ export const toggleAdminAccountActive = toggleAdminAccountStatus;
  * Delete an admin account
  */
 export async function deleteAdminAccount(id) {
+  return invokeAdminUsers('delete', { id });
+
   let accounts = await getAdminAccounts();
   const target = accounts.find((a) => a.id === id);
 

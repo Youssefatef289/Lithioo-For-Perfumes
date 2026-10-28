@@ -7,7 +7,7 @@ import { NavLink, Link, useNavigate } from 'react-router-dom';
 import {
   FiGrid, FiShoppingBag, FiPackage, FiTag, FiImage, FiStar,
   FiMail, FiSettings, FiUsers, FiExternalLink, FiLogOut,
-  FiMenu, FiX, FiSun, FiMoon, FiGlobe, FiBell,
+  FiMenu, FiX, FiSun, FiMoon, FiGlobe, FiBell, FiLayers,
 } from 'react-icons/fi';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
 import { useAdminLang } from '../contexts/AdminLangContext';
@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { to: '/admin/orders',     key: 'orders',      icon: FiShoppingBag },
   { to: '/admin/products',   key: 'products',    icon: FiPackage },
   { to: '/admin/brands',     key: 'brands',      icon: FiTag },
+  { to: '/admin/sections',   key: 'sections',    label: 'Sections', icon: FiLayers },
   { to: '/admin/hero',       key: 'hero',        icon: FiImage },
   { to: '/admin/reviews',    key: 'reviews',     icon: FiStar },
   { to: '/admin/subscribers',key: 'subscribers', icon: FiMail },
@@ -40,10 +41,10 @@ function SidebarLink({ item, collapsed, t, newOrders }) {
             : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100'
         }`
       }
-      title={collapsed ? t.nav[item.key] : undefined}
+      title={collapsed ? (item.label || t.nav[item.key]) : undefined}
     >
       <item.icon size={18} className="shrink-0" />
-      {!collapsed && <span className="truncate">{t.nav[item.key]}</span>}
+      {!collapsed && <span className="truncate">{item.label || t.nav[item.key]}</span>}
       {isNew && (
         <span className={`ms-auto rounded-full bg-red-500 text-white text-xs font-bold ${collapsed ? 'absolute -end-1 -top-1 h-4 w-4 flex items-center justify-center' : 'px-1.5 py-0.5'}`}>
           {newOrders > 9 ? '9+' : newOrders}

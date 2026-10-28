@@ -6,34 +6,57 @@
  * Stores and manages accounts directly using cloud database storage and local persistence.
  */
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import {
-  authenticateAdmin,
-  createAdminAccount,
-  getActiveSession,
-  clearActiveSession,
-} from '../services/adminAccounts';
+import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 
 const AdminAuthContext = createContext(null);
+
+const emailForUsername = (username) => `${String(username || '').trim().toLowerCase()}@lithioo.app`;
+
+async function getProfile(user) {
+  if (!user || !supabase) return null;
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, full_name, username, phone, role, is_active')
+    .eq('id', user.id)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
 
 export function AdminAuthProvider({ children }) {
   const [profile, setProfile] = useState(null); // { id, full_name, username, phone, role, is_active }
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
 
-  // Restore session on mount
+  // Restore the Supabase Auth session. Dashboard access is never trusted from
+  // browser storage alone: the matching profile and active role are required.
   useEffect(() => {
-    try {
-      const active = getActiveSession();
-      if (active && active.is_active !== false) {
-        setProfile(active);
-      } else {
-        setProfile(null);
-      }
-    } catch (err) {
-      console.warn('Session restoration failed:', err);
-    } finally {
+    if (!isSupabaseConfigured || !supabase) {
       setLoading(false);
+      return undefined;
     }
+
+    let mounted = true;
+    const restore = async (session) => {
+      try {
+        const nextProfile = session?.user ? await getProfile(session.user) : null;
+        if (mounted) setProfile(nextProfile?.is_active === false ? null : nextProfile);
+      } catch (err) {
+        if (mounted) setProfile(null);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    supabase.auth.getSession().then(({ data }) => restore(data.session));
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      restore(session);
+    });
+
+    return () => {
+      mounted = false;
+      subscription.subscription.unsubscribe();
+    };
   }, []);
 
   /**
@@ -44,16 +67,26 @@ export function AdminAuthProvider({ children }) {
   const signIn = async (username, password) => {
     setAuthError(null);
     try {
-      const res = await authenticateAdmin(username, password);
-      if (res.ok && res.user) {
-        setProfile(res.user);
-        return { ok: true, profile: res.user };
+      if (!isSupabaseConfigured || !supabase) throw new Error('supabase_not_configured');
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: emailForUsername(username),
+        password,
+      });
+      if (error || !data.user) throw error || new Error('invalid_credentials');
+
+      const nextProfile = await getProfile(data.user);
+      if (!nextProfile || nextProfile.is_active === false || !['admin', 'manager', 'staff'].includes(nextProfile.role)) {
+        await supabase.auth.signOut();
+        setAuthError('account_disabled');
+        return { ok: false, error: 'account_disabled' };
       }
-      setAuthError(res.error || 'invalid_credentials');
-      return { ok: false, error: res.error || 'invalid_credentials' };
+
+      setProfile(nextProfile);
+      return { ok: true, profile: nextProfile };
     } catch (err) {
-      setAuthError('invalid_credentials');
-      return { ok: false, error: 'invalid_credentials' };
+      const code = err?.message === 'supabase_not_configured' ? 'supabase_not_configured' : 'invalid_credentials';
+      setAuthError(code);
+      return { ok: false, error: code };
     }
   };
 
@@ -63,42 +96,25 @@ export function AdminAuthProvider({ children }) {
    */
   const signUp = async ({ fullName, username, phone, password, role = 'admin' }) => {
     setAuthError(null);
-    try {
-      const res = await createAdminAccount({
-        full_name: fullName,
-        username,
-        phone,
-        password,
-        role,
-      });
-
-      if (res.ok && res.user) {
-        setProfile(res.user);
-        return { ok: true, profile: res.user };
-      }
-
-      setAuthError(res.error || 'registration_failed');
-      return { ok: false, error: res.error || 'registration_failed' };
-    } catch (err) {
-      setAuthError('server_error');
-      return { ok: false, error: 'server_error' };
-    }
+    // Staff accounts are created only by an authenticated administrator from
+    // the Team page. Public registration must never create dashboard access.
+    setAuthError('registration_disabled');
+    return { ok: false, error: 'registration_disabled' };
   };
 
   /**
    * Sign Out
    */
   const signOut = async () => {
-    clearActiveSession();
+    if (supabase) await supabase.auth.signOut();
     setProfile(null);
     setAuthError(null);
   };
 
   const refreshProfile = useCallback(async () => {
-    const active = getActiveSession();
-    if (active) {
-      setProfile(active);
-    }
+    if (!supabase) return;
+    const { data } = await supabase.auth.getUser();
+    setProfile(data.user ? await getProfile(data.user) : null);
   }, []);
 
   const isAuthenticated = Boolean(profile && profile.is_active !== false);

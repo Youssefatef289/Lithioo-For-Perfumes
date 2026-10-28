@@ -142,6 +142,7 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
             </h3>
             <PriceDisplay
               price={price}
+              discountPercent={product.discountPercent}
               language={language}
               className="mt-0.5"
             />
