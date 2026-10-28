@@ -21,8 +21,8 @@ const Home = () => {
       <BrandLogoMarquee />
       <OurStore />
       <ImageBanner src="/image/banners/banner-1.webp" alt="Lithioo Perfumes banner" fullBleed />
-      <NewDiverseProducts />
       <OriginalProducts />
+      <NewDiverseProducts />
       <ImageBanner src="/image/banners/banner-2.webp" alt="Lithioo Perfumes banner" />
       <ProductsSlideshow />
       <Testimonials />
