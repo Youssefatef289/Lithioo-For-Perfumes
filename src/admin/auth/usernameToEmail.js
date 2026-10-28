@@ -1,42 +1,95 @@
 /**
  * src/admin/auth/usernameToEmail.js
  * 
- * Maps internal username to Supabase Auth email and provides validation helpers.
- * Users never see or type the internal email.
+ * Maps user names and usernames to safe Supabase Auth emails and provides validation helpers.
+ * Supports Arabic, English, spaces, and numbers naturally.
  */
 
 const DEFAULT_AUTH_DOMAIN = process.env.REACT_APP_AUTH_EMAIL_DOMAIN || 'lithioo.app';
 
 /**
- * Converts a username to a safe internal email format for Supabase Auth.
- * @param {string} username
+ * Converts any user display name (Arabic, English, with spaces, symbols)
+ * into a safe, deterministic lowercase ASCII username slug matching ^[a-z0-9_]{3,30}$.
+ * @param {string} name
  * @returns {string}
  */
-export function usernameToEmail(username) {
-  if (!username) return '';
-  const clean = String(username).trim().toLowerCase().replace(/\s+/g, '_');
-  const safe = /^[a-z0-9_.-]+$/.test(clean)
-    ? clean
-    : encodeURIComponent(clean).replace(/%/g, 'x').toLowerCase();
-  return `${safe}@${DEFAULT_AUTH_DOMAIN}`;
+export function nameToUsernameSlug(name) {
+  if (!name) return `user_${Math.random().toString(36).slice(2, 8)}`;
+  const trimmed = String(name).trim();
+
+  // If already pure standard ASCII alphanumeric
+  const asciiClean = trimmed
+    .toLowerCase()
+    .replace(/\s+/g, '_')
+    .replace(/[^a-z0-9_]/g, '');
+
+  if (asciiClean.length >= 3 && asciiClean.length <= 30) {
+    return asciiClean;
+  }
+
+  // Transliterate Arabic letters
+  const arabicToLatin = {
+    'ا': 'a', 'أ': 'a', 'إ': 'e', 'آ': 'a', 'ء': 'a',
+    'ب': 'b', 'ت': 't', 'ث': 'th',
+    'ج': 'g', 'ح': 'h', 'خ': 'kh',
+    'د': 'd', 'ذ': 'th', 'ر': 'r', 'ز': 'z',
+    'س': 's', 'ش': 'sh', 'ص': 's', 'ض': 'd',
+    'ط': 't', 'ظ': 'z', 'ع': 'a', 'غ': 'gh',
+    'ف': 'f', 'ق': 'q', 'ك': 'k', 'ل': 'l',
+    'م': 'm', 'ن': 'n', 'ه': 'h', 'و': 'w',
+    'ي': 'y', 'ى': 'a', 'ة': 'a',
+  };
+
+  let transliterated = '';
+  for (const char of trimmed.toLowerCase()) {
+    if (arabicToLatin[char]) {
+      transliterated += arabicToLatin[char];
+    } else if (/[a-z0-9]/.test(char)) {
+      transliterated += char;
+    } else if (/\s/.test(char)) {
+      transliterated += '_';
+    }
+  }
+
+  transliterated = transliterated.replace(/_+/g, '_').replace(/^_|_$/g, '').slice(0, 24);
+
+  if (transliterated.length >= 3) {
+    return transliterated;
+  }
+
+  const fallback = (transliterated || 'user') + '_' + Math.random().toString(36).slice(2, 7);
+  return fallback.slice(0, 30);
 }
 
 /**
- * Validates a username:
+ * Converts a name or username to a safe internal email format for Supabase Auth.
+ * @param {string} usernameOrName
+ * @returns {string}
+ */
+export function usernameToEmail(usernameOrName) {
+  if (!usernameOrName) return '';
+  const clean = String(usernameOrName).trim();
+  if (clean.includes('@')) return clean.toLowerCase();
+  const slug = nameToUsernameSlug(clean);
+  return `${slug}@${DEFAULT_AUTH_DOMAIN}`;
+}
+
+/**
+ * Validates a display name / username:
  * - Allows Arabic, English, numbers, spaces, and underscores
- * - Length between 2 and 50 characters
+ * - Length between 2 and 60 characters
  * @param {string} username
  * @returns {boolean}
  */
 export function validateUsername(username) {
   if (!username || typeof username !== 'string') return false;
   const clean = username.trim();
-  return clean.length >= 2 && clean.length <= 50;
+  return clean.length >= 2 && clean.length <= 60;
 }
 
 /**
- * Normalizes an Egyptian phone number:
- * - Strips all spaces, dashes, parentheses
+ * Normalizes an Egyptian or international phone number:
+ * - Strips spaces, dashes, parentheses
  * - Converts leading +20 or 20 to 0
  * @param {string} phone
  * @returns {string}
@@ -53,14 +106,14 @@ export function normalizePhone(phone) {
 }
 
 /**
- * Validates Egyptian mobile phone number:
- * Must start with 010, 011, 012, or 015 followed by 8 digits (11 digits total).
+ * Validates phone number (tolerant, non-blocking):
  * @param {string} phone
  * @returns {boolean}
  */
 export function validatePhone(phone) {
+  if (!phone) return true; // Optional
   const normalized = normalizePhone(phone);
-  return /^01[0125][0-9]{8}$/.test(normalized);
+  return normalized.length >= 8 && normalized.length <= 15;
 }
 
 /**

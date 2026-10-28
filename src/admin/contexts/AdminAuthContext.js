@@ -7,7 +7,7 @@
  */
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase, supabaseAdmin, isSupabaseConfigured } from '../../lib/supabaseClient';
-import { usernameToEmail } from '../auth/usernameToEmail';
+import { usernameToEmail, nameToUsernameSlug } from '../auth/usernameToEmail';
 
 const AdminAuthContext = createContext(null);
 
@@ -73,16 +73,48 @@ export function AdminAuthProvider({ children }) {
     setAuthError(null);
     try {
       if (!isSupabaseConfigured || !supabase) throw new Error('supabase_not_configured');
-      const cleanInput = String(usernameOrEmail || '').trim().toLowerCase();
+      const cleanInput = String(usernameOrEmail || '').trim();
+      if (!cleanInput) throw new Error('invalid_credentials');
 
-      // Candidate emails to check (direct email, @lithioo.app, @lithioo.email)
-      const candidateEmails = cleanInput.includes('@')
-        ? [cleanInput]
-        : [
-            usernameToEmail(cleanInput),
-            `${cleanInput}@lithioo.email`,
-            `${cleanInput}@lithioo.app`,
-          ];
+      // Candidate emails to check
+      const candidateEmails = [];
+
+      if (cleanInput.includes('@')) {
+        candidateEmails.push(cleanInput.toLowerCase());
+      } else {
+        // Look up by profile full_name or username if supabaseAdmin is available
+        if (supabaseAdmin) {
+          try {
+            const { data: matchedProfiles } = await supabaseAdmin
+              .from('profiles')
+              .select('id, full_name, username, phone')
+              .or(`username.ilike.${cleanInput},full_name.ilike.%${cleanInput}%`);
+
+            if (matchedProfiles && matchedProfiles.length > 0) {
+              for (const p of matchedProfiles) {
+                const { data: uData } = await supabaseAdmin.auth.admin.getUserById(p.id);
+                if (uData?.user?.email && !candidateEmails.includes(uData.user.email)) {
+                  candidateEmails.push(uData.user.email);
+                }
+              }
+            }
+          } catch (_) {}
+        }
+
+        const safeSlug = nameToUsernameSlug(cleanInput);
+        const derived = [
+          usernameToEmail(cleanInput),
+          `${safeSlug}@lithioo.app`,
+          `${cleanInput.toLowerCase().replace(/\s+/g, '_')}@lithioo.app`,
+          `${cleanInput.toLowerCase().replace(/\s+/g, '_')}@lithioo.email`,
+        ];
+
+        for (const em of derived) {
+          if (em && !candidateEmails.includes(em)) {
+            candidateEmails.push(em);
+          }
+        }
+      }
 
       let authenticatedUser = null;
       let lastError = null;
@@ -133,22 +165,22 @@ export function AdminAuthProvider({ children }) {
     try {
       if (!isSupabaseConfigured || !supabase) throw new Error('supabase_not_configured');
 
-      const cleanUsername = String(username || '').trim().toLowerCase();
-      const email = emailForUsername(cleanUsername);
+      const rawName = String(fullName || username || '').trim();
+      const cleanSlug = nameToUsernameSlug(rawName);
+      const email = emailForUsername(rawName);
       const cleanPhone = phone ? String(phone).trim() : '';
-      const cleanFullName = fullName ? String(fullName).trim() : cleanUsername;
+      const cleanFullName = rawName || cleanSlug;
 
       let createdUser = null;
 
       // 1. If supabaseAdmin is available, create user via admin API with email_confirm: true
-      // This bypasses Gotrue MX checks and email rate limiting completely!
       if (supabaseAdmin) {
         const { data: adminCreated, error: adminErr } = await supabaseAdmin.auth.admin.createUser({
           email,
           password,
           email_confirm: true,
           user_metadata: {
-            username: cleanUsername,
+            username: cleanSlug,
             full_name: cleanFullName,
             phone: cleanPhone,
             role: role || 'admin',
@@ -171,7 +203,7 @@ export function AdminAuthProvider({ children }) {
           password,
           options: {
             data: {
-              username: cleanUsername,
+              username: cleanSlug,
               full_name: cleanFullName,
               phone: cleanPhone,
               role: role || 'admin',
@@ -200,7 +232,7 @@ export function AdminAuthProvider({ children }) {
         await profileClient.from('profiles').upsert({
           id: createdUser.id,
           full_name: cleanFullName,
-          username: cleanUsername,
+          username: cleanSlug,
           phone: cleanPhone,
           role: role || 'admin',
           is_active: true,
@@ -221,7 +253,7 @@ export function AdminAuthProvider({ children }) {
         nextProfile = {
           id: createdUser.id,
           full_name: cleanFullName,
-          username: cleanUsername,
+          username: cleanSlug,
           phone: cleanPhone,
           role: role || 'admin',
           is_active: true,
