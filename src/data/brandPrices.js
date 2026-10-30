@@ -128,11 +128,17 @@ const GALLERY_REFERENCE_PRICES = {
   'Sapphire Leather by Ibrahim Al Qurashi – Eau de Parfum 150ml': 2300, // avg: same brand + 150ml size
 };
 
-const normalizeProductName = (name) =>
-  name
-    .replace(/\s*\(\d+\)\s*$/, '')
+export const normalizeProductName = (name) => {
+  if (!name) return '';
+  return name
+    .replace(/\s*\(\s*\d+\s*\)\s*(?:\d{3,4}\s*(?:egp|ج)?)?$/gi, '')
+    .replace(/(?:\d{3,4}\s*(?:egp|ج)?)\s*\(\s*\d+\s*\)$/gi, '')
+    .replace(/\s*\(\s*\d+\s*\)\s*$/g, '')
+    .replace(/[\s\-_#]+(\d+|[a-z])\s*$/gi, '')
+    .replace(/[\s\-_#]+$/g, '')
     .replace(/\s+/g, ' ')
     .trim();
+};
 
 const getNormalizedKey = (name) =>
   normalizeProductName(name)
@@ -184,12 +190,16 @@ export const getBrandGalleryProducts = (brandId) => {
 
   const grouped = BRAND_IMAGE_CONTEXT.keys()
     .filter((filePath) => filePath.startsWith(`./${folder}/`))
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
     .reduce((products, filePath) => {
       const fileName = filePath.split('/').pop().replace(/\.[^.]+$/, '');
       const name = normalizeProductName(fileName);
       const key = name.toLowerCase();
       const product = products[key] || { name, images: [], price: getPriceForProduct(fileName) };
-      product.images.push(BRAND_IMAGE_CONTEXT(filePath));
+      const img = BRAND_IMAGE_CONTEXT(filePath);
+      if (!product.images.includes(img)) {
+        product.images.push(img);
+      }
       product.price = product.price || getPriceForProduct(fileName, product.price);
       products[key] = product;
       return products;

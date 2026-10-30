@@ -43,53 +43,90 @@ const BrandPage = () => {
     // 2. Gallery products for this brand
     const galleryMatches = getBrandGalleryProducts(brand.id) || [];
 
-    // Helper for normalizing product titles
+    // Helper for normalizing product titles (strips size, brand suffix, trailing numbers/symbols/parentheses)
     const cleanKey = (str) =>
       (str || '')
         .toLowerCase()
-        .replace(/\b(?:edp|eau de parfum|eau de toilette|for men|for women|unisex|perfume|100ml|150ml|200ml|by assaf|by ibraq|by afnan)\b/g, '')
+        .replace(/\b(?:edp|eau de parfum|eau de toilette|for men|for women|unisex|perfume|100ml|150ml|200ml|by assaf|by ibraq|by afnan|by le bonheur|by ibraheem al qurashi|by ibrahim al qurashi)\b/g, '')
+        .replace(/\s*\(\s*\d+\s*\)\s*(?:\d{3,4}\s*(?:egp|ج)?)?$/gi, '')
+        .replace(/(?:\d{3,4}\s*(?:egp|ج)?)\s*\(\s*\d+\s*\)$/gi, '')
+        .replace(/\s*\(\s*\d+\s*\)\s*$/g, '')
+        .replace(/[\s\-_#]+(\d+|[a-z])\s*$/gi, '')
+        .replace(/[\s\-_#]+$/g, '')
         .replace(/[^a-z0-9\u0600-\u06FF]/g, '')
         .trim();
+
+    // 1. Enhance catalog matches with gallery images if available
+    const enhancedCatalogMatches = catalogMatches.map((product) => {
+      const key = cleanKey(product.nameEn || product.name);
+      const matchedGallery = galleryMatches.find((gp) => cleanKey(gp.name) === key);
+      if (!matchedGallery || !matchedGallery.images?.length) return product;
+
+      const combinedImages = [
+        ...(product.detailImages || [product.image, product.imageHover]),
+        ...matchedGallery.images,
+      ].filter(Boolean);
+      const uniqueImages = [...new Set(combinedImages)];
+
+      return {
+        ...product,
+        image: product.image || uniqueImages[0],
+        imageHover: product.imageHover || uniqueImages[1] || uniqueImages[0],
+        detailImages: uniqueImages,
+      };
+    });
 
     const catalogKeys = new Set(
       catalogMatches.map((p) => cleanKey(p.nameEn || p.name))
     );
 
-    // 3. Convert gallery products not in catalog to full product cards
-    const extraGalleryCards = galleryMatches
-      .filter((gp) => {
-        const key = cleanKey(gp.name);
-        return !catalogKeys.has(key);
-      })
-      .map((gp, index) => ({
-        id: `brand-gallery-${brand.id}-${index}-${gp.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
-        name: gp.name,
-        nameEn: gp.name,
-        nameAr: gp.name,
-        brand: brand.name,
-        brandAr: brand.nameAr || brand.name,
-        brandId: brand.id,
-        section: 'original',
-        category: brand.name,
-        categoryAr: brand.nameAr || brand.name,
-        price: gp.price || 0,
-        image: gp.images[0],
-        imageHover: gp.images[1] || gp.images[0],
-        detailImages: gp.images,
-        description: `${gp.name} by ${brand.name}.`,
-        descriptionAr: `${gp.name} من ${brand.nameAr || brand.name}.`,
-        ingredients: ['Natural Oils', 'Signature Accords', 'Luxury Base Notes'],
-        ingredientsAr: ['زيوت عطرية نقية', 'نفحات مميزة', 'قاعدة شرقية فاخرة'],
-        benefits: ['Long lasting fragrance', 'Authentic brand packaging'],
-        benefitsAr: ['ثبات عالي يدوم طويلاً', 'تغليف أصلي معتمد'],
-        hideSizes: true,
-        sizes: [],
-        inStock: true,
-        rating: 4.8,
-        reviews: 35 + ((index * 7) % 40),
-      }));
+    // 2. Convert gallery products not in catalog to full product cards, merging duplicate variants
+    const extraByKey = new Map();
 
-    return [...catalogMatches, ...extraGalleryCards];
+    galleryMatches.forEach((gp) => {
+      const key = cleanKey(gp.name);
+      if (catalogKeys.has(key)) return; // already merged with catalog!
+
+      if (extraByKey.has(key)) {
+        const existing = extraByKey.get(key);
+        gp.images.forEach((img) => {
+          if (!existing.images.includes(img)) existing.images.push(img);
+        });
+        if (!existing.price && gp.price) existing.price = gp.price;
+      } else {
+        extraByKey.set(key, { ...gp, images: [...gp.images] });
+      }
+    });
+
+    const extraGalleryCards = Array.from(extraByKey.values()).map((gp, index) => ({
+      id: `brand-gallery-${brand.id}-${index}-${gp.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+      name: gp.name,
+      nameEn: gp.name,
+      nameAr: gp.name,
+      brand: brand.name,
+      brandAr: brand.nameAr || brand.name,
+      brandId: brand.id,
+      section: 'original',
+      category: brand.name,
+      categoryAr: brand.nameAr || brand.name,
+      price: gp.price || 0,
+      image: gp.images[0],
+      imageHover: gp.images[1] || gp.images[0],
+      detailImages: gp.images,
+      description: `${gp.name} by ${brand.name}.`,
+      descriptionAr: `${gp.name} من ${brand.nameAr || brand.name}.`,
+      ingredients: ['Natural Oils', 'Signature Accords', 'Luxury Base Notes'],
+      ingredientsAr: ['زيوت عطرية نقية', 'نفحات مميزة', 'قاعدة شرقية فاخرة'],
+      benefits: ['Long lasting fragrance', 'Authentic brand packaging'],
+      benefitsAr: ['ثبات عالي يدوم طويلاً', 'تغليف أصلي معتمد'],
+      hideSizes: true,
+      sizes: [],
+      inStock: true,
+      rating: 4.8,
+      reviews: 35 + ((index * 7) % 40),
+    }));
+
+    return [...enhancedCatalogMatches, ...extraGalleryCards];
   }, [brand]);
 
   const displayName = brand ? getBrandLabel(brand, language) : '';
