@@ -34,10 +34,49 @@ const ProductCatalog = () => {
   );
 
   const catalogProducts = useMemo(() => {
-    return allProducts.filter((product) => {
+    const raw = allProducts.filter((product) => {
       const brandId = (product.brandId || getBrandIdByName(product.brand) || '').toLowerCase();
       return allowedBrandIdSet.has(brandId);
     });
+
+    const cleanKey = (product) => {
+      const brand = (product.brand || '').toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]/g, '');
+      const name = (product.nameEn || product.name || '')
+        .toLowerCase()
+        .replace(/\b(?:edp|eau de parfum|eau de toilette|for men|for women|unisex|perfume|100ml|150ml|200ml)\b/g, '')
+        .replace(/\s*\(\s*\d+\s*(?:ml)?\s*\)/gi, '')
+        .replace(/\s*\(\s*\d+\s*\)\s*(?:\d{3,4}\s*(?:egp|ج)?)?$/gi, '')
+        .replace(/(?:\d{3,4}\s*(?:egp|ج)?)\s*\(\s*\d+\s*\)$/gi, '')
+        .replace(/\s*\(\s*\d+\s*\)\s*$/g, '')
+        .replace(/[\s\-_#]+(\d+|[a-z])\s*$/gi, '')
+        .replace(/[\s\-_#]+$/g, '')
+        .replace(/[^a-z0-9\u0600-\u06FF]/g, '')
+        .trim();
+      return `${brand}::${name}`;
+    };
+
+    const merged = new Map();
+    raw.forEach((product) => {
+      const key = cleanKey(product);
+      if (merged.has(key)) {
+        const existing = merged.get(key);
+        const allImgs = [
+          ...(existing.detailImages || [existing.image, existing.imageHover]),
+          ...(product.detailImages || [product.image, product.imageHover]),
+        ].filter(Boolean);
+        existing.detailImages = [...new Set(allImgs)];
+      } else {
+        const baseImgs = [
+          ...(product.detailImages || [product.image, product.imageHover]),
+        ].filter(Boolean);
+        merged.set(key, {
+          ...product,
+          detailImages: [...new Set(baseImgs)],
+        });
+      }
+    });
+
+    return Array.from(merged.values());
   }, [allowedBrandIdSet]);
 
   const sectionMatches = (product, sectionId) => {

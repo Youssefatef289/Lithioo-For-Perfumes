@@ -122,6 +122,15 @@ export const PRODUCT_IMAGES = {
   'Arabians Tonka': single('Montale', 'arabians-tonka', 'webp'),
   'Ana Abiyedh': single('Lattafa', 'ana-abiyedh', 'jpg'),
   Manifesto: single('Yves Saint Laurent (YSL)', 'manifesto', 'jpg'),
+  'Aventus Black Elixir': [
+    '/image/Perfume brands/Dkhoon Emirates/عطر فرانكل أفينتوس بلاك إليكسير من عساف للرجال - أو دو بارفان - 200 مل  (1) 2700EGP.jpeg',
+    '/image/Perfume brands/Dkhoon Emirates/عطر فرانكل أفينتوس بلاك إليكسير من عساف للرجال - أو دو بارفان - 200 مل  (2) 2700EGP.jpeg',
+    '/image/Perfume brands/Dkhoon Emirates/عطر فرانكل أفينتوس بلاك إليكسير من عساف للرجال - أو دو بارفان - 200 مل 2700EGP (1).jpeg',
+    '/image/Perfume brands/Dkhoon Emirates/عطر فرانكل أفينتوس بلاك إليكسير من عساف للرجال - أو دو بارفان - 200 مل 2700EGP (2).jpeg',
+    '/image/Perfume brands/Dkhoon Emirates/عطر فرانكل أفينتوس بلاك إليكسير من عساف للرجال - أو دو بارفان - 200 مل 1900egp (1).png',
+    '/image/Perfume brands/Dkhoon Emirates/عطر فرانكل أفينتوس بلاك إليكسير من عساف للرجال - أو دو بارفان - 200 مل 1900egp (2).png',
+    '/image/Perfume brands/Dkhoon Emirates/عطر فرانكل أفينتوس بلاك إليكسير من عساف للرجال - أو دو بارفان - 200 مل 1900egp (3).png',
+  ],
 };
 
 export const getProductImages = (name) => PRODUCT_IMAGES[name] || null;
