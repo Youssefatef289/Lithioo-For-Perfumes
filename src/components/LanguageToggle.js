@@ -14,7 +14,7 @@ const LanguageToggle = ({ className = '', variant = 'segmented', overHero = fals
     return (
       <button
         type="button"
-        className={`flex w-full shrink-0 items-center justify-center gap-2 rounded-lg border-2 border-brand px-3 py-2 text-sm font-bold uppercase tracking-wider text-brand transition-all hover:-translate-y-0.5 hover:bg-brand hover:text-white hover:shadow-md ${className}`}
+        className={`flex w-full shrink-0 items-center justify-center gap-2 rounded-none border-2 border-brand px-3 py-2 text-sm font-bold uppercase tracking-wider text-brand transition-all hover:-translate-y-0.5 hover:bg-brand hover:text-white hover:shadow-md ${className}`}
         onClick={() => setLanguage(nextLang)}
         aria-label={t.a11y.switchLanguage}
       >
@@ -37,7 +37,7 @@ const LanguageToggle = ({ className = '', variant = 'segmented', overHero = fals
 
   return (
     <div
-      className={`flex shrink-0 items-center gap-0.5 rounded-lg border p-0.5 transition-all ${trackBase} ${className}`}
+      className={`flex shrink-0 items-center gap-0.5 rounded-none border p-0.5 transition-all ${trackBase} ${className}`}
       role="group"
       aria-label={t.a11y.switchLanguage}
     >
@@ -50,7 +50,7 @@ const LanguageToggle = ({ className = '', variant = 'segmented', overHero = fals
             onClick={() => setLanguage(seg.code)}
             aria-pressed={active}
             className={[
-              'flex h-8 min-w-[2rem] items-center justify-center rounded-md px-2 text-sm font-bold leading-none transition-all duration-300',
+              'flex h-8 min-w-[2rem] items-center justify-center rounded-none px-2 text-sm font-bold leading-none transition-all duration-300',
               active ? 'bg-brand text-white shadow-sm' : inactiveText,
             ].join(' ')}
           >

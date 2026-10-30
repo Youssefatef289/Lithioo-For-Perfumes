@@ -2,11 +2,36 @@
  * src/admin/auth/usernameToEmail.js
  * 
  * Maps user names and usernames to safe Supabase Auth emails and provides validation helpers.
- * Supports Arabic, English, spaces, and numbers naturally.
+ * Dedicated to admin authentication for Lithioo Perfumes.
  */
+
+export const ALLOWED_ADMIN_USERNAME = 'admin_lithioo';
 
 // Fallback to owned brand domain if environment variable is not provided
 const DEFAULT_AUTH_DOMAIN = process.env.REACT_APP_AUTH_EMAIL_DOMAIN || 'lithiooperfumes.com';
+
+/**
+ * Returns the configured admin email from the environment variable REACT_APP_ADMIN_EMAIL,
+ * or safely derives it using the allowed username and domain.
+ * @returns {string}
+ */
+export function getAdminEmail() {
+  const envEmail = process.env.REACT_APP_ADMIN_EMAIL;
+  if (envEmail && String(envEmail).trim()) {
+    return String(envEmail).trim().toLowerCase();
+  }
+  return `${ALLOWED_ADMIN_USERNAME}@${DEFAULT_AUTH_DOMAIN}`;
+}
+
+/**
+ * Checks if the given username matches the allowed admin username (case-insensitive).
+ * @param {string} username
+ * @returns {boolean}
+ */
+export function isAllowedAdminUsername(username) {
+  if (!username || typeof username !== 'string') return false;
+  return username.trim().toLowerCase() === ALLOWED_ADMIN_USERNAME;
+}
 
 /**
  * Converts any user display name (Arabic, English, with spaces, symbols)
@@ -63,66 +88,28 @@ export function nameToUsernameSlug(name) {
 }
 
 /**
- * Converts a name or username to a safe internal email format for Supabase Auth.
+ * Converts a name or username to a safe email format for Supabase Auth.
+ * For admin_lithioo, it prioritizes REACT_APP_ADMIN_EMAIL.
  * @param {string} usernameOrName
  * @returns {string}
  */
 export function usernameToEmail(usernameOrName) {
   if (!usernameOrName) return '';
   const clean = String(usernameOrName).trim();
+  if (clean.toLowerCase() === ALLOWED_ADMIN_USERNAME) {
+    return getAdminEmail();
+  }
   if (clean.includes('@')) return clean.toLowerCase();
   const slug = nameToUsernameSlug(clean);
   return `${slug}@${DEFAULT_AUTH_DOMAIN}`;
 }
 
-/**
- * Validates a display name / username:
- * - Allows Arabic, English, numbers, spaces, and underscores
- * - Length between 2 and 60 characters
- * @param {string} username
- * @returns {boolean}
- */
 export function validateUsername(username) {
   if (!username || typeof username !== 'string') return false;
   const clean = username.trim();
   return clean.length >= 2 && clean.length <= 60;
 }
 
-/**
- * Normalizes an Egyptian or international phone number:
- * - Strips spaces, dashes, parentheses
- * - Converts leading +20 or 20 to 0
- * @param {string} phone
- * @returns {string}
- */
-export function normalizePhone(phone) {
-  if (!phone || typeof phone !== 'string') return '';
-  let cleaned = phone.replace(/[\s\-()]/g, '');
-  if (cleaned.startsWith('+20')) {
-    cleaned = '0' + cleaned.slice(3);
-  } else if (cleaned.startsWith('20') && cleaned.length === 12) {
-    cleaned = '0' + cleaned.slice(2);
-  }
-  return cleaned;
-}
-
-/**
- * Validates phone number (tolerant, non-blocking):
- * @param {string} phone
- * @returns {boolean}
- */
-export function validatePhone(phone) {
-  if (!phone) return true; // Optional
-  const normalized = normalizePhone(phone);
-  return normalized.length >= 8 && normalized.length <= 15;
-}
-
-/**
- * Validates password:
- * Minimum 6 characters.
- * @param {string} password
- * @returns {boolean}
- */
 export function validatePassword(password) {
   if (!password || typeof password !== 'string') return false;
   return password.length >= 6;

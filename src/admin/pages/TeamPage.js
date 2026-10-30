@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  FiUserPlus,
-  FiShield,
+    FiShield,
   FiEdit2,
   FiKey,
   FiTrash2,
@@ -16,20 +15,13 @@ import { useAdminLang } from '../contexts/AdminLangContext';
 import { Button, Input, Select, Switch, Card, Modal, ConfirmDialog, Skeleton, useToast } from '../components/ui';
 import {
   getAdminAccounts,
-  createAdminAccount,
-  updateAdminAccount,
+    updateAdminAccount,
   resetAdminPassword,
   toggleAdminAccountActive,
   deleteAdminAccount,
 } from '../services/adminAccounts';
 
 // Zod schemas
-const createUserSchema = z.object({
-  username: z.string().trim().regex(/^[a-z0-9_]{3,30}$/, { message: 'invalid_username' }),
-  password: z.string().min(8, { message: 'weak_password' }),
-  role: z.enum(['admin', 'manager', 'staff']),
-});
-
 const updateUserSchema = z.object({
   role: z.enum(['admin', 'manager', 'staff']),
 });
@@ -57,20 +49,11 @@ export default function TeamPage() {
   const [togglingId, setTogglingId] = useState(null);
 
   // Modals state
-  const [showAddModal, setShowAddModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [resettingUser, setResettingUser] = useState(null);
   const [deletingUser, setDeletingUser] = useState(null);
 
   // Form states
-  const [addForm, setAddForm] = useState({
-    username: '',
-    password: '',
-    role: 'staff',
-  });
-  const [addFormErrors, setAddFormErrors] = useState({});
-  const [addFormSubmitting, setAddFormSubmitting] = useState(false);
-  const [copiedAddPass, setCopiedAddPass] = useState(false);
 
   const [editForm, setEditForm] = useState({ role: 'staff' });
   const [editFormErrors, setEditFormErrors] = useState({});
@@ -137,61 +120,6 @@ export default function TeamPage() {
       toast({ message: t.common.error, type: 'error' });
     } finally {
       setTogglingId(null);
-    }
-  };
-
-  // ── ADD USER HANDLERS ──────────────────────────────────────
-  const handleOpenAdd = () => {
-    const generated = generateSecurePassword();
-    setAddForm({
-      username: '',
-      password: generated,
-      role: 'staff',
-    });
-    setAddFormErrors({});
-    setShowAddModal(true);
-  };
-
-  const handleSubmitAdd = async (e) => {
-    e.preventDefault();
-    setAddFormErrors({});
-
-    const normalizedData = {
-      ...addForm,
-      username: addForm.username.trim().toLowerCase(),
-    };
-
-    const validation = createUserSchema.safeParse(normalizedData);
-    if (!validation.success) {
-      const fieldErrors = {};
-      validation.error.issues.forEach((issue) => {
-        const field = issue.path[0];
-        fieldErrors[field] = getFriendlyError(issue.message);
-      });
-      setAddFormErrors(fieldErrors);
-      return;
-    }
-
-    setAddFormSubmitting(true);
-
-    try {
-      const res = await createAdminAccount({
-        username: normalizedData.username,
-        password: normalizedData.password,
-        role: normalizedData.role,
-      });
-
-      if (res.ok) {
-        toast({ message: t.team.successCreate, type: 'success' });
-        setShowAddModal(false);
-        await loadProfiles();
-      } else {
-        toast({ message: getFriendlyError(res.error), type: 'error' });
-      }
-    } catch (err) {
-      toast({ message: t.common.error, type: 'error' });
-    } finally {
-      setAddFormSubmitting(false);
     }
   };
 
@@ -382,10 +310,7 @@ export default function TeamPage() {
           </p>
         </div>
 
-        <Button onClick={handleOpenAdd} className="flex items-center gap-2 self-start sm:self-auto">
-          <FiUserPlus size={16} />
-          <span>{t.team.addUser}</span>
-        </Button>
+        
       </div>
 
       {/* Profiles Table Card */}
@@ -570,103 +495,7 @@ export default function TeamPage() {
         )}
       </Card>
 
-      {/* ── MODAL 1: ADD USER ───────────────────────────────────── */}
-      <Modal
-        open={showAddModal}
-        onClose={() => !addFormSubmitting && setShowAddModal(false)}
-        title={t.team.addUser}
-        size="md"
-        footer={
-          <div className="flex justify-end gap-3">
-            <Button
-              variant="ghost"
-              onClick={() => setShowAddModal(false)}
-              disabled={addFormSubmitting}
-            >
-              {t.common.cancel}
-            </Button>
-            <Button
-              onClick={handleSubmitAdd}
-              loading={addFormSubmitting}
-            >
-              {t.team.addUser}
-            </Button>
-          </div>
-        }
-      >
-        <form onSubmit={handleSubmitAdd} className="space-y-4">
-          <Input
-            label={t.team.username}
-            required
-            placeholder={language === 'ar' ? 'اسم المستخدم' : 'username'}
-            value={addForm.username}
-            onChange={(e) => setAddForm({ ...addForm, username: e.target.value })}
-            error={addFormErrors.username}
-          />
-
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-              {t.team.password}
-            </label>
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1">
-                <Input
-                  type="text"
-                  required
-                  value={addForm.password}
-                  onChange={(e) => setAddForm({ ...addForm, password: e.target.value })}
-                  error={addFormErrors.password}
-                  className="font-mono text-sm"
-                />
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                size="md"
-                onClick={() => {
-                  const pass = generateSecurePassword();
-                  setAddForm({ ...addForm, password: pass });
-                }}
-                title={t.team.generatePassword}
-                className="shrink-0 flex items-center gap-1.5"
-              >
-                <FiRefreshCw size={14} />
-                <span className="hidden sm:inline">{language === 'ar' ? 'توليد' : 'Generate'}</span>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="md"
-                onClick={() => {
-                  navigator.clipboard.writeText(addForm.password);
-                  setCopiedAddPass(true);
-                  setTimeout(() => setCopiedAddPass(false), 2000);
-                }}
-                title={t.team.copyPassword}
-                className="shrink-0 flex items-center gap-1.5"
-              >
-                {copiedAddPass ? <FiCheck className="text-emerald-500" size={14} /> : <FiCopy size={14} />}
-                <span className="hidden sm:inline">
-                  {copiedAddPass ? t.team.copied : t.team.copyPassword}
-                </span>
-              </Button>
-            </div>
-            <p className="text-xs text-neutral-400">
-              {language === 'ar' ? 'يجب ألا تقل عن 8 أحرف. يرجى نسخ كلمة المرور وإعطاؤها للمستخدم.' : 'Min 8 chars. Please copy and share this password with the user.'}
-            </p>
-          </div>
-
-          <Select
-            label={t.team.role}
-            value={addForm.role}
-            onChange={(e) => setAddForm({ ...addForm, role: e.target.value })}
-          >
-            <option value="staff">{t.team.staff}</option>
-            <option value="manager">{t.team.manager}</option>
-            <option value="admin">{t.team.admin}</option>
-          </Select>
-        </form>
-      </Modal>
+      
 
       {/* ── MODAL 2: EDIT USER ──────────────────────────────────── */}
       <Modal

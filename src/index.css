@@ -24,6 +24,18 @@
   ::selection {
     @apply bg-brand/25 text-neutral-900;
   }
+
+  /* جميع الزراير بدون حواف دائرية على مستوى الموقع بالكامل */
+  button,
+  .btn-primary,
+  .btn-accent,
+  .btn-outline,
+  a.btn-primary,
+  a.btn-accent,
+  a.btn-outline,
+  [role="button"] {
+    border-radius: 0 !important;
+  }
 }
 
 @layer components {
@@ -44,17 +56,17 @@
     @apply mx-auto w-full max-w-wide px-4 sm:px-6 lg:px-8;
   }
 
-  /* أزرار أساسية متسقة */
+  /* أزرار أساسية متسقة بدون حواف */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-brand-dark hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950;
+    @apply inline-flex items-center justify-center gap-2 rounded-none bg-brand px-6 py-3 text-sm font-semibold text-white shadow-none transition hover:bg-brand-dark hover:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-neutral-950;
   }
 
   .btn-accent {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-6 py-3.5 text-base font-semibold text-white shadow-md transition hover:bg-accent-dark hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 dark:ring-offset-neutral-950;
+    @apply inline-flex items-center justify-center gap-2 rounded-none bg-accent px-6 py-3.5 text-base font-semibold text-white shadow-none transition hover:bg-accent-dark hover:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 dark:ring-offset-neutral-950;
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border-2 border-brand bg-transparent px-6 py-3 text-sm font-semibold text-brand transition hover:bg-brand hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:ring-offset-neutral-950;
+    @apply inline-flex items-center justify-center gap-2 rounded-none border-2 border-brand bg-transparent px-6 py-3 text-sm font-semibold text-brand transition hover:bg-brand hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 dark:ring-offset-neutral-950;
   }
 
   .card-elevated {

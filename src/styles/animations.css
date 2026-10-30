@@ -198,14 +198,13 @@ html {
 }
 
 /* Touch devices: ensure add-to-cart text is visible if device has no hover pointer */
-@media (hover: none) {
-  .cart-btn-text-auto {
-    max-width: 200px !important;
-    opacity: 1 !important;
-    transform: none !important;
-    margin-inline-start: 0.5rem !important;
-    pointer-events: auto !important;
-  }
+/* Ensure Add to Cart text is always visible on all devices and screen sizes */
+.cart-btn-text-auto {
+  max-width: 200px !important;
+  opacity: 1 !important;
+  transform: none !important;
+  margin-inline-start: 0.5rem !important;
+  pointer-events: auto !important;
 }
 
 /* Reduce motion for users who prefer it */

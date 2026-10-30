@@ -212,22 +212,11 @@ const AddToCartButton = ({
           </span>
         )}
 
-        {/* Text: Permanent on mobile (< md), slides & fades in on desktop hover (>= md), permanently visible when isAdded */}
+        {/* Text: Always visible across all devices and desktops, permanently rendered */}
         <span
           className={[
-            'cart-btn-text-auto inline-flex items-center whitespace-nowrap overflow-hidden transition-all duration-300 ease-out',
-            isAdded
-              ? 'max-w-[200px] opacity-100 translate-x-0 ms-2 text-white'
-              : [
-                  // Mobile (< md): always visible
-                  'max-w-[200px] opacity-100 translate-x-0 ms-2',
-                  // Desktop (>= md): collapsed by default, slight slide offset
-                  'md:max-w-0 md:opacity-0 md:pointer-events-none md:ms-0',
-                  isRtl ? 'md:translate-x-2.5' : 'md:-translate-x-2.5',
-                  // Desktop on hover of parent card (.group) or button (.group/cart)
-                  'group-hover:md:max-w-[200px] group-hover:md:opacity-100 group-hover:md:pointer-events-auto group-hover:md:translate-x-0 group-hover:md:ms-2',
-                  'group-hover/cart:md:max-w-[200px] group-hover/cart:md:opacity-100 group-hover/cart:md:pointer-events-auto group-hover/cart:md:translate-x-0 group-hover/cart:md:ms-2',
-                ].join(' '),
+            'cart-btn-text-auto inline-flex items-center whitespace-nowrap overflow-hidden transition-all duration-300 ease-out ms-2 max-w-[200px] opacity-100 translate-x-0',
+            isAdded ? 'text-white' : 'text-current',
           ].join(' ')}
         >
           <AnimatePresence mode="wait" initial={false}>

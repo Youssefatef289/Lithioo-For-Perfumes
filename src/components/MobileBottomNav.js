@@ -63,7 +63,7 @@ const MobileBottomNav = () => {
       dir={isRtl ? 'rtl' : 'ltr'}
       className="fixed bottom-4 inset-x-4 z-[900] mx-auto max-w-sm md:hidden"
     >
-      <div className="relative flex items-center justify-around rounded-full border border-neutral-200/80 bg-white/85 p-1.5 shadow-xl shadow-black/10 backdrop-blur-md dark:border-white/10 dark:bg-neutral-900/85 dark:shadow-black/40">
+      <div className="relative flex items-center justify-around rounded-none border border-neutral-200/80 bg-white/85 p-1.5 shadow-none shadow-black/10 backdrop-blur-md dark:border-white/10 dark:bg-neutral-900/85 dark:shadow-black/40">
         {items.map((item) => {
           const { id, path, label, Icon, isActive, hasBadge, badgeCount, isCart } = item;
 
@@ -72,7 +72,7 @@ const MobileBottomNav = () => {
               key={id}
               to={path}
               data-cart-icon={isCart ? true : undefined}
-              className={`relative z-10 flex min-h-[42px] items-center justify-center rounded-full px-3 py-2 text-xs font-semibold transition-colors duration-200 select-none ${
+              className={`relative z-10 flex min-h-[42px] items-center justify-center rounded-none px-3 py-2 text-xs font-semibold transition-colors duration-200 select-none ${
                 isActive
                   ? 'text-brand dark:text-brand'
                   : 'text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white'
@@ -87,7 +87,7 @@ const MobileBottomNav = () => {
                     stiffness: 380,
                     damping: 30,
                   }}
-                  className="absolute inset-0 rounded-full bg-neutral-100 shadow-sm dark:bg-neutral-800"
+                  className="absolute inset-0 rounded-none bg-neutral-100 shadow-sm dark:bg-neutral-800"
                   aria-hidden="true"
                 />
               )}

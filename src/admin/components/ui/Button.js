@@ -9,10 +9,10 @@ const VARIANTS = {
 };
 
 const SIZES = {
-  xs: 'h-7 px-2.5 text-xs rounded-lg',
-  sm: 'h-8 px-3 text-sm rounded-lg',
-  md: 'h-10 px-4 text-sm rounded-xl',
-  lg: 'h-11 px-5 text-base rounded-xl',
+  xs: 'h-7 px-2.5 text-xs rounded-none',
+  sm: 'h-8 px-3 text-sm rounded-none',
+  md: 'h-10 px-4 text-sm rounded-none',
+  lg: 'h-11 px-5 text-base rounded-none',
 };
 
 export function Button({

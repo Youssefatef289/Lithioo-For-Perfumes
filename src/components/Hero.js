@@ -39,7 +39,7 @@ const Hero = () => {
         <button
           type="button"
           onClick={() => navigate('/products')}
-          className="btn-primary mt-5 shadow-md sm:mt-7"
+          className="btn-primary mt-5 shadow-none sm:mt-7"
         >
           {t.hero.buttonShop}
         </button>

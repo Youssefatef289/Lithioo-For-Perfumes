@@ -31,8 +31,7 @@ const CartSidebar = () => {
     setIsCartOpen(false);
   };
 
-  const stepperBtn =
-    'flex h-7 w-7 items-center justify-center rounded-full text-neutral-500 transition hover:bg-brand hover:text-white';
+  const stepperBtn = 'flex h-7 w-7 items-center justify-center rounded-none text-neutral-500 transition hover:bg-brand hover:text-white';
 
   const panelTranslate = isCartOpen ? 'translate-x-0' : 'translate-x-full rtl:-translate-x-full';
   const itemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -81,7 +80,7 @@ const CartSidebar = () => {
               <p className="text-neutral-500 dark:text-neutral-400">{t.cart.empty}</p>
               <button
                 type="button"
-                className="rounded-full bg-brand px-7 py-3 text-sm font-semibold uppercase tracking-wider text-white transition hover:bg-brand-dark"
+                className="rounded-none bg-brand px-7 py-3 text-sm font-semibold uppercase tracking-wider text-white transition hover:bg-brand-dark"
                 onClick={() => {
                   setIsCartOpen(false);
                   navigate('/products');
@@ -179,14 +178,14 @@ const CartSidebar = () => {
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    className="flex-1 rounded-full border border-neutral-200 py-2.5 text-sm font-semibold text-neutral-600 transition hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
+                    className="flex-1 rounded-none border border-neutral-200 py-2.5 text-sm font-semibold text-neutral-600 transition hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800"
                     onClick={clearCart}
                   >
                     {t.cart.clearCart}
                   </button>
                   <button
                     type="button"
-                    className="flex-1 rounded-full bg-neutral-900 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+                    className="flex-1 rounded-none bg-neutral-900 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
                     onClick={handleCheckout}
                   >
                     {t.cart.viewCart}

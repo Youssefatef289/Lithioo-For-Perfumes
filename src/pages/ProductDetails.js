@@ -82,8 +82,7 @@ const ProductDetails = () => {
       ? product.detailImages
       : [product.image, product.imageHover].filter((img, i, arr) => img && arr.indexOf(img) === i);
 
-  const qtyBtn =
-    'flex h-10 w-10 items-center justify-center rounded-lg border border-neutral-200 text-lg font-medium text-neutral-700 transition hover:border-brand disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-600 dark:text-neutral-200';
+  const qtyBtn = 'flex h-10 w-10 items-center justify-center rounded-none border border-neutral-200 text-lg font-medium text-neutral-700 transition hover:border-brand disabled:cursor-not-allowed disabled:opacity-40 dark:border-neutral-600 dark:text-neutral-200';
 
   return (
     <main className="page-main min-h-screen w-full bg-white px-4 py-8 pt-24 dark:bg-neutral-950 sm:px-6 sm:py-12 md:pt-28 lg:px-8">
@@ -213,7 +212,7 @@ const ProductDetails = () => {
             <button
               type="button"
               onClick={() => openWhatsApp(buildSingleProductMessage(lineItem, price))}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3.5 text-base font-semibold text-white shadow-md transition hover:bg-[#20bd5a]"
+              className="flex w-full items-center justify-center gap-2 rounded-none bg-[#25D366] py-3.5 text-base font-semibold text-white shadow-none transition hover:bg-[#20bd5a]"
             >
               <FaWhatsapp className="h-5 w-5" />
               {modal.orderNow}

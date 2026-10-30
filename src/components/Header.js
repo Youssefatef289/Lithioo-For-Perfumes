@@ -139,7 +139,7 @@ const Header = () => {
   ].join(' ');
 
   const iconBtn = [
-    'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-all hover:-translate-y-0.5',
+    'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-none transition-all hover:-translate-y-0.5',
     darkHero
       ? 'border border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/25 hover:shadow-md'
       : overHero
@@ -154,7 +154,7 @@ const Header = () => {
   const mobileNavInactive = 'text-neutral-500 hover:text-brand dark:text-neutral-400 dark:hover:text-brand';
 
   const sectionButtonBase =
-    'flex items-center justify-center rounded-2xl border px-4 py-3 text-sm font-semibold transition-all duration-300';
+    'flex items-center justify-center rounded-none border px-4 py-3 text-sm font-semibold transition-all duration-300';
   const sectionButtonActive =
     'border-brand bg-brand text-white shadow-md shadow-brand/15';
   const sectionButtonInactive =
@@ -383,7 +383,7 @@ const Header = () => {
                         </div>
                         <button
                           type="button"
-                          className="rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-dark"
+                          className="rounded-none bg-brand px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-dark"
                           onClick={() => handleProductsSection('all')}
                         >
                           {t.header.browseCatalog}
@@ -442,14 +442,14 @@ const Header = () => {
                         <div className="mt-4 flex items-center gap-2">
                           <button
                             type="button"
-                            className="flex-1 rounded-full border border-neutral-200 py-2.5 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                            className="flex-1 rounded-none border border-neutral-200 py-2.5 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
                             onClick={() => handleProductsSection('all')}
                           >
                             {t.header.browseCatalog}
                           </button>
                           <button
                             type="button"
-                            className="flex-1 rounded-full bg-neutral-900 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+                            className="flex-1 rounded-none bg-neutral-900 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral-700 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
                             onClick={() => {
                               clearWishlist();
                               setMobilePanel(null);

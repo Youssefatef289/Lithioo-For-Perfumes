@@ -83,7 +83,7 @@ const ProductCatalog = () => {
 
   const pageBtn = (active, disabled) =>
     [
-      'min-w-[2.5rem] rounded-lg border px-3 py-2 text-sm font-medium transition',
+      'min-w-[2.5rem] rounded-none border px-3 py-2 text-sm font-medium transition',
       disabled
         ? 'cursor-not-allowed border-neutral-200 text-neutral-300 dark:border-neutral-700 dark:text-neutral-600'
         : active

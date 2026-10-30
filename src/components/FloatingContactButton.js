@@ -12,7 +12,7 @@ import { EMAIL_MAILTO, PHONE_TEL, SOCIAL_LINKS } from '../data/contact';
 import { getWhatsAppUrl } from '../utils/whatsapp';
 
 const actionBtn =
-  'pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full text-white shadow-lg transition-transform duration-200 hover:scale-110 active:scale-95 sm:h-[52px] sm:w-[52px]';
+  'pointer-events-auto flex h-12 w-12 items-center justify-center rounded-none text-white shadow-none transition-transform duration-200 hover:scale-110 active:scale-95 sm:h-[52px] sm:w-[52px]';
 
 const FloatingContactButton = () => {
   const { t } = useLanguage();
@@ -91,7 +91,7 @@ const FloatingContactButton = () => {
             onClick={() => setIsOpen(false)}
           >
             <Icon className={iconClass || 'h-5 w-5'} />
-            <span className="pointer-events-none absolute end-full me-2 translate-x-2 rounded-lg bg-neutral-900 px-2.5 py-1 text-xs font-medium text-white opacity-0 shadow-md transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 sm:block">
+            <span className="pointer-events-none absolute end-full me-2 translate-x-2 rounded-none bg-neutral-900 px-2.5 py-1 text-xs font-medium text-white opacity-0 shadow-md transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100 sm:block">
               {label}
             </span>
           </a>
@@ -102,7 +102,7 @@ const FloatingContactButton = () => {
         type="button"
         onClick={() => setIsOpen((o) => !o)}
         className={[
-          'pointer-events-auto relative flex items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-brand to-accent text-white shadow-xl ring-2 ring-white/40 transition-all duration-300 ease-out hover:shadow-2xl dark:ring-neutral-800/60',
+          'pointer-events-auto relative flex items-center justify-center overflow-hidden rounded-none bg-gradient-to-br from-brand to-accent text-white shadow-none ring-2 ring-white/40 transition-all duration-300 ease-out hover:shadow-2xl dark:ring-neutral-800/60',
           isOpen
             ? 'h-14 w-[7.25rem] gap-2 px-4 sm:h-[58px] sm:w-32'
             : 'h-14 w-14 animate-fab-float animate-fab-ring sm:h-[58px] sm:w-[58px]',

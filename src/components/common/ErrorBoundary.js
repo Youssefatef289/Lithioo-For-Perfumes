@@ -43,7 +43,7 @@ class ErrorBoundary extends React.Component {
             <button
               type="button"
               onClick={this.handleReload}
-              className="mt-6 w-full rounded-full bg-brand py-3 text-sm font-semibold text-white shadow-md transition hover:bg-brand-dark"
+              className="mt-6 w-full rounded-none bg-brand py-3 shadow-none text-sm font-semibold text-white shadow-md transition hover:bg-brand-dark"
             >
               إعادة تحميل الصفحة / Reload
             </button>

@@ -337,7 +337,7 @@ const OrderWhatsAppButton = ({ className = '', compact = false, onOrdered }) => 
           type="submit"
           disabled={cartItems.length === 0 || submitting}
           className={[
-            'flex w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[#20bd5a] disabled:cursor-not-allowed disabled:opacity-50',
+            'flex w-full items-center justify-center gap-2 rounded-none bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-none transition hover:bg-[#20bd5a] disabled:cursor-not-allowed disabled:opacity-50',
             compact ? 'py-2.5 text-sm' : 'py-3.5',
           ].join(' ')}
         >

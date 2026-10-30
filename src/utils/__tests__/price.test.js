@@ -1,5 +1,5 @@
 import { parsePrice, formatEGP } from '../price';
-import { getProductSizePrice, BOTTLE_SIZES } from '../../data/sizes';
+import { getProductSizePrice } from '../../data/sizes';
 
 describe('Price calculation and formatting utilities', () => {
   test('parsePrice parses numbers correctly', () => {

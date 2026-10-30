@@ -33,7 +33,7 @@ const BackButton = () => {
       <button
         type="button"
         onClick={handleBack}
-        className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-neutral-200/90 bg-white/90 px-3.5 py-1.5 text-xs font-semibold text-neutral-800 shadow-md backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-brand hover:text-brand dark:border-neutral-700/90 dark:bg-neutral-900/90 dark:text-neutral-200 dark:hover:border-brand sm:text-sm"
+        className="pointer-events-auto inline-flex items-center gap-1.5 rounded-none border border-neutral-200/90 bg-white/90 px-3.5 py-1.5 text-xs font-semibold text-neutral-800 shadow-none backdrop-blur-md transition-all duration-200 hover:scale-105 hover:border-brand hover:text-brand dark:border-neutral-700/90 dark:bg-neutral-900/90 dark:text-neutral-200 dark:hover:border-brand sm:text-sm"
         aria-label={language === 'ar' ? 'رجوع' : 'Back'}
       >
         <FiArrowLeft className="h-4 w-4 rtl:rotate-180" />

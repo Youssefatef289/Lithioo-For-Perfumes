@@ -1,39 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FiEye, FiEyeOff, FiLock, FiUser, FiPhone, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiLock, FiUser, FiAlertCircle } from 'react-icons/fi';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
 import { useAdminLang } from '../contexts/AdminLangContext';
 import { Button, Input, Card } from '../components/ui';
+import { isAllowedAdminUsername, ALLOWED_ADMIN_USERNAME } from '../auth/usernameToEmail';
 
 const MAX_FAILED_ATTEMPTS = 5;
 const THROTTLE_SECONDS = 30;
 
 export default function LoginPage() {
-  const { signIn, signUp } = useAdminAuth();
+  const { signIn } = useAdminAuth();
   const { t, language } = useAdminLang();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Mode: 'signin' | 'signup'
-  const [mode, setMode] = useState('signin');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  // Sign in fields
-  const [signInUsername, setSignInUsername] = useState('');
-  const [signInPassword, setSignInPassword] = useState('');
-  const [showSignInPass, setShowSignInPass] = useState(false);
-
-  // Sign up fields
-  const [signUpName, setSignUpName] = useState('');
-  const [signUpPhone, setSignUpPhone] = useState('');
-  const [signUpPassword, setSignUpPassword] = useState('');
-  const [signUpConfirmPass, setSignUpConfirmPass] = useState('');
-  const [showSignUpPass, setShowSignUpPass] = useState(false);
-  const [showSignUpConfirmPass, setShowSignUpConfirmPass] = useState(false);
-
-  // Status
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
 
   // Throttle state
   const [failedAttempts, setFailedAttempts] = useState(0);
@@ -56,25 +43,29 @@ export default function LoginPage() {
     return () => clearInterval(timer);
   }, [cooldown]);
 
-  const switchMode = (newMode) => {
-    setMode(newMode);
-    setErrorMsg('');
-    setSuccessMsg('');
-  };
-
-  // Handle Sign In Submit
   const handleSignIn = async (e) => {
     e.preventDefault();
     if (cooldown > 0) return;
 
-    const cleanInput = signInUsername.trim();
-    if (!cleanInput || !signInPassword) return;
+    const cleanUsername = username.trim();
+    if (!cleanUsername || !password) return;
 
-    setLoading(true);
     setErrorMsg('');
 
+    // Strict validation: Only admin_lithioo is allowed
+    if (!isAllowedAdminUsername(cleanUsername)) {
+      setErrorMsg(
+        language === 'ar'
+          ? `اسم المستخدم غير مصرح به. تسجيل الدخول مقتصر على حساب ${ALLOWED_ADMIN_USERNAME} فقط.`
+          : `Unauthorized username. Access is restricted to ${ALLOWED_ADMIN_USERNAME} only.`
+      );
+      return;
+    }
+
+    setLoading(true);
+
     try {
-      const res = await signIn(cleanInput, signInPassword);
+      const res = await signIn(cleanUsername, password);
 
       if (res.ok) {
         setFailedAttempts(0);
@@ -84,6 +75,12 @@ export default function LoginPage() {
           language === 'ar'
             ? 'الحساب معطل أو غير مصرح له بالدخول.'
             : 'Account disabled or not authorized.'
+        );
+      } else if (res.error === 'unauthorized_user') {
+        setErrorMsg(
+          language === 'ar'
+            ? `اسم المستخدم غير مصرح به. تسجيل الدخول مقتصر على حساب ${ALLOWED_ADMIN_USERNAME} فقط.`
+            : `Unauthorized username. Access is restricted to ${ALLOWED_ADMIN_USERNAME} only.`
         );
       } else {
         const newAttempts = failedAttempts + 1;
@@ -99,119 +96,17 @@ export default function LoginPage() {
         } else {
           setErrorMsg(
             language === 'ar'
-              ? 'الاسم أو كلمة المرور غير صحيحة.'
-              : 'Invalid name or password.'
+              ? 'اسم المستخدم أو كلمة المرور غير صحيحة.'
+              : 'Invalid username or password.'
           );
         }
       }
     } catch (err) {
       setErrorMsg(
         language === 'ar'
-          ? 'الاسم أو كلمة المرور غير صحيحة.'
-          : 'Invalid name or password.'
+          ? 'اسم المستخدم أو كلمة المرور غير صحيحة.'
+          : 'Invalid username or password.'
       );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle Sign Up Submit
-  const handleSignUp = async (e) => {
-    e.preventDefault();
-    setErrorMsg('');
-    setSuccessMsg('');
-
-    const cleanName = signUpName.trim();
-    const cleanPhone = signUpPhone.trim();
-    const pass = signUpPassword;
-    const confirmPass = signUpConfirmPass;
-
-    if (!cleanName || !pass) {
-      setErrorMsg(language === 'ar' ? 'يرجى إدخال الاسم وكلمة المرور.' : 'Please enter your name and password.');
-      return;
-    }
-
-    if (cleanName.length < 2) {
-      setErrorMsg(language === 'ar' ? 'يجب أن يتكون الاسم من حرفين على الأقل.' : 'Name must be at least 2 characters.');
-      return;
-    }
-
-    if (pass.length < 6) {
-      setErrorMsg(language === 'ar' ? 'يجب ألا تقل كلمة المرور عن 6 أحرف.' : 'Password must be at least 6 characters.');
-      return;
-    }
-
-    if (confirmPass && pass !== confirmPass) {
-      setErrorMsg(language === 'ar' ? 'كلمتا المرور غير متطابقتين.' : 'Passwords do not match.');
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const res = await signUp({
-        fullName: cleanName,
-        username: cleanName,
-        phone: cleanPhone,
-        password: pass,
-        role: 'admin',
-      });
-
-      if (res.ok) {
-        setSuccessMsg(
-          language === 'ar'
-            ? 'تم إنشاء الحساب بنجاح وربطه بـ Supabase! جاري تحويلك للوحة التحكم...'
-            : 'Account created and linked to Supabase! Redirecting…'
-        );
-        setTimeout(() => {
-          navigate(from, { replace: true });
-        }, 1000);
-      } else if (res.error === 'invalid_email_domain') {
-        setErrorMsg(
-          language === 'ar'
-            ? 'صيغة البريد الإلكتروني أو دومين الحساب غير مقبولة لدى خادم المصادقة. يرجى التحقق من ضبط دومين البريد (REACT_APP_AUTH_EMAIL_DOMAIN).'
-            : 'The email address or domain was rejected by the authentication server. Please verify your domain configuration.'
-        );
-      } else if (res.error === 'username_taken_or_invalid') {
-        setErrorMsg(
-          language === 'ar'
-            ? 'هذا الاسم مسجل بالفعل. يرجى اختيار اسم آخر أو تسجيل الدخول.'
-            : 'This name is already registered. Please choose another or sign in.'
-        );
-      } else if (res.error === 'supabase_not_configured') {
-        setErrorMsg(
-          language === 'ar'
-            ? 'تعذر الاتصال بـ Supabase. يرجى مراجعة إعدادات الاتصال.'
-            : 'Supabase connection is not configured.'
-        );
-      } else {
-        const raw = String(res.error || res.originalMessage || '');
-        if (raw.toLowerCase().includes('is invalid') || raw.toLowerCase().includes('domain')) {
-          setErrorMsg(
-            language === 'ar'
-              ? 'صيغة البريد الإلكتروني أو دومين الحساب غير مقبولة لدى خادم المصادقة. يرجى التأكد من ضبط دومين بريد صالح.'
-              : 'The email address or domain was rejected by the authentication server.'
-          );
-        } else {
-          setErrorMsg(
-            res.error ||
-              (language === 'ar'
-                ? 'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة ثانية.'
-                : 'Failed to create account. Please try again.')
-          );
-        }
-      }
-    } catch (err) {
-      const msg = (err?.message || '').toLowerCase();
-      if (msg.includes('is invalid') || msg.includes('domain')) {
-        setErrorMsg(
-          language === 'ar'
-            ? 'صيغة البريد الإلكتروني أو دومين الحساب غير مقبولة لدى خادم المصادقة.'
-            : 'The email address or domain was rejected by the authentication server.'
-        );
-      } else {
-        setErrorMsg(err.message || (language === 'ar' ? 'حدث خطأ في الخادم.' : 'Server error occurred.'));
-      }
     } finally {
       setLoading(false);
     }
@@ -222,7 +117,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4 py-12 dark:bg-neutral-950">
       <div className="w-full max-w-md">
-        {/* Header with Logo above brand name */}
+        {/* Header with Logo */}
         <div className="mb-6 text-center">
           <Link to="/" className="inline-block mb-3 transition-transform hover:scale-105" title="Lithioo Store">
             <img
@@ -241,253 +136,87 @@ export default function LoginPage() {
 
         {/* Card */}
         <Card className="shadow-xl border border-neutral-200/80 dark:border-neutral-800">
-          {/* Mode Switch Tabs */}
-          <div className="mb-6 flex border-b border-neutral-200 dark:border-neutral-800">
-            <button
-              type="button"
-              onClick={() => switchMode('signin')}
-              className={`flex-1 pb-3 text-center text-sm font-semibold transition-colors duration-200 ${
-                mode === 'signin'
-                  ? 'border-b-2 border-brand text-brand'
-                  : 'text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200'
-              }`}
-            >
+          <div className="mb-6 text-center">
+            <h2 className="text-lg font-bold text-neutral-900 dark:text-white">
               {t.login?.signIn || (language === 'ar' ? 'تسجيل الدخول' : 'Sign In')}
-            </button>
-            <button
-              type="button"
-              onClick={() => switchMode('signup')}
-              className={`flex-1 pb-3 text-center text-sm font-semibold transition-colors duration-200 ${
-                mode === 'signup'
-                  ? 'border-b-2 border-brand text-brand'
-                  : 'text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200'
-              }`}
-            >
-              {t.login?.signUp || (language === 'ar' ? 'إنشاء حساب جديد' : 'Create Account')}
-            </button>
+            </h2>
+            <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+              {language === 'ar'
+                ? 'أدخل بيانات حساب المشرف للمتابعة'
+                : 'Enter your administrator credentials to continue'}
+            </p>
           </div>
 
-          {mode === 'signup' && (
-            <p className="mb-4 rounded-xl bg-amber-500/10 p-2.5 text-center text-xs text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
-              {language === 'ar'
-                ? 'اكتب اسمك وكلمة المرور وسيتم ربط الحساب تلقائياً كمدير للنظام في Supabase.'
-                : 'Enter your name and password to create an admin account in Supabase.'}
-            </p>
-          )}
-
-          {/* Error & Success Messages */}
+          {/* Error Message */}
           {errorMsg && (
-            <div className="mb-4 flex items-center gap-2 rounded-xl bg-red-50 p-3 text-xs font-medium text-red-600 dark:bg-red-900/20 dark:text-red-400">
+            <div className="mb-4 flex items-center gap-2 rounded-none bg-red-50 p-3 text-xs font-medium text-red-600 dark:bg-red-900/20 dark:text-red-400 border border-red-200 dark:border-red-800/40">
               <FiAlertCircle className="shrink-0" size={16} />
               <span>{errorMsg}</span>
             </div>
           )}
 
-          {successMsg && (
-            <div className="mb-4 flex items-center gap-2 rounded-xl bg-emerald-50 p-3 text-xs font-medium text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400">
-              <FiCheckCircle className="shrink-0" size={16} />
-              <span>{successMsg}</span>
+          {/* Sign In Form */}
+          <form onSubmit={handleSignIn} autoComplete="off" className="space-y-4">
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                {t.login?.username || (language === 'ar' ? 'اسم المستخدم' : 'Username')}
+              </label>
+              <div className="relative">
+                <Input
+                  type="text"
+                  required
+                  autoComplete="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder={ALLOWED_ADMIN_USERNAME}
+                  className="ps-9"
+                  disabled={isLocked || loading}
+                />
+                <FiUser className="absolute start-3 top-3 text-neutral-400" size={16} />
+              </div>
             </div>
-          )}
 
-          {/* ── FORM 1: SIGN IN ────────────────────────────────────── */}
-          {mode === 'signin' && (
-            <form onSubmit={handleSignIn} autoComplete="off" className="space-y-4">
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                  {language === 'ar' ? 'الاسم أو البريد الإلكتروني' : 'Name or Email'}
-                </label>
-                <div className="relative">
-                  <Input
-                    type="text"
-                    required
-                    autoComplete="off"
-                    value={signInUsername}
-                    onChange={(e) => setSignInUsername(e.target.value)}
-                    placeholder={language === 'ar' ? 'اكتب اسمك الذي سجلت به أو بريدك' : 'Enter your name or email'}
-                    className="ps-9"
-                    disabled={isLocked || loading}
-                  />
-                  <FiUser className="absolute start-3 top-3 text-neutral-400" size={16} />
-                </div>
-              </div>
-
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                  {t.login?.password || (language === 'ar' ? 'كلمة المرور' : 'Password')}
-                </label>
-                <div className="relative">
-                  <Input
-                    type={showSignInPass ? 'text' : 'password'}
-                    required
-                    autoComplete="current-password"
-                    value={signInPassword}
-                    onChange={(e) => setSignInPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="ps-9 pe-10"
-                    disabled={isLocked || loading}
-                  />
-                  <FiLock className="absolute start-3 top-3 text-neutral-400" size={16} />
-                  <button
-                    type="button"
-                    onClick={() => setShowSignInPass((s) => !s)}
-                    className="absolute end-3 top-3 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
-                    title={showSignInPass ? 'Hide password' : 'Show password'}
-                    tabIndex={-1}
-                  >
-                    {showSignInPass ? <FiEyeOff size={16} /> : <FiEye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                loading={loading}
-                disabled={isLocked || !signInUsername.trim() || !signInPassword}
-                className="w-full mt-2"
-              >
-                {isLocked
-                  ? language === 'ar'
-                    ? `انتظر ${cooldown} ثانية...`
-                    : `Wait ${cooldown}s...`
-                  : t.login?.signIn || (language === 'ar' ? 'تسجيل الدخول' : 'Sign In')}
-              </Button>
-
-              <div className="pt-2 text-center">
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                {t.login?.password || (language === 'ar' ? 'كلمة المرور' : 'Password')}
+              </label>
+              <div className="relative">
+                <Input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="ps-9 pe-10"
+                  disabled={isLocked || loading}
+                />
+                <FiLock className="absolute start-3 top-3 text-neutral-400" size={16} />
                 <button
                   type="button"
-                  onClick={() => switchMode('signup')}
-                  className="text-xs font-medium text-brand hover:underline"
+                  onClick={() => setShowPassword((s) => !s)}
+                  className="absolute end-3 top-3 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                  tabIndex={-1}
                 >
-                  {t.login?.noAccount || (language === 'ar' ? 'ليس لديك حساب؟ إنشاء حساب جديد' : "Don't have an account? Create one")}
+                  {showPassword ? <FiEyeOff size={16} /> : <FiEye size={16} />}
                 </button>
               </div>
-            </form>
-          )}
+            </div>
 
-          {/* ── FORM 2: SIGN UP ────────────────────────────────────── */}
-          {mode === 'signup' && (
-            <form onSubmit={handleSignUp} autoComplete="off" className="space-y-3.5">
-              {/* Name */}
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                  {language === 'ar' ? 'الاسم' : 'Name'}
-                </label>
-                <div className="relative">
-                  <Input
-                    type="text"
-                    required
-                    autoComplete="off"
-                    value={signUpName}
-                    onChange={(e) => setSignUpName(e.target.value)}
-                    placeholder={language === 'ar' ? 'اكتب اسمك (مثال: يوسف عاطف أو أحمد)' : 'Enter your name (e.g. John Doe)'}
-                    className="ps-9"
-                    disabled={loading}
-                  />
-                  <FiUser className="absolute start-3 top-3 text-neutral-400" size={16} />
-                </div>
-                <p className="mt-1 text-[11px] text-neutral-400">
-                  {language === 'ar' ? 'اكتب اسمك بالعربي أو الإنجليزي بكل حرية وبدون أي شروط معقدة.' : 'Enter your name freely in Arabic or English.'}
-                </p>
-              </div>
-
-              {/* Password */}
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                  {t.login?.password || (language === 'ar' ? 'كلمة المرور' : 'Password')}
-                </label>
-                <div className="relative">
-                  <Input
-                    type={showSignUpPass ? 'text' : 'password'}
-                    required
-                    value={signUpPassword}
-                    onChange={(e) => setSignUpPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="ps-9 pe-10"
-                    disabled={loading}
-                  />
-                  <FiLock className="absolute start-3 top-3 text-neutral-400" size={16} />
-                  <button
-                    type="button"
-                    onClick={() => setShowSignUpPass((s) => !s)}
-                    className="absolute end-3 top-3 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
-                    title={showSignUpPass ? 'Hide password' : 'Show password'}
-                    tabIndex={-1}
-                  >
-                    {showSignUpPass ? <FiEyeOff size={16} /> : <FiEye size={16} />}
-                  </button>
-                </div>
-                <p className="mt-1 text-[11px] text-neutral-400">
-                  {language === 'ar' ? '6 أحرف على الأقل.' : 'At least 6 characters.'}
-                </p>
-              </div>
-
-              {/* Confirm Password */}
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                  {t.login?.confirmPassword || (language === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password')}
-                </label>
-                <div className="relative">
-                  <Input
-                    type={showSignUpConfirmPass ? 'text' : 'password'}
-                    required
-                    value={signUpConfirmPass}
-                    onChange={(e) => setSignUpConfirmPass(e.target.value)}
-                    placeholder="••••••••"
-                    className="ps-9 pe-10"
-                    disabled={loading}
-                  />
-                  <FiLock className="absolute start-3 top-3 text-neutral-400" size={16} />
-                  <button
-                    type="button"
-                    onClick={() => setShowSignUpConfirmPass((s) => !s)}
-                    className="absolute end-3 top-3 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200"
-                    title={showSignUpConfirmPass ? 'Hide password' : 'Show password'}
-                    tabIndex={-1}
-                  >
-                    {showSignUpConfirmPass ? <FiEyeOff size={16} /> : <FiEye size={16} />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Phone (Optional) */}
-              <div>
-                <label className="mb-1 block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                  {language === 'ar' ? 'رقم الهاتف (اختياري)' : 'Phone Number (Optional)'}
-                </label>
-                <div className="relative">
-                  <Input
-                    type="tel"
-                    value={signUpPhone}
-                    onChange={(e) => setSignUpPhone(e.target.value)}
-                    placeholder="01012345678"
-                    className="ps-9 font-mono"
-                    disabled={loading}
-                  />
-                  <FiPhone className="absolute start-3 top-3 text-neutral-400" size={16} />
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                loading={loading}
-                disabled={!signUpName.trim() || !signUpPassword}
-                className="w-full mt-2"
-              >
-                {t.login?.signUp || (language === 'ar' ? 'إنشاء الحساب والدخول' : 'Create Account & Enter')}
-              </Button>
-
-              <div className="pt-2 text-center">
-                <button
-                  type="button"
-                  onClick={() => switchMode('signin')}
-                  className="text-xs font-medium text-brand hover:underline"
-                >
-                  {language === 'ar' ? 'لديك حساب بالفعل؟ تسجيل الدخول' : 'Already have an account? Sign In'}
-                </button>
-              </div>
-            </form>
-          )}
+            <Button
+              type="submit"
+              loading={loading}
+              disabled={isLocked || !username.trim() || !password}
+              className="w-full mt-2"
+            >
+              {isLocked
+                ? language === 'ar'
+                  ? `انتظر ${cooldown} ثانية...`
+                  : `Wait ${cooldown}s...`
+                : t.login?.signIn || (language === 'ar' ? 'تسجيل الدخول' : 'Sign In')}
+            </Button>
+          </form>
         </Card>
       </div>
     </div>

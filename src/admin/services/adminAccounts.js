@@ -2,8 +2,8 @@
  * src/admin/services/adminAccounts.js
  * 
  * Manages admin dashboard accounts and authentication.
- * Uses Edge Functions ('createAdminUser' / 'admin-users') for secure administrative tasks.
- * No secret keys or privileged clients are exposed to the browser.
+ * Uses Edge Functions for administrative tasks.
+ * Account creation from the frontend is strictly disabled.
  */
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
 
@@ -13,7 +13,7 @@ const SESSION_KEY = 'lithioo_admin_session';
 export const DEFAULT_SUPER_ADMIN = {
   id: 'admin-root-001',
   full_name: 'مدير النظام (Super Admin)',
-  username: 'admin',
+  username: 'admin_lithioo',
   phone: '01000000000',
   role: 'admin',
   is_active: true,
@@ -29,7 +29,6 @@ async function invokeAdminUsers(action, data = {}) {
     return { ok: false, error: 'supabase_not_configured' };
   }
 
-  // Try 'createAdminUser' function first, then fallback to 'admin-users'
   const functionNames = ['createAdminUser', 'admin-users'];
   let lastError = null;
 
@@ -76,13 +75,6 @@ export async function getAdminAccounts() {
     console.error('getAdminAccounts exception:', err);
     return [];
   }
-}
-
-/**
- * Register a new admin account via backend Edge Function
- */
-export async function createAdminAccount({ username, password, role = 'staff', phone, full_name }) {
-  return invokeAdminUsers('create', { username, password, role, phone, full_name });
 }
 
 /**

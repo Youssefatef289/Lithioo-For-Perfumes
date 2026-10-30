@@ -106,8 +106,7 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
 
   const handleAddToCart = () => addToCart(lineItem, 1);
 
-  const arrowBtn =
-    'pointer-events-auto flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-neutral-700 shadow-md ring-1 ring-black/5 backdrop-blur transition hover:bg-white hover:text-brand';
+  const arrowBtn = 'pointer-events-auto flex h-9 w-9 items-center justify-center rounded-none bg-white/90 text-neutral-700 shadow-none ring-1 ring-black/5 backdrop-blur transition hover:bg-white hover:text-brand';
 
   const gallery = (
     <div className="relative flex h-full flex-col bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900">
@@ -269,7 +268,7 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
         <button
           type="button"
           onClick={() => openWhatsApp(buildSingleProductMessage(lineItem, price))}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-[#25D366] py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[#20bd5a]"
+          className="flex w-full items-center justify-center gap-2 rounded-none bg-[#25D366] py-3 text-sm font-semibold text-white shadow-none transition hover:bg-[#20bd5a]"
         >
           <FaWhatsapp className="h-5 w-5" />
           {t.modal.orderNow}
@@ -326,7 +325,7 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
         <button
           type="button"
           onClick={onClose}
-          className="absolute end-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-neutral-700 shadow-md backdrop-blur transition hover:rotate-90 hover:text-brand sm:end-4 sm:top-4 dark:bg-neutral-800/95 dark:text-neutral-200"
+          className="absolute end-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-none bg-white/95 text-neutral-700 shadow-none backdrop-blur transition hover:rotate-90 hover:text-brand sm:end-4 sm:top-4 dark:bg-neutral-800/95 dark:text-neutral-200"
           aria-label={t.modal.close}
         >
           <FiX className="h-5 w-5" />
