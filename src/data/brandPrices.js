@@ -61,8 +61,6 @@ const ASSAF_PRICE_BY_NAME = {
   'strike black assaf 125ml': 2400,
   'risk comet by assaf': 2700,
   'pink queen by assaf': 2700,
-  'aventus black elixir': 2700,
-  'aventus black elixir 200ml': 1900,
   'boisee classic collection': 3500,
   'miracle eau de parfum': 2300,
   'noir classic collection': 3500,
