@@ -12,7 +12,7 @@ import { EMAIL_MAILTO, PHONE_TEL, SOCIAL_LINKS } from '../data/contact';
 import { getWhatsAppUrl } from '../utils/whatsapp';
 
 const actionBtn =
-  'pointer-events-auto flex h-12 w-12 items-center justify-center rounded-none text-white shadow-none transition-transform duration-200 hover:scale-110 active:scale-95 sm:h-[52px] sm:w-[52px]';
+  'fab-circle pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full text-white shadow-lg transition-transform duration-200 hover:scale-110 active:scale-95 sm:h-14 sm:w-14 p-0';
 
 const FloatingContactButton = () => {
   const { t } = useLanguage();
@@ -102,10 +102,10 @@ const FloatingContactButton = () => {
         type="button"
         onClick={() => setIsOpen((o) => !o)}
         className={[
-          'pointer-events-auto relative flex items-center justify-center overflow-hidden rounded-none bg-gradient-to-br from-brand to-accent text-white shadow-none ring-2 ring-white/40 transition-all duration-300 ease-out hover:shadow-2xl dark:ring-neutral-800/60',
+          'fab-circle pointer-events-auto relative flex items-center justify-center overflow-hidden rounded-full text-white shadow-xl ring-2 ring-white/40 transition-all duration-300 ease-out hover:shadow-2xl dark:ring-neutral-800/60 p-0',
           isOpen
-            ? 'h-14 w-[7.25rem] gap-2 px-4 sm:h-[58px] sm:w-32'
-            : 'h-14 w-14 animate-fab-float animate-fab-ring sm:h-[58px] sm:w-[58px]',
+            ? 'h-14 w-[7.25rem] gap-2 px-4 !rounded-full bg-gradient-to-br from-brand to-accent sm:h-14 sm:w-32'
+            : 'h-14 w-14 bg-[#25D366] animate-fab-float animate-fab-ring sm:h-14 sm:w-14',
         ].join(' ')}
         aria-expanded={isOpen}
         aria-label={isOpen ? f.closeMenu : f.openMenu}

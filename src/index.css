@@ -36,6 +36,14 @@
   [role="button"] {
     border-radius: 0 !important;
   }
+
+  /* استثناء خاص للأزرار العائمة الدائرية مثل زر الواتساب الجانبي */
+  button.fab-circle,
+  [role="button"].fab-circle,
+  .fab-circle,
+  .floating-whatsapp-btn {
+    border-radius: 9999px !important;
+  }
 }
 
 @layer components {
