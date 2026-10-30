@@ -76,9 +76,12 @@ const BrandPage = () => {
       };
     });
 
-    const catalogKeys = new Set(
-      catalogMatches.map((p) => cleanKey(p.nameEn || p.name))
-    );
+    const catalogKeys = new Set();
+    catalogMatches.forEach((p) => {
+      if (p.nameEn) catalogKeys.add(cleanKey(p.nameEn));
+      if (p.name) catalogKeys.add(cleanKey(p.name));
+      if (p.nameAr) catalogKeys.add(cleanKey(p.nameAr));
+    });
 
     // 2. Convert gallery products not in catalog to full product cards, merging duplicate variants
     const extraByKey = new Map();
