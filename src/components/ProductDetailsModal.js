@@ -158,7 +158,7 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
                 type="button"
                 onClick={() => scrollToImage(i)}
                 aria-label={`${i + 1}`}
-                className={`h-2 rounded-full transition-all duration-300 ${
+                className={`h-2 rounded-none transition-all duration-300 ${
                   activeImg === i ? 'w-6 bg-brand' : 'w-2 bg-neutral-300 hover:bg-brand/60 dark:bg-neutral-600'
                 }`}
               />
@@ -173,7 +173,7 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
     <div className="flex flex-col gap-5 p-5 sm:p-7">
       <div>
         {lp?.brand && (
-          <span className="inline-block rounded-full bg-brand/10 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-brand">
+          <span className="inline-block rounded-none bg-brand/10 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-brand">
             {lp.brand}
           </span>
         )}
@@ -229,7 +229,7 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
             {ingredients.map((note) => (
               <li
                 key={note}
-                className="rounded-full border border-brand/20 bg-brand/5 px-3 py-1 text-xs font-medium text-brand"
+                className="rounded-none border border-brand/20 bg-brand/5 px-3 py-1 text-xs font-medium text-brand"
               >
                 {note}
               </li>
@@ -249,7 +249,7 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
                 key={benefit}
                 className="flex items-start gap-2 text-sm text-neutral-600 dark:text-neutral-300"
               >
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-none bg-brand" />
                 {benefit}
               </li>
             ))}
@@ -321,7 +321,7 @@ const ProductDetailsModal = ({ product, isOpen, onClose, initialSize = DEFAULT_S
         aria-label={t.modal.close}
       />
 
-      <div className="animate-modal-in relative z-[1] flex max-h-[100dvh] w-full max-w-5xl flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl dark:bg-neutral-900 sm:max-h-[92vh] sm:rounded-3xl md:flex-row">
+      <div className="animate-modal-in relative z-[1] flex max-h-[100dvh] w-full max-w-5xl flex-col overflow-hidden rounded-none bg-white shadow-2xl dark:bg-neutral-900 sm:max-h-[92vh] md:flex-row">
         <button
           type="button"
           onClick={onClose}

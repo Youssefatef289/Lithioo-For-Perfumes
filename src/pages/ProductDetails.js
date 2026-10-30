@@ -97,7 +97,7 @@ const ProductDetails = () => {
 
         <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
           <div className="space-y-4">
-            <div className="card-elevated overflow-hidden p-6">
+            <div className="card-elevated !rounded-none overflow-hidden p-6">
               <img src={images[selectedImage]} alt={lp.name} className="mx-auto max-h-[420px] w-full object-contain" />
             </div>
             {images.length > 1 && (
@@ -107,7 +107,7 @@ const ProductDetails = () => {
                     key={index}
                     type="button"
                     onClick={() => setSelectedImage(index)}
-                    className={`h-16 w-16 overflow-hidden rounded-lg border-2 p-1 ${
+                    className={`h-16 w-16 overflow-hidden rounded-none border-2 p-1 ${
                       selectedImage === index ? 'border-brand' : 'border-transparent opacity-70 hover:opacity-100'
                     }`}
                   >
@@ -151,13 +151,13 @@ const ProductDetails = () => {
                 className="ms-auto items-end text-end"
               />
               {product.inStock && (
-                <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
+                <span className="rounded-none bg-emerald-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
                   {modal.inStock}
                 </span>
               )}
             </div>
 
-            <div className="card-elevated p-5">
+            <div className="card-elevated !rounded-none p-5">
               <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
                 {modal.productDetails}
               </h3>
@@ -165,13 +165,13 @@ const ProductDetails = () => {
             </div>
 
             {lp.ingredients?.length > 0 && (
-              <div className="card-elevated p-5">
+              <div className="card-elevated !rounded-none p-5">
                 <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
                   {modal.ingredients}
                 </h3>
                 <ul className="flex flex-wrap gap-2">
                   {lp.ingredients.map((note) => (
-                    <li key={note} className="rounded-full bg-brand/10 px-3 py-1 text-sm font-medium text-brand">
+                    <li key={note} className="rounded-none bg-brand/10 px-3 py-1 text-sm font-medium text-brand">
                       {note}
                     </li>
                   ))}
@@ -180,7 +180,7 @@ const ProductDetails = () => {
             )}
 
             {lp.benefits?.length > 0 && (
-              <div className="card-elevated p-5">
+              <div className="card-elevated !rounded-none p-5">
                 <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
                   {modal.benefits}
                 </h3>
@@ -235,7 +235,7 @@ const ProductDetails = () => {
               </button>
             </div>
 
-            <div className="card-elevated flex flex-col gap-2 p-4 text-sm">
+            <div className="card-elevated !rounded-none flex flex-col gap-2 p-4 text-sm">
               <p className="text-neutral-700 dark:text-neutral-300">
                 <strong className="text-neutral-900 dark:text-white">{productPage.category}:</strong> {lp.category}
               </p>
