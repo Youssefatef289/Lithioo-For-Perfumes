@@ -75,7 +75,11 @@ export default function AdminApp() {
     const next = isDark ? 'light' : 'dark';
     setIsDark(!isDark);
     document.documentElement.setAttribute('data-theme', next);
-    try { localStorage.setItem('lithioo_theme', next); } catch {}
+    try {
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        window.sessionStorage.setItem('lithioo_theme', next);
+      }
+    } catch {}
   };
 
   return (

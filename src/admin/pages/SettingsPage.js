@@ -17,7 +17,7 @@ export default function SettingsPage() {
     store_name: 'Lithioo Perfumes',
     whatsapp_number: '201064307053',
     phone_display: '+20 10 6430 7053',
-    email: 'laithymohamed9@gmail.com',
+    email: 'info@lithiooperfumes.com',
     address_en: '',
     address_ar: '',
     map_url: '',

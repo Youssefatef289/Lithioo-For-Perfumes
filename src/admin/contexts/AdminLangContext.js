@@ -10,7 +10,14 @@ const STORAGE_KEY = 'lithioo_admin_lang';
 
 export function AdminLangProvider({ children }) {
   const [language, setLanguage] = useState(() => {
-    try { return localStorage.getItem(STORAGE_KEY) || 'en'; } catch { return 'en'; }
+    try {
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        return window.sessionStorage.getItem(STORAGE_KEY) || 'en';
+      }
+      return 'en';
+    } catch {
+      return 'en';
+    }
   });
 
   const isRTL = language === 'ar';
@@ -21,7 +28,11 @@ export function AdminLangProvider({ children }) {
   };
 
   useEffect(() => {
-    try { localStorage.setItem(STORAGE_KEY, language); } catch {}
+    try {
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        window.sessionStorage.setItem(STORAGE_KEY, language);
+      }
+    } catch {}
     // Apply dir only on admin routes
     document.documentElement.setAttribute('data-admin-dir', isRTL ? 'rtl' : 'ltr');
   }, [language, isRTL]);
