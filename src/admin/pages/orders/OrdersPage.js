@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { FiDownload, FiSearch, FiEye, FiPhone } from 'react-icons/fi';
 import { useAdminLang } from '../../contexts/AdminLangContext';
 import { useToast } from '../../components/ui/Toast';
-import { fetchOrders, subscribeToOrders } from '../../../services/orders';
+import { fetchOrders, subscribeToOrders, updateOrderStatus } from '../../../services/orders';
 import { Button, Input, DataTable, StatusPill, Tabs } from '../../components/ui';
 
 export default function OrdersPage({ onRead }) {
@@ -19,6 +19,7 @@ export default function OrdersPage({ onRead }) {
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState(null);
 
   // Debounce search
   useEffect(() => {
@@ -110,14 +111,33 @@ export default function OrdersPage({ onRead }) {
     document.body.removeChild(link);
   };
 
+  const handleStatusUpdate = async (orderId, nextStatus) => {
+    setUpdatingId(orderId);
+    try {
+      await updateOrderStatus(orderId, nextStatus);
+      toast({
+        message:
+          t.orders.statusUpdated ||
+          (language === 'ar' ? 'تم تحديث حالة الطلب بنجاح' : 'Order status updated successfully'),
+        type: 'success',
+      });
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, status: nextStatus } : o))
+      );
+    } catch (err) {
+      console.error('Failed to update status:', err);
+      toast({ message: t.common.error, type: 'error' });
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const statusTabs = [
-    { key: 'all', label: t.orders.all },
-    { key: 'new', label: t.orders.new },
-    { key: 'confirmed', label: t.orders.confirmed },
-    { key: 'preparing', label: t.orders.preparing },
-    { key: 'shipped', label: t.orders.shipped },
-    { key: 'delivered', label: t.orders.delivered },
-    { key: 'cancelled', label: t.orders.cancelled },
+    { key: 'all',         label: t.orders.all },
+    { key: 'new',         label: t.orders.new || 'جديد' },
+    { key: 'in_progress', label: t.orders.in_progress || 'قيد التنفيذ' },
+    { key: 'delivered',   label: t.orders.delivered || 'مكتمل' },
+    { key: 'cancelled',   label: t.orders.cancelled || 'ملغي' },
   ];
 
   const columns = [
@@ -163,7 +183,27 @@ export default function OrdersPage({ onRead }) {
     {
       key: 'status',
       label: t.orders.status,
-      render: (val) => <StatusPill status={val} label={t.orders[val]} />,
+      render: (val, row) => {
+        // Map preparing / confirmed / shipped to in_progress or fallback
+        const selectValue = ['preparing', 'confirmed', 'shipped'].includes(val) ? 'preparing' : val;
+        return (
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusPill status={val} label={t.orders[val] || val} />
+            <select
+              value={selectValue}
+              onChange={(e) => handleStatusUpdate(row.id, e.target.value)}
+              disabled={updatingId === row.id}
+              className="rounded-lg border border-neutral-200 bg-white px-2 py-1 text-xs font-medium text-neutral-700 hover:border-brand dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-1 focus:ring-brand transition disabled:opacity-50"
+              title={t.orders.changeStatus || 'Change Status'}
+            >
+              <option value="new">{t.orders.new || 'جديد'}</option>
+              <option value="preparing">{t.orders.in_progress || 'قيد التنفيذ'}</option>
+              <option value="delivered">{t.orders.delivered || 'مكتمل'}</option>
+              <option value="cancelled">{t.orders.cancelled || 'ملغي'}</option>
+            </select>
+          </div>
+        );
+      },
     },
     {
       key: 'created_at',

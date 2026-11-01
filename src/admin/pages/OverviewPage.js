@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import {
   FiDollarSign,
   FiShoppingBag,
-  FiTrendingUp,
-  FiAlertCircle,
   FiClock,
   FiArrowUpRight,
+  FiPackage,
+  FiTag,
 } from 'react-icons/fi';
 import {
   LineChart,
@@ -22,6 +22,8 @@ import {
 } from 'recharts';
 import { useAdminLang } from '../contexts/AdminLangContext';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
+import { allProducts } from '../../data/products';
+import { BRAND_LOGOS } from '../../data/brands';
 import { Card, StatCard, StatusPill, Skeleton } from '../components/ui';
 
 const STATUS_COLORS = {
@@ -39,7 +41,8 @@ export default function OverviewPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
-  const [lowStockCount, setLowStockCount] = useState(0);
+  const [productsCount, setProductsCount] = useState(0);
+  const [brandsCount, setBrandsCount] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
@@ -58,7 +61,7 @@ export default function OverviewPage() {
       }
 
       if (!isSupabaseConfigured) {
-        // Fallback offline mock values
+        // Fallback offline static values
         if (isMounted) {
           setStats({
             revenue: 0,
@@ -70,13 +73,25 @@ export default function OverviewPage() {
             top_products: [],
           });
           setRecentOrders([]);
-          setLowStockCount(0);
+          setProductsCount(allProducts?.length || 0);
+          setBrandsCount(BRAND_LOGOS?.length || 0);
           setLoading(false);
         }
         return;
       }
 
       try {
+        // Fetch products count and brands count
+        const [prodRes, brandRes] = await Promise.all([
+          supabase.from('products').select('id', { count: 'exact', head: true }),
+          supabase.from('brands').select('id', { count: 'exact', head: true }),
+        ]);
+
+        if (isMounted) {
+          setProductsCount(prodRes.count ?? allProducts?.length ?? 0);
+          setBrandsCount(brandRes.count ?? BRAND_LOGOS?.length ?? 0);
+        }
+
         // 1. Try to call admin_dashboard_stats RPC
         const { data: rpcStats, error: rpcError } = await supabase.rpc(
           'admin_dashboard_stats',
@@ -129,16 +144,6 @@ export default function OverviewPage() {
 
         if (isMounted && ordersList) {
           setRecentOrders(ordersList);
-        }
-
-        // 3. Fetch Low / Out-of-stock count
-        const { count: outStock } = await supabase
-          .from('products')
-          .select('id', { count: 'exact', head: true })
-          .eq('in_stock', false);
-
-        if (isMounted) {
-          setLowStockCount(outStock || 0);
         }
       } catch (err) {
         console.error('Error loading dashboard stats:', err);
@@ -225,41 +230,41 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      {/* Summary KPI Cards: Products, Brands, New Orders, Total Revenue */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* 1. Total Products */}
         <StatCard
-          label={t.overview.revenue}
-          value={`${(stats?.revenue || 0).toLocaleString()} ${t.common.egp}`}
-          icon={FiDollarSign}
+          label={t.overview.totalProducts || (language === 'ar' ? 'عدد المنتجات' : 'Total Products')}
+          value={productsCount}
+          icon={FiPackage}
           color="brand"
           loading={loading}
         />
+
+        {/* 2. Total Brands */}
         <StatCard
-          label={t.overview.orders}
-          value={stats?.orders_count || 0}
-          icon={FiShoppingBag}
+          label={t.overview.totalBrands || (language === 'ar' ? 'عدد البراندات' : 'Total Brands')}
+          value={brandsCount}
+          icon={FiTag}
           color="blue"
           loading={loading}
         />
+
+        {/* 3. New Orders */}
         <StatCard
-          label={t.overview.avgOrder}
-          value={`${(stats?.avg_order_value || 0).toLocaleString()} ${t.common.egp}`}
-          icon={FiTrendingUp}
-          color="green"
-          loading={loading}
-        />
-        <StatCard
-          label={t.overview.newOrders}
+          label={t.overview.newOrders || (language === 'ar' ? 'الطلبات الجديدة' : 'New Orders')}
           value={stats?.new_orders || 0}
           icon={FiClock}
           color="amber"
           loading={loading}
         />
+
+        {/* 4. Total Sales / Revenue */}
         <StatCard
-          label={t.overview.lowStock}
-          value={lowStockCount}
-          icon={FiAlertCircle}
-          color={lowStockCount > 0 ? 'red' : 'gray'}
+          label={t.overview.revenue || (language === 'ar' ? 'إجمالي المبيعات' : 'Total Sales')}
+          value={`${(stats?.revenue || 0).toLocaleString()} ${t.common.egp}`}
+          icon={FiDollarSign}
+          color="green"
           loading={loading}
         />
       </div>

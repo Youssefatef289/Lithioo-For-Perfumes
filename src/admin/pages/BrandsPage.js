@@ -180,9 +180,14 @@ export default function BrandsPage() {
       {/* Brands Grid */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {brands.map((b) => (
-          <Card key={b.id || b.slug} className="flex flex-col justify-between">
+          <Card
+            key={b.id || b.slug}
+            className="flex flex-col justify-between cursor-pointer hover:border-brand/70 hover:shadow-md transition group"
+            onClick={() => openEdit(b)}
+            title={language === 'ar' ? `اضغط لتعديل براند ${b.name_ar || b.name_en}` : `Click to edit ${b.name_en}`}
+          >
             <div>
-              <div className="flex h-24 w-full items-center justify-center rounded-xl bg-neutral-50 p-3 dark:bg-neutral-800">
+              <div className="flex h-24 w-full items-center justify-center rounded-xl bg-neutral-50 p-3 dark:bg-neutral-800 transition group-hover:bg-brand/5">
                 {b.logo_url ? (
                   <img
                     src={b.logo_url}
@@ -195,7 +200,9 @@ export default function BrandsPage() {
               </div>
 
               <div className="mt-3">
-                <h3 className="font-bold text-neutral-900 dark:text-white">{b.name_en}</h3>
+                <h3 className="font-bold text-neutral-900 group-hover:text-brand dark:text-white transition">
+                  {b.name_en}
+                </h3>
                 {b.name_ar && (
                   <p className="text-xs text-neutral-500" dir="rtl">
                     {b.name_ar}
@@ -229,14 +236,24 @@ export default function BrandsPage() {
 
               <div className="flex items-center gap-1">
                 <button
-                  onClick={() => openEdit(b)}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openEdit(b);
+                  }}
                   className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-brand dark:hover:bg-neutral-800"
+                  title={t.products.edit}
                 >
                   <FiEdit2 size={15} />
                 </button>
                 <button
-                  onClick={() => setDeleteTarget(b)}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDeleteTarget(b);
+                  }}
                   className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-red-500 dark:hover:bg-neutral-800"
+                  title={t.brands.delete}
                 >
                   <FiTrash2 size={15} />
                 </button>

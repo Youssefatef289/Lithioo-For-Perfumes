@@ -57,7 +57,13 @@ export async function fetchOrders({ page = 1, perPage = 20, status = null, searc
     .order('created_at', { ascending: false })
     .range((page - 1) * perPage, page * perPage - 1);
 
-  if (status) query = query.eq('status', status);
+  if (status) {
+    if (status === 'in_progress') {
+      query = query.in('status', ['preparing', 'confirmed', 'shipped']);
+    } else {
+      query = query.eq('status', status);
+    }
+  }
   if (search) {
     query = query.or(
       `customer_name.ilike.%${search}%,phone.ilike.%${search}%,order_number::text.ilike.%${search}%`
@@ -89,14 +95,26 @@ export async function fetchOrder(orderId) {
  * Update order status (calls update_order_status RPC).
  */
 export async function updateOrderStatus(orderId, status, note = null) {
-  if (!isSupabaseConfigured) return;
+  if (!isSupabaseConfigured || !supabase) return;
 
-  const { error } = await supabase.rpc('update_order_status', {
-    p_order_id: orderId,
-    p_status: status,
-    p_note: note,
-  });
-  if (error) throw error;
+  try {
+    const { error } = await supabase.rpc('update_order_status', {
+      p_order_id: orderId,
+      p_status: status,
+      p_note: note,
+    });
+    if (!error) return;
+  } catch (rpcErr) {
+    console.warn('update_order_status RPC notice:', rpcErr);
+  }
+
+  // Fallback to direct table update with RLS
+  const { error: updateErr } = await supabase
+    .from('orders')
+    .update({ status })
+    .eq('id', orderId);
+
+  if (updateErr) throw updateErr;
 }
 
 /**
