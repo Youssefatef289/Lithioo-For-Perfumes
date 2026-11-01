@@ -64,3 +64,4 @@ export const adminRoutes = [
     Component: SettingsPage,
   },
 ];
+
