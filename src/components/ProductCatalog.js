@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { allProducts, PRODUCT_SECTIONS } from '../data/products';
-import { FEATURED_BRANDS, FEATURED_BRAND_IDS, getBrandIdByName } from '../data/brands';
+import { FEATURED_BRANDS } from '../data/brands';
 import ProductCard from './ProductCard';
 import ProductSectionTabs from './ProductSectionTabs';
 import BrandGrid from './BrandGrid';
@@ -28,18 +28,11 @@ const ProductCatalog = () => {
     }
   }, [brandFromUrl, navigate]);
 
-  const allowedBrandIdSet = useMemo(
-    () => new Set(FEATURED_BRAND_IDS.map((id) => id.toLowerCase())),
-    []
-  );
-
   const catalogProducts = useMemo(() => {
-    const raw = allProducts.filter((product) => {
-      const brandId = (product.brandId || getBrandIdByName(product.brand) || '').toLowerCase();
-      return allowedBrandIdSet.has(brandId);
-    });
+    const raw = allProducts;
 
     const cleanKey = (product) => {
+      const section = product.section || '';
       const brand = (product.brand || '').toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]/g, '');
       const name = (product.nameEn || product.name || '')
         .toLowerCase()
@@ -52,7 +45,7 @@ const ProductCatalog = () => {
         .replace(/[\s\-_#]+$/g, '')
         .replace(/[^a-z0-9\u0600-\u06FF]/g, '')
         .trim();
-      return `${brand}::${name}`;
+      return `${section}::${brand}::${name}`;
     };
 
     const merged = new Map();
@@ -77,7 +70,7 @@ const ProductCatalog = () => {
     });
 
     return Array.from(merged.values());
-  }, [allowedBrandIdSet]);
+  }, []);
 
   const sectionMatches = (product, sectionId) => {
     if (sectionId === 'all') return true;

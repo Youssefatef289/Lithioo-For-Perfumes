@@ -20,19 +20,9 @@ const MobileBottomNav = () => {
 
   const items = [
     {
-      id: 'cart',
-      path: '/cart',
-      label: language === 'ar' ? 'السلة' : 'Cart',
-      Icon: FiShoppingCart,
-      hasBadge: cartCount > 0,
-      badgeCount: cartCount,
-      isCart: true,
-      isActive: location.pathname === '/cart',
-    },
-    {
       id: 'home',
       path: '/',
-      label: language === 'ar' ? 'الهوم' : 'Home',
+      label: language === 'ar' ? 'الرئيسية' : 'Home',
       Icon: FiHome,
       isActive: location.pathname === '/',
     },
@@ -54,6 +44,16 @@ const MobileBottomNav = () => {
       isActive:
         location.pathname.startsWith('/brand/') ||
         location.search.includes('brand='),
+    },
+    {
+      id: 'cart',
+      path: '/cart',
+      label: language === 'ar' ? 'السلة' : 'Cart',
+      Icon: FiShoppingCart,
+      hasBadge: cartCount > 0,
+      badgeCount: cartCount,
+      isCart: true,
+      isActive: location.pathname === '/cart',
     },
   ];
 

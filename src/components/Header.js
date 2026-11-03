@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { FiGrid, FiHeart, FiShoppingCart, FiTrash2, FiX, FiTag } from 'react-icons/fi';
+import { FiGrid, FiHeart, FiShoppingCart, FiTrash2, FiX, FiTag, FiHome } from 'react-icons/fi';
 import LanguageToggle from './LanguageToggle';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useCart } from '../contexts/CartContext';
 import { useWishlist } from '../contexts/WishlistContext';
 import { PRODUCT_SECTIONS } from '../data/products';
 import { BRAND_LOGOS } from '../data/brands';
-import { getBrandPriceSummary } from '../data/brandPrices';
 import { formatEGP } from '../utils/price';
-import { localizeDigits } from '../utils/digits';
 import { localizeProduct } from '../utils/localizeProduct';
 
 const HERO_CONFIG = {
@@ -274,18 +272,6 @@ const Header = () => {
                               <span className="block truncate text-sm font-semibold text-neutral-900 dark:text-neutral-100">
                                 {language === 'ar' ? brand.nameAr : brand.name}
                               </span>
-                              {(() => {
-                                const summary = getBrandPriceSummary(brand);
-                                return summary != null ? (
-                                  <span className="mt-0.5 block text-xs font-semibold text-brand">
-                                    <span dir="ltr">
-                                      {summary.min === summary.max
-                                        ? localizeDigits(formatEGP(summary.min), language)
-                                        : `${localizeDigits(formatEGP(summary.min), language)} – ${localizeDigits(formatEGP(summary.max), language)}`}
-                                    </span>
-                                  </span>
-                                ) : null;
-                              })()}
                             </span>
                           </Link>
                         ))}
@@ -465,7 +451,18 @@ const Header = () => {
               </div>
             )}
 
-            <nav className="grid grid-cols-4 overflow-hidden rounded-t-3xl border border-neutral-200 border-b-0 bg-white/95 shadow-[0_-16px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl dark:border-neutral-700 dark:bg-neutral-900/95">
+            <nav className="grid grid-cols-5 overflow-hidden rounded-t-3xl border border-neutral-200 border-b-0 bg-white/95 shadow-[0_-16px_30px_rgba(0,0,0,0.12)] backdrop-blur-xl dark:border-neutral-700 dark:bg-neutral-900/95">
+              <Link
+                to="/"
+                className={`${mobileNavButton} ${
+                  location.pathname === '/' && !mobilePanel ? mobileNavActive : mobileNavInactive
+                }`}
+                onClick={() => setMobilePanel(null)}
+                aria-label={t.header.home}
+              >
+                <FiHome className="h-5 w-5" />
+                <span>{t.header.home}</span>
+              </Link>
               <button
                 type="button"
                 className={`${mobileNavButton} ${
