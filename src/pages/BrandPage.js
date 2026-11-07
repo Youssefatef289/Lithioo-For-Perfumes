@@ -5,6 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { BRAND_LOGOS, getBrandById, getBrandLabel, getBrandIdByName } from '../data/brands';
 import { allProducts } from '../data/products';
 import { getBrandGalleryProducts } from '../data/brandPrices';
+import { resolveGalleryProductNames } from '../data/productArabic';
 import ProductCard from '../components/ProductCard';
 
 const BrandPage = () => {
@@ -101,33 +102,36 @@ const BrandPage = () => {
       }
     });
 
-    const extraGalleryCards = Array.from(extraByKey.values()).map((gp, index) => ({
-      id: `brand-gallery-${brand.id}-${index}-${gp.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
-      name: gp.name,
-      nameEn: gp.name,
-      nameAr: gp.name,
-      brand: brand.name,
-      brandAr: brand.nameAr || brand.name,
-      brandId: brand.id,
-      section: 'original',
-      category: brand.name,
-      categoryAr: brand.nameAr || brand.name,
-      price: gp.price || 0,
-      image: gp.images[0],
-      imageHover: gp.images[1] || gp.images[0],
-      detailImages: gp.images,
-      description: `${gp.name} by ${brand.name}.`,
-      descriptionAr: `${gp.name} من ${brand.nameAr || brand.name}.`,
-      ingredients: ['Natural Oils', 'Signature Accords', 'Luxury Base Notes'],
-      ingredientsAr: ['زيوت عطرية نقية', 'نفحات مميزة', 'قاعدة شرقية فاخرة'],
-      benefits: ['Long lasting fragrance', 'Authentic brand packaging'],
-      benefitsAr: ['ثبات عالي يدوم طويلاً', 'تغليف أصلي معتمد'],
-      hideSizes: true,
-      sizes: [],
-      inStock: true,
-      rating: 4.8,
-      reviews: 35 + ((index * 7) % 40),
-    }));
+    const extraGalleryCards = Array.from(extraByKey.values()).map((gp, index) => {
+      const { nameEn, nameAr } = resolveGalleryProductNames(gp.name);
+      return {
+        id: `brand-gallery-${brand.id}-${index}-${(nameEn || gp.name).toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+        name: nameEn || gp.name,
+        nameEn: nameEn || gp.name,
+        nameAr: nameAr || gp.name,
+        brand: brand.name,
+        brandAr: brand.nameAr || brand.name,
+        brandId: brand.id,
+        section: 'original',
+        category: brand.name,
+        categoryAr: brand.nameAr || brand.name,
+        price: gp.price || 0,
+        image: gp.images[0],
+        imageHover: gp.images[1] || gp.images[0],
+        detailImages: gp.images,
+        description: `${nameEn || gp.name} by ${brand.name}.`,
+        descriptionAr: `${nameAr || gp.name} من ${brand.nameAr || brand.name}.`,
+        ingredients: ['Natural Oils', 'Signature Accords', 'Luxury Base Notes'],
+        ingredientsAr: ['زيوت عطرية نقية', 'نفحات مميزة', 'قاعدة شرقية فاخرة'],
+        benefits: ['Long lasting fragrance', 'Authentic brand packaging'],
+        benefitsAr: ['ثبات عالي يدوم طويلاً', 'تغليف أصلي معتمد'],
+        hideSizes: true,
+        sizes: [],
+        inStock: true,
+        rating: 4.8,
+        reviews: 35 + ((index * 7) % 40),
+      };
+    });
 
     return [...enhancedCatalogMatches, ...extraGalleryCards];
   }, [brand]);

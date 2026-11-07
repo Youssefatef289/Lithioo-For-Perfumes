@@ -66,6 +66,11 @@ const ASSAF_PRICE_BY_NAME = {
   'noir classic collection': 3500,
   'miss grey intense': 1900,
   'wild colt by assaf': 2600,
+  'بوكس اروجيت بينك': 4200,
+  'assaf box rouge pink': 4200,
+  'مجموعة ثلاثيه اورا عساف': 3500,
+  'مجموعة ثلاثية اورا عساف': 3500,
+  'triple aura set': 3500,
 };
 
 /**
@@ -80,6 +85,25 @@ const ASSAF_PRICE_BY_NAME = {
  *    (src/data/newLuxuryProducts.js).
  */
 const GALLERY_REFERENCE_PRICES = {
+  // New Featured Sets & Boxes
+  'بوكس اروجيت بينك': 4200,
+  'Assaf Box Rouge Pink': 4200,
+  'مجموعة ثلاثيه اورا عساف': 3500,
+  'مجموعة ثلاثية اورا عساف': 3500,
+  'Triple Aura Set': 3500,
+  'بوكس ديفا من دخون الاماراتيه': 4500,
+  'بوكس ديفا من دخون الإماراتية': 4500,
+  'Dakhoon Al Emarateya - Diva Box': 4500,
+  'بوكس (Special Edition 2) من دخون الاماراتيه': 4500,
+  'بوكس (Special Edition 2) من دخون الإماراتية': 4500,
+  'Dakhoon Al Emarateya - Special Edition 2 Box': 4500,
+  'Elviera Edition Yum Yum Set': 3500,
+  'Jean Antoine - Elviera Edition Yum Yum Set': 3500,
+  'Elviera Edition Blush Set': 3500,
+  'Jean Antoine - Elviera Edition Blush Set': 3500,
+  'Elviera Edition imperio  Set': 3500,
+  'Elviera Edition imperio Set': 3500,
+  'Jean Antoine - Elviera Edition Imperio Set': 3500,
   // Al Majed Oud — same products as the Original section
   'Candy Musk Al Majed Oud كاندي مسك من الماجد للعود (150مل للجنسين)': 2500, // originals: candy-musk-al-majed-oud-150
   'Lady Sukoon Perfume - 100ml': 1800, // originals: lady-sukoon-perfume-100ml

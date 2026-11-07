@@ -322,3 +322,219 @@ export const BENEFITS_AR = {
   'Available in multiple bottle sizes': 'متوفر بأحجام متعددة',
   'Strong longevity on skin and clothes': 'ثبات قوي على البشرة والملابس',
 };
+
+export const GALLERY_NAMES_TRANSLATION = {
+  // Target items
+  'بوكس اروجيت بينك': {
+    nameEn: 'Assaf Box Rouge Pink',
+    nameAr: 'عساف بوكس أروجيت بينك',
+  },
+  'عساف بوكس اروجيت بينك': {
+    nameEn: 'Assaf Box Rouge Pink',
+    nameAr: 'عساف بوكس أروجيت بينك',
+  },
+  'مجموعة ثلاثيه اورا عساف': {
+    nameEn: 'Triple Aura Set',
+    nameAr: 'مجموعة ثلاثية أورا عساف',
+  },
+  'مجموعة ثلاثية اورا': {
+    nameEn: 'Triple Aura Set',
+    nameAr: 'مجموعة ثلاثية أورا',
+  },
+  'بوكس ديفا من دخون الاماراتيه': {
+    nameEn: 'Dakhoon Al Emarateya - Diva Box',
+    nameAr: 'بوكس ديفا من دخون الإماراتية',
+  },
+  'بوكس (Special Edition 2) من دخون الاماراتيه': {
+    nameEn: 'Dakhoon Al Emarateya - Special Edition 2 Box',
+    nameAr: 'بوكس سبيشال إديشن 2 من دخون الإماراتية',
+  },
+  'Elviera Edition Yum Yum Set': {
+    nameEn: 'Jean Antoine - Elviera Edition Yum Yum Set',
+    nameAr: 'جان أنطوان - مجموعة إلفيرا إديشن يم يم',
+  },
+  'Elviera Edition Blush Set': {
+    nameEn: 'Jean Antoine - Elviera Edition Blush Set',
+    nameAr: 'جان أنطوان - مجموعة إلفيرا إديشن بلش',
+  },
+  'Elviera Edition imperio  Set': {
+    nameEn: 'Jean Antoine - Elviera Edition Imperio Set',
+    nameAr: 'جان أنطوان - مجموعة إلفيرا إديشن إمبريو',
+  },
+  'Elviera Edition imperio Set': {
+    nameEn: 'Jean Antoine - Elviera Edition Imperio Set',
+    nameAr: 'جان أنطوان - مجموعة إلفيرا إديشن إمبريو',
+  },
+
+  // Other Arabic cards across brands
+  'صندوق الديسكفري 8 pic 10 ml 3800ج': {
+    nameEn: 'Assaf Discovery Box 8 Pcs (10ml)',
+    nameAr: 'صندوق الديسكفري من عساف 8 قطع (10 مل)',
+  },
+  'عطر فرانكل اماجنيشن عساف - 200مل  Assaf frankel imagination perfume  1900': {
+    nameEn: 'Frankel Imagination by Assaf (200ml)',
+    nameAr: 'عطر فرانكل إيماجينيشن من عساف (200 مل)',
+  },
+  'عطر ميس جريس انتنس للنساء من عساف - او دي بارفان - 100 مل 1900EGP': {
+    nameEn: 'Miss Grey Intense by Assaf (100ml)',
+    nameAr: 'عطر ميس جريس إنتنس للنساء من عساف (100 مل)',
+  },
+  'فرانكل ايماجنيشن 100مل 1700ج': {
+    nameEn: 'Frankel Imagination (100ml)',
+    nameAr: 'فرانكل إيماجينيشن (100 مل)',
+  },
+  'ليدي سوبريم- 100 مل 1700ج': {
+    nameEn: 'Lady Supreme (100ml)',
+    nameAr: 'ليدي سوبريم (100 مل)',
+  },
+  'ريسك كوميت - عساف 2700': {
+    nameEn: 'Risk Comete by Assaf',
+    nameAr: 'ريسك كوميت - عساف',
+  },
+  'وايلد كولت - عساف 2600': {
+    nameEn: 'Wild Colt by Assaf',
+    nameAr: 'وايلد كولت - عساف',
+  },
+  'WILD COLT 200ml 2500ج': {
+    nameEn: 'Wild Colt (200ml)',
+    nameAr: 'وايلد كولت (200 مل)',
+  },
+  'GRIS ERIK 100 ML 1700ج': {
+    nameEn: 'Gris Erik (100ml)',
+    nameAr: 'جريس إريك (100 مل)',
+  },
+  'GRIS ERIK 200ml  2500ج': {
+    nameEn: 'Gris Erik (200ml)',
+    nameAr: 'جريس إريك (200 مل)',
+  },
+  'Hook Blue 200 ML Perfumes 2500ج': {
+    nameEn: 'Hook Blue (200ml)',
+    nameAr: 'هوك بلو (200 مل)',
+  },
+  'MISS FLORA 100مل 1700ج': {
+    nameEn: 'Miss Flora (100ml)',
+    nameAr: 'ميس فلورا (100 مل)',
+  },
+  'Morning Girl 100 ml 1700ج': {
+    nameEn: 'Morning Girl (100ml)',
+    nameAr: 'مورنينج جيرل (100 مل)',
+  },
+  'Pink Lady 100مل 1700ج': {
+    nameEn: 'Pink Lady (100ml)',
+    nameAr: 'بينك ليدي (100 مل)',
+  },
+  'khalifa 100ml 1990ج': {
+    nameEn: 'Khalifa (100ml)',
+    nameAr: 'خليفة (100 مل)',
+  },
+  'عطر الدوحة سكاي لاين 100ml 1990ج': {
+    nameEn: 'Doha Skyline (100ml)',
+    nameAr: 'عطر الدوحة سكاي لاين (100 مل)',
+  },
+  'عطر سيجنتشر روز جولد من دخون الإمارات أو دو بارفان 100 مل 1900EGP': {
+    nameEn: 'Signature Rose Gold by Dkhoon Emirates (100ml)',
+    nameAr: 'عطر سيجنتشر روز جولد من دخون الإمارات (100 مل)',
+  },
+  'عطر دخون عود من دخون الإماراتية أو دو بارفان للجنسين - 100 مل 2000': {
+    nameEn: 'Dkhoon Oud by Dkhoon Emirates (100ml)',
+    nameAr: 'عطر دخون عود من دخون الإماراتية (100 مل)',
+  },
+  'عطر رنان في اي بي 100مل او دو بارفيوم 3000ج': {
+    nameEn: 'Rannan VIP EDP (100ml)',
+    nameAr: 'عطر رنان في آي بي (100 مل)',
+  },
+  'عطر لطافة عود مود للجنسين - او دي بارفان - 100 مل 1200': {
+    nameEn: 'Lattafa Oud Mood (100ml)',
+    nameAr: 'عطر لطافة عود مود (100 مل)',
+  },
+  'لافيرن الأزرق للرجال - ماء عطر - 100 مل 2600': {
+    nameEn: 'Blue Laverne for Men (100ml)',
+    nameAr: 'لافيرن الأزرق للرجال (100 مل)',
+  },
+  'مشاعر فضي 750': {
+    nameEn: 'Mashaer Silver',
+    nameAr: 'مشاعر فضي',
+  },
+  'عطر ريف 21 من ريف – 100 مل  للجنسين  750': {
+    nameEn: 'Reef 21 (100ml)',
+    nameAr: 'عطر ريف 21 (100 مل)',
+  },
+  'عطر عرب العلا 750': {
+    nameEn: 'Arab Al-Ula',
+    nameAr: 'عطر عرب العلا',
+  },
+  'التوباكو الجمايكي 100 مل 1700 ج': {
+    nameEn: 'Jamaican Tobacco (100ml)',
+    nameAr: 'التوباكو الجمايكي (100 مل)',
+  },
+  'التوباكو الدومينيكي 100 مل 1700ج': {
+    nameEn: 'Dominican Tobacco (100ml)',
+    nameAr: 'التوباكو الدومينيكي (100 مل)',
+  },
+  'التوباكو اليوناني 100 مل 1700ج': {
+    nameEn: 'Greek Tobacco (100ml)',
+    nameAr: 'التوباكو اليوناني (100 مل)',
+  },
+  'توق ورد محروق ج2600 50مل': {
+    nameEn: 'Tooq Burnt Rose (50ml)',
+    nameAr: 'توق ورد محروق (50 مل)',
+  },
+  'Candy Musk Al Majed Oud كاندي مسك من الماجد للعود (150مل للجنسين)': {
+    nameEn: 'Candy Musk Al Majed Oud (150ml)',
+    nameAr: 'كاندي مسك من الماجد للعود (150 مل)',
+  },
+  'ASSAF Lip Stick - 150ml  عساف عطر لب ستيك للنساء - 150مل2700EGP': {
+    nameEn: 'Assaf Lip Stick (150ml)',
+    nameAr: 'عساف عطر لب ستيك للنساء (150 مل)',
+  },
+  'RAEES-AURUM_ 180مل  2300ج': {
+    nameEn: 'Raees Aurum (180ml)',
+    nameAr: 'رئيس أوروم (180 مل)',
+  },
+  'Extrait de parfum Marmara 100 ml - French Avenue 2500ج': {
+    nameEn: 'Marmara Extrait de Parfum - French Avenue (100ml)',
+    nameAr: 'مرمرة إكستري دو بارفان (100 مل)',
+  },
+  'IBRAQ Ibrahim Al-Qurashi Al Shams musk EDP75 ml  ابراهيم القرشي عطر مسك الشمس للنساء - 75 مل': {
+    nameEn: 'Al Shams Musk EDP by Ibrahim Al-Qurashi (75ml)',
+    nameAr: 'عطر مسك الشمس من إبراهيم القرشي (75 مل)',
+  },
+  'IBRAQ Ibrahim Al-Qurashi Sunrise Melody 100 ML  إبراهيم القرشي عطر صن رايز ميلودي - 100مل 1900': {
+    nameEn: 'Sunrise Melody by Ibrahim Al-Qurashi (100ml)',
+    nameAr: 'عطر صن رايز ميلودي من إبراهيم القرشي (100 مل)',
+  },
+};
+
+const cleanNameStr = (str) =>
+  (str || '')
+    .toLowerCase()
+    .replace(/\s*\(\s*\d+\s*(?:ml)?\s*\)/gi, '')
+    .replace(/\s*\(\s*\d+\s*\)\s*(?:\d{3,4}\s*(?:egp|ج)?)?$/gi, '')
+    .replace(/(?:\d{3,4}\s*(?:egp|ج)?)\s*\(\s*\d+\s*\)$/gi, '')
+    .replace(/\s*\(\s*\d+\s*\)\s*$/g, '')
+    .replace(/[\s\-_#]+(\d+|[a-z])\s*$/gi, '')
+    .replace(/[\s\-_#]+$/g, '')
+    .replace(/[^a-z0-9\u0600-\u06FF]/g, '')
+    .trim();
+
+export const resolveGalleryProductNames = (rawName) => {
+  const norm = cleanNameStr(rawName);
+  for (const [k, v] of Object.entries(GALLERY_NAMES_TRANSLATION)) {
+    if (cleanNameStr(k) === norm) {
+      return v;
+    }
+  }
+
+  const hasArabic = /[\u0600-\u06FF]/.test(rawName);
+  if (!hasArabic) {
+    return {
+      nameEn: rawName,
+      nameAr: PRODUCT_NAMES_AR[rawName] || rawName,
+    };
+  }
+
+  return {
+    nameEn: rawName,
+    nameAr: rawName,
+  };
+};
