@@ -10,17 +10,20 @@ export const ALLOWED_ADMIN_USERNAME =
   'admin_lithioo';
 
 // Fallback to owned brand domain if environment variable is not provided
-const DEFAULT_AUTH_DOMAIN = process.env.REACT_APP_AUTH_EMAIL_DOMAIN || 'lithiooperfumes.com';
+const DEFAULT_AUTH_DOMAIN = process.env.REACT_APP_AUTH_EMAIL_DOMAIN || 'laithymohamed9@gmail.com';
 
 /**
  * Returns the configured admin email from the environment variable REACT_APP_ADMIN_EMAIL,
- * with fallback to admin_lithioo@lithiooperfumes.com.
+ * or safely falls back to the configured admin email or brand domain.
  * @returns {string}
  */
 export function getAdminEmail() {
   const envEmail = process.env.REACT_APP_ADMIN_EMAIL;
   if (envEmail && String(envEmail).trim()) {
     return String(envEmail).trim().toLowerCase();
+  }
+  if (DEFAULT_AUTH_DOMAIN && DEFAULT_AUTH_DOMAIN.includes('@')) {
+    return DEFAULT_AUTH_DOMAIN.trim().toLowerCase();
   }
   return `${ALLOWED_ADMIN_USERNAME}@${DEFAULT_AUTH_DOMAIN}`;
 }
