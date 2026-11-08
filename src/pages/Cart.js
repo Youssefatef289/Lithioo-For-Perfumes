@@ -276,7 +276,14 @@ const Cart = () => {
             <button
               type="button"
               disabled={selectedKeys.size === 0}
-              onClick={() => setCheckoutOpen(true)}
+              onClick={() => {
+                navigate('/order', {
+                  state: {
+                    items: selectedItems,
+                    total: selectedTotal,
+                  },
+                });
+              }}
               className="mt-5 flex w-full items-center justify-center rounded-none bg-brand py-3.5 text-sm font-semibold uppercase tracking-wider text-white shadow-none transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-40"
             >
               {isRtl ? 'إتمام الطلب' : 'Checkout'} {selectedCount > 0 ? `(${selectedCount})` : ''}

@@ -3,6 +3,7 @@ import { FiX, FiCheckCircle, FiAlertCircle, FiLoader } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import { useLanguage } from '../contexts/LanguageContext';
 import { createOrder, getCurrentCustomerData, fetchLastOrderByPhone } from '../services/orders';
+import { sendOrderNotificationEmail } from '../services/orderNotification';
 import { formatEGP, parsePrice } from '../utils/price';
 import { localizeProduct } from '../utils/localizeProduct';
 import { openWhatsApp } from '../utils/whatsapp';
@@ -138,6 +139,15 @@ const CheckoutModal = ({
 
       const result = await createOrder(payload);
       setSuccessOrder(result);
+
+      // Send email alert to admin Gmail
+      sendOrderNotificationEmail({
+        order: result,
+        customer: formData,
+        items: selectedItems,
+      }).catch((emailErr) => {
+        console.warn('Failed to send order email alert:', emailErr);
+      });
 
       if (onOrderSuccess) {
         onOrderSuccess(result, selectedItems.map((item) => item.cartKey));

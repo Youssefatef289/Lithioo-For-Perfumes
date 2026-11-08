@@ -14,6 +14,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
+import OrderCheckoutPage from './pages/OrderCheckoutPage';
 
 // Admin dashboard — loaded lazily so it does NOT bloat the storefront bundle
 const AdminApp = React.lazy(() => import('./admin/AdminApp'));
@@ -54,6 +55,8 @@ function App() {
                 <Route path="/brand/:brandId" element={<BrandPage />} />
                 <Route path="/product/:id" element={<ProductDetails />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path="/order" element={<OrderCheckoutPage />} />
+                <Route path="/checkout" element={<OrderCheckoutPage />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
               </Routes>
