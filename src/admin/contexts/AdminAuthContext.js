@@ -7,12 +7,7 @@
  */
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '../../lib/supabaseClient';
-import {
-  usernameToEmail,
-  isAllowedAdminUsername,
-  getAdminEmail,
-  ALLOWED_ADMIN_USERNAME,
-} from '../auth/usernameToEmail';
+import { usernameToEmail } from '../auth/usernameToEmail';
 
 const AdminAuthContext = createContext(null);
 
@@ -50,26 +45,9 @@ export function AdminAuthProvider({ children }) {
           return;
         }
 
-        const adminEmail = getAdminEmail().toLowerCase();
-        const userEmail = (session.user.email || '').toLowerCase();
-        const metaUsername = (session.user.user_metadata?.username || '').toLowerCase();
-
-        // Check if the authenticated session belongs to admin_lithioo
-        const isAllowed = userEmail === adminEmail || metaUsername === ALLOWED_ADMIN_USERNAME;
-
-        if (!isAllowed) {
-          console.warn('Unauthorized session detected for user:', userEmail);
-          await supabase.auth.signOut();
-          if (mounted) {
-            setProfile(null);
-            setAuthError('unauthorized_user');
-          }
-          return;
-        }
-
         const profileData = await getProfile(session.user);
         if (!profileData || profileData.role !== 'admin' || profileData.is_active === false) {
-          console.warn('Unauthorized or inactive profile session:', userEmail);
+          console.warn('Unauthorized or inactive profile session:', session.user.email);
           await supabase.auth.signOut();
           if (mounted) {
             setProfile(null);
@@ -110,13 +88,15 @@ export function AdminAuthProvider({ children }) {
       if (!isSupabaseConfigured || !supabase) throw new Error('supabase_not_configured');
       const cleanInput = String(usernameInput || '').trim();
 
-      // Only allow admin_lithioo
-      if (!isAllowedAdminUsername(cleanInput)) {
-        setAuthError('unauthorized_user');
-        return { ok: false, error: 'unauthorized_user' };
+      if (!cleanInput) {
+        setAuthError('invalid_credentials');
+        return { ok: false, error: 'invalid_credentials' };
       }
 
-      const email = usernameToEmail(cleanInput);
+      // If user provided an email, authenticate with it directly; otherwise map username
+      const email = cleanInput.includes('@')
+        ? cleanInput.toLowerCase()
+        : usernameToEmail(cleanInput);
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email,

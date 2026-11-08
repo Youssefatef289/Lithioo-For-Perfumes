@@ -4,7 +4,6 @@ import { FiEye, FiEyeOff, FiLock, FiUser, FiAlertCircle } from 'react-icons/fi';
 import { useAdminAuth } from '../contexts/AdminAuthContext';
 import { useAdminLang } from '../contexts/AdminLangContext';
 import { Button, Input, Card } from '../components/ui';
-import { isAllowedAdminUsername, ALLOWED_ADMIN_USERNAME } from '../auth/usernameToEmail';
 
 const MAX_FAILED_ATTEMPTS = 5;
 const THROTTLE_SECONDS = 30;
@@ -52,16 +51,6 @@ export default function LoginPage() {
 
     setErrorMsg('');
 
-    // Strict validation: Only admin_lithioo is allowed
-    if (!isAllowedAdminUsername(cleanUsername)) {
-      setErrorMsg(
-        language === 'ar'
-          ? `اسم المستخدم غير مصرح به. تسجيل الدخول مقتصر على حساب ${ALLOWED_ADMIN_USERNAME} فقط.`
-          : `Unauthorized username. Access is restricted to ${ALLOWED_ADMIN_USERNAME} only.`
-      );
-      return;
-    }
-
     setLoading(true);
 
     try {
@@ -73,14 +62,14 @@ export default function LoginPage() {
       } else if (res.error === 'account_disabled') {
         setErrorMsg(
           language === 'ar'
-            ? 'الحساب معطل أو غير مصرح له بالدخول.'
-            : 'Account disabled or not authorized.'
+            ? 'الحساب معطل في قاعدة البيانات أو غير مصرح له بالدخول.'
+            : 'Account is disabled in the database or not authorized.'
         );
       } else if (res.error === 'unauthorized_user') {
         setErrorMsg(
           language === 'ar'
-            ? `اسم المستخدم غير مصرح به. تسجيل الدخول مقتصر على حساب ${ALLOWED_ADMIN_USERNAME} فقط.`
-            : `Unauthorized username. Access is restricted to ${ALLOWED_ADMIN_USERNAME} only.`
+            ? 'هذا الحساب لا يملك صلاحيات المشرف (admin) في Supabase.'
+            : 'This account does not have admin role privileges in Supabase.'
         );
       } else {
         const newAttempts = failedAttempts + 1;
@@ -96,16 +85,16 @@ export default function LoginPage() {
         } else {
           setErrorMsg(
             language === 'ar'
-              ? 'اسم المستخدم أو كلمة المرور غير صحيحة.'
-              : 'Invalid username or password.'
+              ? 'البريد أو اسم المستخدم أو كلمة المرور غير صحيحة.'
+              : 'Invalid email, username, or password.'
           );
         }
       }
     } catch (err) {
       setErrorMsg(
         language === 'ar'
-          ? 'اسم المستخدم أو كلمة المرور غير صحيحة.'
-          : 'Invalid username or password.'
+          ? 'البريد أو اسم المستخدم أو كلمة المرور غير صحيحة.'
+          : 'Invalid email, username, or password.'
       );
     } finally {
       setLoading(false);
@@ -159,7 +148,7 @@ export default function LoginPage() {
           <form onSubmit={handleSignIn} autoComplete="off" className="space-y-4">
             <div>
               <label className="mb-1 block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
-                {t.login?.username || (language === 'ar' ? 'اسم المستخدم' : 'Username')}
+                {language === 'ar' ? 'البريد الإلكتروني أو اسم المستخدم' : 'Email or Username'}
               </label>
               <div className="relative">
                 <Input
@@ -168,7 +157,7 @@ export default function LoginPage() {
                   autoComplete="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder={ALLOWED_ADMIN_USERNAME}
+                  placeholder={language === 'ar' ? 'admin_lithioo أو البريد الإلكتروني' : 'admin_lithioo or email'}
                   className="ps-9"
                   disabled={isLocked || loading}
                 />
