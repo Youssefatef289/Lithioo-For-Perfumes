@@ -67,23 +67,19 @@ export function AdminAuthProvider({ children }) {
           return;
         }
 
-        const nextProfile = await getProfile(session.user);
-        if (nextProfile && nextProfile.is_active === false) {
+        const profileData = await getProfile(session.user);
+        if (!profileData || profileData.role !== 'admin' || profileData.is_active === false) {
+          console.warn('Unauthorized or inactive profile session:', userEmail);
           await supabase.auth.signOut();
-          if (mounted) setProfile(null);
+          if (mounted) {
+            setProfile(null);
+            setAuthError(profileData && profileData.is_active === false ? 'account_disabled' : 'unauthorized_user');
+          }
           return;
         }
 
         if (mounted) {
-          setProfile(
-            nextProfile || {
-              id: session.user.id,
-              full_name: 'Admin Lithioo',
-              username: ALLOWED_ADMIN_USERNAME,
-              role: 'admin',
-              is_active: true,
-            }
-          );
+          setProfile(profileData);
         }
       } catch (err) {
         if (mounted) setProfile(null);
@@ -134,22 +130,18 @@ export function AdminAuthProvider({ children }) {
       }
 
       const authenticatedUser = data.user;
-      const nextProfile = (await getProfile(authenticatedUser)) || {
-        id: authenticatedUser.id,
-        full_name: 'Admin Lithioo',
-        username: ALLOWED_ADMIN_USERNAME,
-        role: 'admin',
-        is_active: true,
-      };
+      const profileData = await getProfile(authenticatedUser);
 
-      if (nextProfile.is_active === false) {
+      // Verify profiles.role and profiles.is_active
+      if (!profileData || profileData.role !== 'admin' || profileData.is_active === false) {
         await supabase.auth.signOut();
-        setAuthError('account_disabled');
-        return { ok: false, error: 'account_disabled' };
+        const code = profileData && profileData.is_active === false ? 'account_disabled' : 'unauthorized_user';
+        setAuthError(code);
+        return { ok: false, error: code };
       }
 
-      setProfile(nextProfile);
-      return { ok: true, profile: nextProfile };
+      setProfile(profileData);
+      return { ok: true, profile: profileData };
     } catch (err) {
       console.error('SignIn Error:', err);
       const code = err?.message === 'supabase_not_configured' ? 'supabase_not_configured' : 'invalid_credentials';

@@ -86,25 +86,89 @@ node scripts/seed-products-full.mjs     # all ~286 products
 
 The seed scripts are **idempotent** — safe to re-run.
 
-### 5. Create Your First Admin Account
+### 5. Admin Authentication & Vercel Deployment Setup (English & Arabic)
 
-1. Go to Supabase Dashboard → **Auth** → **Users** → **Add User** → **Create User**.
-2. Enter Email: `admin@lithioo.app`, set a password, and enable **Auto Confirm User**.
-3. Run this SQL in the SQL Editor to assign the username and admin role:
+#### English: Admin Setup & Vercel Deployment
 
+##### A. Create the Admin User in Supabase Auth
+1. Go to your **Supabase Dashboard** → **Authentication** → **Users** → click **Add user** → **Create user**.
+2. **User Email**: Enter your desired admin email (e.g. matching `REACT_APP_ADMIN_EMAIL` or `admin_lithioo@lithiooperfumes.com`).
+3. **Password**: Choose a strong, secure password.
+4. Enable **Auto Confirm User?** (so email verification is confirmed immediately).
+5. Copy the newly generated **User UID**.
+6. Open **SQL Editor** in Supabase and run:
 ```sql
-INSERT INTO public.profiles (id, full_name, username, phone, role, is_active)
-SELECT id, 'Super Admin', 'admin', '01000000000', 'admin', true
-FROM auth.users WHERE email = 'admin@lithioo.app'
+INSERT INTO public.profiles (id, full_name, username, role, is_active)
+VALUES (
+  '<COPIED_USER_UID>',
+  'Admin Lithioo',
+  'admin_lithioo',
+  'admin',
+  true
+)
 ON CONFLICT (id) DO UPDATE SET
-  username = 'admin',
-  phone = '01000000000',
+  username = 'admin_lithioo',
   role = 'admin',
   is_active = true;
 ```
 
-4. Log in at `/admin/login` using username `admin` and your password.
-5. Create team members from `/admin/team`.
+##### B. Environment Variables to Set on Vercel
+In your Vercel Project Dashboard → **Settings** → **Environment Variables**, add the following 4 variables (Production and Preview):
+- `REACT_APP_SUPABASE_URL`: Your Supabase project URL (`https://<project-ref>.supabase.co`).
+- `REACT_APP_SUPABASE_PUBLISHABLE_KEY`: Your Supabase publishable/anon key.
+- `REACT_APP_ADMIN_EMAIL`: The email of the admin account created above (fallback: `admin_lithioo@lithiooperfumes.com`).
+- `ALLOWED_ADMIN_USERNAME`: `admin_lithioo` (the only allowed administrator username).
+
+> ⚠️ **Security Warning**: NEVER add `SUPABASE_SERVICE_ROLE_KEY` or any secret key to Vercel or frontend code.
+
+##### C. How to Redeploy on Vercel
+Create React App bakes `REACT_APP_*` environment variables into static assets at build time. Whenever you add or change an environment variable:
+1. Go to **Deployments** in your Vercel Dashboard.
+2. Click the three dots (`...`) next to your latest deployment.
+3. Select **Redeploy** (ensure **Use existing Build Cache** is unchecked if needed).
+4. Wait for the deployment to finish, then access `/admin` and log in with username `admin_lithioo` and your password.
+
+---
+
+#### بالعربية: إعداد حساب الأدمن ونشره على Vercel
+
+##### أ. إنشاء حساب المشرف في Supabase Auth
+1. افتح لوحة تحكم **Supabase** ← **Authentication** ← **Users** ← اضغط **Add user** ثم **Create user**.
+2. **User Email**: أدخل بريد المشرف (المطابق لمتغير `REACT_APP_ADMIN_EMAIL` أو `admin_lithioo@lithiooperfumes.com`).
+3. **Password**: اختر كلمة مرور قوية.
+4. فعّل خيار **Auto Confirm User?** ليتم تأكيد البريد تلقائياً.
+5. انسخ معرّف المستخدم الجديد (**User UID**).
+6. من القائمة الجانبية، افتح **SQL Editor** وشغّل الاستعلام التالي:
+```sql
+INSERT INTO public.profiles (id, full_name, username, role, is_active)
+VALUES (
+  '<معرف_المستخدم_المنسوخ>',
+  'Admin Lithioo',
+  'admin_lithioo',
+  'admin',
+  true
+)
+ON CONFLICT (id) DO UPDATE SET
+  username = 'admin_lithioo',
+  role = 'admin',
+  is_active = true;
+```
+
+##### ب. متغيرات البيئة المطلوب ضبطها على Vercel
+في لوحة تحكم مشروعك على **Vercel** ← **Settings** ← **Environment Variables**، أضف المتغيرات الأربعة التالية:
+- `REACT_APP_SUPABASE_URL`: رابط مشروع Supabase الخاص بك.
+- `REACT_APP_SUPABASE_PUBLISHABLE_KEY`: المفتاح العام (Publishable / Anon Key).
+- `REACT_APP_ADMIN_EMAIL`: البريد الإلكتروني لحساب الأدمن.
+- `ALLOWED_ADMIN_USERNAME`: اسم المستخدم الوحيد المسموح `admin_lithioo`.
+
+> ⚠️ **تنبيه أمني**: لا تضع أبداً مفتاح `SUPABASE_SERVICE_ROLE_KEY` أو أي مفتاح سري على Vercel أو في كود الواجهة.
+
+##### ج. كيفية إعادة البناء والنشر (Redeploy) على Vercel
+لأن تطبيق React يقوم بحقن متغيرات `REACT_APP_*` أثناء مرحلة البناء (Build Time)، يجب إعادة النشر بعد تعديل المتغيرات:
+1. من لوحة تحكم Vercel، اذهب إلى تبويب **Deployments**.
+2. اضغط على أيقونة الثلاث نقاط (`...`) بجانب آخر نشر.
+3. اختر **Redeploy**.
+4. بعد اكتمال النشر، ادخل على الرابط `/admin` وسجّل دخولك باسم المستخدم `admin_lithioo` وكلمة المرور.
 
 ---
 

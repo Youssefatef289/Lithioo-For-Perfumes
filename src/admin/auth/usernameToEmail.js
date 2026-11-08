@@ -5,14 +5,16 @@
  * Dedicated to admin authentication for Lithioo Perfumes.
  */
 
-export const ALLOWED_ADMIN_USERNAME = 'admin_lithioo';
+export const ALLOWED_ADMIN_USERNAME =
+  (process.env.ALLOWED_ADMIN_USERNAME && String(process.env.ALLOWED_ADMIN_USERNAME).trim()) ||
+  'admin_lithioo';
 
 // Fallback to owned brand domain if environment variable is not provided
 const DEFAULT_AUTH_DOMAIN = process.env.REACT_APP_AUTH_EMAIL_DOMAIN || 'lithiooperfumes.com';
 
 /**
  * Returns the configured admin email from the environment variable REACT_APP_ADMIN_EMAIL,
- * or safely derives it using the allowed username and domain.
+ * with fallback to admin_lithioo@lithiooperfumes.com.
  * @returns {string}
  */
 export function getAdminEmail() {
