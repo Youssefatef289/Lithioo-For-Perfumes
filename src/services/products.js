@@ -197,18 +197,31 @@ export async function searchProducts(query) {
 
 /**
  * Subscribe to realtime product changes across admin and storefront.
+ * Uses a unique channel name per subscriber to prevent channel collision.
  * Listens to products, sections, and section_products tables.
  */
 export function subscribeToProducts(callback) {
   if (!isSupabaseConfigured || !supabase) return () => {};
 
-  const channel = supabase
-    .channel('products-realtime-sync')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, callback)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'sections' }, callback)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'section_products' }, callback)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, callback)
-    .subscribe();
+  try {
+    const channelName = `products-sync-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const channel = supabase
+      .channel(channelName)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, callback)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sections' }, callback)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'section_products' }, callback)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, callback)
+      .subscribe();
 
-  return () => supabase.removeChannel(channel);
+    return () => {
+      try {
+        supabase.removeChannel(channel);
+      } catch (err) {
+        // Safe unsubscribe
+      }
+    };
+  } catch (err) {
+    console.warn('subscribeToProducts error:', err);
+    return () => {};
+  }
 }

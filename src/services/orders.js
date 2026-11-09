@@ -186,17 +186,30 @@ export async function markOrderAsReceived(orderId, orderData = null, note = 'ØªÙ
 
 /**
  * Subscribe to realtime new orders (admin only).
+ * Uses a unique channel name per subscriber to prevent "cannot add callbacks after subscribe()" errors.
  * Returns an unsubscribe function.
  */
 export function subscribeToOrders(callback) {
   if (!isSupabaseConfigured || !supabase) return () => {};
 
-  const channel = supabase
-    .channel('orders-realtime')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, callback)
-    .subscribe();
+  try {
+    const channelName = `orders-realtime-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const channel = supabase
+      .channel(channelName)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, callback)
+      .subscribe();
 
-  return () => supabase.removeChannel(channel);
+    return () => {
+      try {
+        supabase.removeChannel(channel);
+      } catch (err) {
+        // Safe unsubscribe
+      }
+    };
+  } catch (err) {
+    console.warn('subscribeToOrders error:', err);
+    return () => {};
+  }
 }
 
 

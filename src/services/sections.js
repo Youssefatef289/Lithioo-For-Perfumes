@@ -172,12 +172,24 @@ export async function setSectionProducts(sectionId, productIds = []) {
 /** Subscribe to realtime section changes */
 export function subscribeToSections(callback) {
   if (!isSupabaseConfigured || !supabase) return () => {};
-  const channel = supabase
-    .channel('sections-realtime')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'sections' }, callback)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'section_products' }, callback)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, callback)
-    .subscribe();
+  try {
+    const channelName = `sections-sync-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const channel = supabase
+      .channel(channelName)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sections' }, callback)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'section_products' }, callback)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, callback)
+      .subscribe();
 
-  return () => supabase.removeChannel(channel);
+    return () => {
+      try {
+        supabase.removeChannel(channel);
+      } catch (err) {
+        // Safe unsubscribe
+      }
+    };
+  } catch (err) {
+    console.warn('subscribeToSections error:', err);
+    return () => {};
+  }
 }

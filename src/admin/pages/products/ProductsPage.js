@@ -144,14 +144,50 @@ export default function ProductsPage() {
         };
       });
 
-      setProducts(flatProds);
+      if (flatProds.length > 0) {
+        setProducts(flatProds);
+      } else {
+        setProducts(
+          allProducts.map((p) => ({
+            id: p.id,
+            slug: p.id,
+            name_en: p.name || p.nameEn,
+            name_ar: p.nameAr,
+            brand_name: p.brand,
+            section_slug: p.section,
+            sections: [p.section],
+            all_sections: [p.section],
+            base_price: p.price,
+            sale_price: null,
+            in_stock: p.inStock !== false,
+            is_active: true,
+            image_url: p.image,
+          }))
+        );
+      }
     } catch (err) {
       console.error('ProductsPage loadData error:', err);
-      toast({ message: t.common.error, type: 'error' });
+      setProducts(
+        allProducts.map((p) => ({
+          id: p.id,
+          slug: p.id,
+          name_en: p.name || p.nameEn,
+          name_ar: p.nameAr,
+          brand_name: p.brand,
+          section_slug: p.section,
+          sections: [p.section],
+          all_sections: [p.section],
+          base_price: p.price,
+          sale_price: null,
+          in_stock: p.inStock !== false,
+          is_active: true,
+          image_url: p.image,
+        }))
+      );
     } finally {
       setLoading(false);
     }
-  }, [t.common.error, toast]);
+  }, []);
 
   useEffect(() => {
     loadData();
