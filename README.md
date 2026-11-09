@@ -259,6 +259,74 @@ scripts/
 
 ---
 
+## Live Sync & Realtime Testing (English & Arabic)
+
+### English: Running Migrations & Testing Realtime Sync
+
+#### 1. How to Apply the New Migration
+1. Go to your **Supabase Dashboard** → **SQL Editor** → click **New query**.
+2. Copy the entire contents of [`supabase/migrations/008_admin_live_sync_and_sections.sql`](supabase/migrations/008_admin_live_sync_and_sections.sql).
+3. Paste into the SQL editor and click **Run**.
+4. This migration automatically:
+   - Extends `sections` and creates `section_products` join table for multi-section products.
+   - Creates the `offers` table for promotional campaign sections.
+   - Adds `sale_price`, `stock_status`, and `offer_link` to `products`.
+   - Provisions the `products` storage bucket with public read and admin write RLS policies.
+   - Adds `products`, `sections`, `section_products`, `offers`, `orders`, and `order_status_history` to the `supabase_realtime` publication.
+
+#### 2. Testing Realtime Live Sync Across Two Browsers
+1. **Storefront & Admin Live Sync**:
+   - Open the **Admin Dashboard** (`/admin/products`) in Browser A (e.g. Chrome).
+   - Open the **Storefront** (`/products`) in Browser B (e.g. Edge or Incognito window).
+   - In Browser A, click **+ New** → **Add product**, choose section **Women**, add an image, price, and sale price, then save.
+   - Switch to Browser B: the new product appears instantly in the Women section without refreshing or redeploying!
+2. **Multi-Dashboard Admin Sync**:
+   - Keep Browser A open on `/admin/products`.
+   - Open a second admin session in Browser B (Incognito) on `/admin/products`.
+   - Add or edit any product in Browser B: Browser A updates its list and counts immediately via Supabase Realtime.
+3. **Offer Section Creation**:
+   - In `/admin/products`, click **+ New** → **Add offer section**.
+   - Upload a banner image to the `products` bucket, enter a title, discount, and select included products.
+   - The offer section appears immediately on the storefront with its promotional banner!
+4. **Live Order Flow & "Mark as Received" (استقبال)**:
+   - Keep `/admin/orders` open.
+   - From the storefront, add a perfume to cart and complete checkout.
+   - The admin dashboard chimes and displays an instant notification: *"🔔 New order received!"* and the order appears in the table.
+   - Click **استقبال / Receive** on the order: the order status updates to completed/received, logs into `order_status_history`, and dispatches notification alerts to the admin team.
+
+---
+
+### بالعربية: تطبيق تحديثات قاعدة البيانات واختبار المزامنة اللحظية (Realtime)
+
+#### 1. كيفية تشغيل ملف المايجريشن الجديد
+1. ادخل إلى لوحة تحكم **Supabase** ← اختر **SQL Editor** ← اضغط **New query**.
+2. افتح الملف [`supabase/migrations/008_admin_live_sync_and_sections.sql`](supabase/migrations/008_admin_live_sync_and_sections.sql) وانسخ محتواه بالكامل.
+3. الصقه في محرر SQL ثم اضغط **Run**.
+4. سيقوم المايجريشن تلقائياً بما يلي:
+   - تحديث جدول الأقسام `sections` وإنشاء جدول الربط `section_products` لربط المنتج بعدة أقسام (نسائي، رجالي، أصلي، إلخ).
+   - إنشاء جدول العروض `offers` لأقسام العروض الترويجية.
+   - إضافة أعمدة `sale_price` (سعر الخصم)، `stock_status` (حالة المخزون)، و `offer_link` إلى المنتجات.
+   - إنشاء صندوق التخزين `products` في Supabase Storage مع سياسات أمان RLS (قراءة عامة، وتعديل للمشرفين فقط).
+   - تفعيل النشر اللحظي `supabase_realtime` على جداول المنتجات، الأقسام، العروض، الطلبات، وسجل الحالات.
+
+#### 2. خطوات اختبار المزامنة اللحظية بين متصفحين (Two Browsers)
+1. **المزامنة بين لوحة التحكم والمتجر**:
+   - افتح لوحة التحكم (`/admin/products`) في المتصفح الأول (مثل Google Chrome).
+   - افتح واجهة المتجر (`/products`) في متصفح ثانٍ أو نافذة خاصة (Incognito).
+   - من لوحة التحكم، اضغط **+ جديد** ← **إضافة منتج**، اختر قسم **نسائي**، وأضف صورة وسعر تخفيض، ثم احفظ.
+   - انظر للمتصفح الثاني: سيظهر المنتج فوراً في قسم نسائي دون الحاجة لإعادة تحميل الصفحة إطلاقاً!
+2. **المزامنة بين أدمن في متصفحين مختلفين**:
+   - افتح لوحة التحكم في نافذتين مختلفتين، أضف أو عدّل أي منتج في إحداهما: ستتحدث النافذة الأخرى والعدادات تلقائياً.
+3. **إنشاء قسم عروض ترويجية**:
+   - اضغط **+ جديد** ← **إضافة قسم عروض**، ارفع صورة بانر وحدد نسبة الخصم والمنتجات المشمولة واحفظ: سيظهر قسم العرض الترويجي فوراً في المتجر.
+4. **دورة الطلب اللحظي وزر "استقبال الطلب"**:
+   - اترك صفحة الطلبات `/admin/orders` مفتوحة.
+   - قم بإتمام أوردر تجريبي من المتجر.
+   - ستسمع لوحة التحكم صوتاً وتنبيهاً فورياً: *"🔔 طلب جديد ورد الآن إلى لوحة التحكم!"* وسيظهر الأوردر في الجدول تلقائياً.
+   - اضغط زر **استقبال** بجانب الطلب: سيتم تحديث حالته إلى مستلم، وتسجيل ذلك في سجل `order_status_history`، وإرسال إشعار فوري لفريق الإدارة.
+
+---
+
 ## Security Notes
 
 - The `service_role` key is **never** in the frontend or committed to the repo.

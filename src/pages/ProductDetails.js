@@ -13,6 +13,7 @@ import { useLocalizedProduct } from '../hooks/useLocalizedProduct';
 import { useWishlist } from '../contexts/WishlistContext';
 import { isOriginalProduct } from '../data/productFactory';
 import { getProductById } from '../data/products';
+import { fetchProduct } from '../services/products';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -22,26 +23,43 @@ const ProductDetails = () => {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { modal, productPage } = t;
   const [quantity, setQuantity] = useState(1);
-    const [isToggling, setIsToggling] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(DEFAULT_SIZE_ID);
 
-  const product = getProductById(id);
+  const [product, setProduct] = useState(() => getProductById(id));
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    let isMounted = true;
+    async function load() {
+      const local = getProductById(id);
+      if (local) setProduct(local);
+      try {
+        const live = await fetchProduct(id);
+        if (isMounted && live) {
+          setProduct(live);
+        } else if (!local && isMounted) {
+          navigate('/products');
+        }
+      } catch {
+        if (!local && isMounted) navigate('/products');
+      }
+    }
+    load();
+    return () => {
+      isMounted = false;
+    };
+  }, [id, navigate]);
+
   const lp = useLocalizedProduct(product);
-  const hideSizes = isOriginalProduct(product);
+  const hideSizes = product?.hideSizes ?? isOriginalProduct(product);
   const sizeMeta = getSizeById(selectedSize, language);
   const price = hideSizes
     ? product?.price
     : product
     ? getProductSizePrice(product, selectedSize)
     : sizeMeta.price;
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    if (!product) {
-      navigate('/products');
-    }
-  }, [id, product, navigate]);
 
   if (!product || !lp) {
     return null;
@@ -146,7 +164,7 @@ const ProductDetails = () => {
               )}
               <PriceDisplay
                 price={price}
-                                language={language}
+                language={language}
                 size="lg"
                 className="ms-auto items-end text-end"
               />

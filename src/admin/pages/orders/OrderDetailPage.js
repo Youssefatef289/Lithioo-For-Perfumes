@@ -6,10 +6,11 @@ import {
   FiPhone,
   FiMessageSquare,
   FiPrinter,
+  FiCheckCircle,
 } from 'react-icons/fi';
 import { useAdminLang } from '../../contexts/AdminLangContext';
 import { useToast } from '../../components/ui/Toast';
-import { fetchOrder, updateOrderStatus } from '../../../services/orders';
+import { fetchOrder, updateOrderStatus, markOrderAsReceived } from '../../../services/orders';
 import { Card, Button, StatusPill, Select, Textarea, Skeleton } from '../../components/ui';
 
 export default function OrderDetailPage() {
@@ -51,6 +52,30 @@ export default function OrderDetailPage() {
       await updateOrderStatus(order.id, newStatus, statusNote || null);
       toast({ message: language === 'ar' ? 'تم تحديث الحالة بنجاح' : 'Status updated', type: 'success' });
       setStatusNote('');
+      await loadOrder();
+    } catch (err) {
+      toast({ message: err.message || t.common.error, type: 'error' });
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleReceiveAction = async () => {
+    if (!order) return;
+    setUpdating(true);
+    try {
+      await markOrderAsReceived(
+        order.id,
+        order,
+        language === 'ar' ? 'تم استقبال وتأكيد استلام الطلب من لوحة التحكم' : 'Order marked as received via admin dashboard'
+      );
+      toast({
+        message:
+          language === 'ar'
+            ? '✅ تم استقبال الطلب بنجاح وإرسال إشعار لفريق الإدارة'
+            : 'Order received & admin notification sent',
+        type: 'success',
+      });
       await loadOrder();
     } catch (err) {
       toast({ message: err.message || t.common.error, type: 'error' });
@@ -120,12 +145,30 @@ export default function OrderDetailPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {order.status !== 'delivered' ? (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleReceiveAction}
+              loading={updating}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              <FiCheckCircle size={15} />
+              {t.orders.markReceived || (language === 'ar' ? 'استقبال الطلب' : 'Mark as received')}
+            </Button>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+              <FiCheckCircle size={14} />
+              {language === 'ar' ? 'تم استقبال الطلب' : 'Order Received'}
+            </span>
+          )}
+
           <Button variant="outline" size="sm" onClick={() => window.print()}>
             <FiPrinter size={14} />
             {language === 'ar' ? 'طباعة الفاتورة' : 'Print Invoice'}
           </Button>
-          <Button variant="primary" size="sm" onClick={openWhatsApp}>
+          <Button variant="outline" size="sm" onClick={openWhatsApp}>
             <FiMessageSquare size={14} />
             {t.orders.openWhatsApp}
           </Button>

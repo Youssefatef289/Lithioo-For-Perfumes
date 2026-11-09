@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { allProducts, PRODUCT_SECTIONS } from '../data/products';
+import { fetchAllProducts, subscribeToProducts } from '../services/products';
+import { fetchOffers } from '../services/sections';
 import { FEATURED_BRANDS } from '../data/brands';
 import ProductCard from './ProductCard';
 import ProductSectionTabs from './ProductSectionTabs';
@@ -13,13 +15,44 @@ const VALID_SECTIONS = ['all', 'men', 'women', 'special', 'new-diverse', 'origin
 const resolveSection = (value) => (VALID_SECTIONS.includes(value) ? value : 'all');
 
 const ProductCatalog = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const sectionFromUrl = resolveSection(searchParams.get('section'));
   const brandFromUrl = searchParams.get('brand');
   const [activeSection, setActiveSection] = useState(sectionFromUrl);
   const [currentPage, setCurrentPage] = useState(1);
+  const [productsList, setProductsList] = useState(allProducts);
+  const [activeOffers, setActiveOffers] = useState([]);
+
+  // Live Supabase Sync & Realtime Subscription
+  useEffect(() => {
+    let isMounted = true;
+    async function syncData() {
+      try {
+        const [prods, offers] = await Promise.all([
+          fetchAllProducts(),
+          fetchOffers(),
+        ]);
+        if (isMounted) {
+          if (prods && prods.length > 0) setProductsList(prods);
+          if (offers) setActiveOffers(offers.filter((o) => o.is_active));
+        }
+      } catch (err) {
+        console.warn('Realtime sync fallback:', err);
+      }
+    }
+
+    syncData();
+    const unsub = subscribeToProducts(() => {
+      syncData();
+    });
+
+    return () => {
+      isMounted = false;
+      unsub();
+    };
+  }, []);
 
   // If URL has ?brand=, navigate immediately to /brand/:brandId
   useEffect(() => {
@@ -29,7 +62,7 @@ const ProductCatalog = () => {
   }, [brandFromUrl, navigate]);
 
   const catalogProducts = useMemo(() => {
-    const raw = allProducts;
+    const raw = productsList;
 
     const cleanKey = (product) => {
       const section = product.section || '';
@@ -70,11 +103,19 @@ const ProductCatalog = () => {
     });
 
     return Array.from(merged.values());
-  }, []);
+  }, [productsList]);
 
   const sectionMatches = (product, sectionId) => {
     if (sectionId === 'all') return true;
-    if (sectionId === 'original') return product.section === 'original' || product.section === 'new-luxury';
+    if (Array.isArray(product.sections) && product.sections.includes(sectionId)) return true;
+    if (sectionId === 'original') {
+      return (
+        product.section === 'original' ||
+        product.section === 'new-luxury' ||
+        (Array.isArray(product.sections) &&
+          (product.sections.includes('original') || product.sections.includes('new-luxury')))
+      );
+    }
     return product.section === sectionId;
   };
 
@@ -150,6 +191,40 @@ const ProductCatalog = () => {
             }}
           />
         </section>
+
+        {/* Active Promotional Offer Sections */}
+        {activeOffers.length > 0 && (
+          <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {activeOffers.map((offer) => {
+              const title = language === 'ar' ? offer.title_ar || offer.title_en : offer.title_en || offer.title_ar;
+              const desc = language === 'ar' ? offer.description_ar : offer.description_en;
+              return (
+                <div
+                  key={offer.id}
+                  className="relative flex items-center overflow-hidden rounded-2xl border border-brand/30 bg-gradient-to-r from-brand/10 via-brand/5 to-transparent p-4 sm:p-5"
+                >
+                  {offer.image_url && (
+                    <img
+                      src={offer.image_url}
+                      alt=""
+                      className="h-20 w-20 rounded-xl object-cover shrink-0 me-4 border border-brand/20"
+                    />
+                  )}
+                  <div className="flex flex-col justify-center">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-brand">
+                      {language === 'ar' ? 'عرض خاص مميز' : 'Exclusive Offer'}
+                      {offer.discount_percentage ? ` • ${offer.discount_percentage}%` : ''}
+                    </span>
+                    <h3 className="text-base sm:text-lg font-bold text-neutral-900 dark:text-white mt-0.5">
+                      {title}
+                    </h3>
+                    {desc && <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-1 line-clamp-2">{desc}</p>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Section Tabs */}
         <ProductSectionTabs

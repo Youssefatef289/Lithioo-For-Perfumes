@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../contexts/LanguageContext';
 import { allProducts, PRODUCT_SECTIONS } from '../data/products';
+import { fetchAllProducts, subscribeToProducts } from '../services/products';
 import ProductCard from './ProductCard';
 import ProductSectionTabs from './ProductSectionTabs';
 
@@ -10,19 +11,47 @@ const HOME_PRODUCTS_LIMIT = 4;
 const OurStore = () => {
   const { t } = useLanguage();
   const [activeSection, setActiveSection] = useState('men');
+  const [productsList, setProductsList] = useState(allProducts);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function sync() {
+      try {
+        const prods = await fetchAllProducts();
+        if (isMounted && prods && prods.length > 0) {
+          setProductsList(prods);
+        }
+      } catch (err) {
+        console.warn('OurStore sync notice:', err);
+      }
+    }
+    sync();
+    const unsub = subscribeToProducts(() => sync());
+    return () => {
+      isMounted = false;
+      unsub();
+    };
+  }, []);
 
   const counts = useMemo(
     () =>
       PRODUCT_SECTIONS.reduce((acc, section) => {
-        acc[section.id] = allProducts.filter((p) => p.section === section.id).length;
+        acc[section.id] = productsList.filter((p) => {
+          if (Array.isArray(p.sections) && p.sections.includes(section.id)) return true;
+          return p.section === section.id;
+        }).length;
         return acc;
       }, {}),
-    []
+    [productsList]
   );
 
   const sectionProducts = useMemo(
-    () => allProducts.filter((p) => p.section === activeSection),
-    [activeSection]
+    () =>
+      productsList.filter((p) => {
+        if (Array.isArray(p.sections) && p.sections.includes(activeSection)) return true;
+        return p.section === activeSection;
+      }),
+    [productsList, activeSection]
   );
 
   const displayedProducts = sectionProducts.slice(0, HOME_PRODUCTS_LIMIT);

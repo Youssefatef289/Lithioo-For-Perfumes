@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { FiArrowLeft, FiArrowRight, FiSave } from 'react-icons/fi';
+import { FiArrowLeft, FiArrowRight, FiSave, FiCheck } from 'react-icons/fi';
 import { useAdminLang } from '../../contexts/AdminLangContext';
 import { useToast } from '../../components/ui/Toast';
 import { supabase, isSupabaseConfigured } from '../../../lib/supabaseClient';
+import { fetchSections } from '../../../services/sections';
 import {
   Button,
   Input,
@@ -32,6 +33,9 @@ export default function ProductFormPage() {
   const [sections, setSections] = useState([]);
   const [categories, setCategories] = useState([]);
 
+  // Multi-section selection
+  const [selectedSectionIds, setSelectedSectionIds] = useState([]);
+
   // Form State
   const [formData, setFormData] = useState({
     slug: '',
@@ -41,8 +45,10 @@ export default function ProductFormPage() {
     section_id: '',
     category_id: '',
     base_price: '',
+    sale_price: '',
     discount_percent: 0,
     discount_label: '',
+    offer_link: '',
     hide_sizes: true,
     description_en: '',
     description_ar: '',
@@ -53,6 +59,7 @@ export default function ProductFormPage() {
     image_url: '',
     image_hover_url: '',
     detail_images: '',
+    stock_status: 'in_stock', // 'in_stock' | 'low_stock' | 'out_of_stock'
     in_stock: true,
     is_featured: false,
     is_new: false,
@@ -75,14 +82,15 @@ export default function ProductFormPage() {
         return;
       }
       try {
-        const [{ data: b }, { data: s }, { data: c }] = await Promise.all([
+        const [brandRes, sectionRes, catRes] = await Promise.all([
           supabase.from('brands').select('id, slug, name_en').order('name_en'),
-          supabase.from('sections').select('id, slug, name_en').order('sort_order'),
+          fetchSections(),
           supabase.from('categories').select('id, slug, name_en'),
         ]);
-        if (b) setBrands(b);
-        if (s) setSections(s);
-        if (c) setCategories(c);
+
+        if (brandRes.data) setBrands(brandRes.data);
+        if (sectionRes) setSections(sectionRes);
+        if (catRes.data) setCategories(catRes.data);
 
         if (isEditing) {
           // Fetch existing product
@@ -101,8 +109,10 @@ export default function ProductFormPage() {
               section_id: prod.section_id || '',
               category_id: prod.category_id || '',
               base_price: prod.base_price ?? '',
+              sale_price: prod.sale_price ?? '',
               discount_percent: prod.discount_percent ?? 0,
               discount_label: prod.discount_label || '',
+              offer_link: prod.offer_link || '',
               hide_sizes: prod.hide_sizes !== false,
               description_en: prod.description_en || '',
               description_ar: prod.description_ar || '',
@@ -113,12 +123,25 @@ export default function ProductFormPage() {
               image_url: prod.image_url || '',
               image_hover_url: prod.image_hover_url || '',
               detail_images: (prod.detail_images || []).join('\n'),
+              stock_status: prod.stock_status || (prod.in_stock ? 'in_stock' : 'out_of_stock'),
               in_stock: prod.in_stock !== false,
               is_featured: Boolean(prod.is_featured),
               is_new: Boolean(prod.is_new),
               is_active: prod.is_active !== false,
               sort_order: prod.sort_order || 0,
             });
+
+            // Fetch joined sections from section_products
+            const { data: sps } = await supabase
+              .from('section_products')
+              .select('section_id')
+              .eq('product_id', prod.id);
+
+            const initialSecs = (sps || []).map((sp) => sp.section_id);
+            if (prod.section_id && !initialSecs.includes(prod.section_id)) {
+              initialSecs.push(prod.section_id);
+            }
+            setSelectedSectionIds(initialSecs);
 
             if (prod.product_sizes && prod.product_sizes.length > 0) {
               setSizeRows(
@@ -134,7 +157,7 @@ export default function ProductFormPage() {
           }
         }
       } catch (err) {
-        console.error(err);
+        console.error('ProductFormPage init error:', err);
       } finally {
         setLoading(false);
       }
@@ -145,7 +168,6 @@ export default function ProductFormPage() {
   const handleChange = (field, val) => {
     setFormData((prev) => {
       const next = { ...prev, [field]: val };
-      // Auto-generate slug from English name if not editing
       if (field === 'name_en' && !isEditing && !prev.slugModified) {
         next.slug = val
           .toLowerCase()
@@ -156,10 +178,42 @@ export default function ProductFormPage() {
     });
   };
 
+  const toggleSection = (sectionId) => {
+    setSelectedSectionIds((prev) => {
+      if (prev.includes(sectionId)) {
+        return prev.filter((s) => s !== sectionId);
+      }
+      return [...prev, sectionId];
+    });
+  };
+
+  // Upload image to Supabase Storage bucket 'products'
+  const uploadToStorage = async (file) => {
+    if (!file || !isSupabaseConfigured) return null;
+    const ext = file.name.split('.').pop();
+    const cleanFileName = `product-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
+
+    // Try 'products' bucket first, fallback to 'product-images'
+    let uploadRes = await supabase.storage.from('products').upload(cleanFileName, file);
+    let bucketName = 'products';
+
+    if (uploadRes.error) {
+      uploadRes = await supabase.storage.from('product-images').upload(cleanFileName, file);
+      bucketName = 'product-images';
+    }
+
+    if (uploadRes.error) {
+      throw uploadRes.error;
+    }
+
+    const { data } = supabase.storage.from(bucketName).getPublicUrl(cleanFileName);
+    return data?.publicUrl;
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     if (!formData.name_en) {
-      toast({ message: 'Name (EN) is required', type: 'warning' });
+      toast({ message: language === 'ar' ? 'اسم المنتج بالإنجليزي مطلوب' : 'Name (EN) is required', type: 'warning' });
       return;
     }
     setSaving(true);
@@ -174,16 +228,21 @@ export default function ProductFormPage() {
         return;
       }
 
+      const primarySectionId = selectedSectionIds[0] || formData.section_id || null;
+      const inStockValue = formData.stock_status !== 'out_of_stock';
+
       const payload = {
         slug: formData.slug || formData.name_en.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
         name_en: formData.name_en,
         name_ar: formData.name_ar || null,
         brand_id: formData.brand_id || null,
-        section_id: formData.section_id || null,
+        section_id: primarySectionId,
         category_id: formData.category_id || null,
         base_price: formData.base_price !== '' ? Number(formData.base_price) : null,
+        sale_price: formData.sale_price !== '' ? Number(formData.sale_price) : null,
         discount_percent: Math.max(0, Math.min(100, Number(formData.discount_percent) || 0)),
         discount_label: formData.discount_label?.trim() || null,
+        offer_link: formData.offer_link?.trim() || null,
         hide_sizes: formData.hide_sizes,
         description_en: formData.description_en || null,
         description_ar: formData.description_ar || null,
@@ -204,11 +263,13 @@ export default function ProductFormPage() {
         detail_images: formData.detail_images
           ? formData.detail_images.split('\n').map((s) => s.trim()).filter(Boolean)
           : [],
-        in_stock: formData.in_stock,
+        stock_status: formData.stock_status,
+        in_stock: inStockValue,
         is_featured: formData.is_featured,
         is_new: formData.is_new,
         is_active: formData.is_active,
         sort_order: Number(formData.sort_order) || 0,
+        updated_at: new Date().toISOString(),
       };
 
       let productId = id;
@@ -225,6 +286,19 @@ export default function ProductFormPage() {
         productId = inserted.id;
       }
 
+      // Sync section_products join table
+      if (productId) {
+        await supabase.from('section_products').delete().eq('product_id', productId);
+        if (selectedSectionIds.length > 0) {
+          const spRows = selectedSectionIds.map((secId, i) => ({
+            section_id: secId,
+            product_id: productId,
+            position: i,
+          }));
+          await supabase.from('section_products').insert(spRows);
+        }
+      }
+
       // Upsert sizes if hide_sizes is false
       if (!formData.hide_sizes && productId) {
         await supabase.from('product_sizes').delete().eq('product_id', productId);
@@ -239,10 +313,10 @@ export default function ProductFormPage() {
         await supabase.from('product_sizes').insert(sizesToInsert);
       }
 
-      toast({ message: t.products.saved, type: 'success' });
+      toast({ message: t.products.save + ' ' + (language === 'ar' ? 'بنجاح' : 'successfully'), type: 'success' });
       navigate('/admin/products');
     } catch (err) {
-      console.error(err);
+      console.error('Failed to save product:', err);
       toast({ message: err.message || t.common.error, type: 'error' });
     } finally {
       setSaving(false);
@@ -250,11 +324,11 @@ export default function ProductFormPage() {
   };
 
   const tabs = [
-    { key: 'general', label: t.products.tabGeneral },
-    { key: 'pricing', label: t.products.tabPricing },
-    { key: 'content', label: t.products.tabContent },
-    { key: 'media', label: t.products.tabMedia },
-    { key: 'visibility', label: t.products.tabVisibility },
+    { key: 'general', label: t.products.tabGeneral || (language === 'ar' ? 'عام' : 'General') },
+    { key: 'pricing', label: t.products.tabPricing || (language === 'ar' ? 'الأسعار والعروض' : 'Pricing & Offers') },
+    { key: 'content', label: t.products.tabContent || (language === 'ar' ? 'المحتوى والوصف' : 'Content & Description') },
+    { key: 'media', label: t.products.tabMedia || (language === 'ar' ? 'الصور والميديا' : 'Media') },
+    { key: 'visibility', label: t.products.tabVisibility || (language === 'ar' ? 'المخزون والحالة' : 'Inventory & Status') },
   ];
 
   if (loading) {
@@ -297,66 +371,94 @@ export default function ProductFormPage() {
       {/* Tab Panels */}
       <Card>
         {activeTab === 'general' && (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Input
-              label={t.products.nameEn}
-              required
-              value={formData.name_en}
-              onChange={(e) => handleChange('name_en', e.target.value)}
-            />
-            <Input
-              label={t.products.nameAr}
-              value={formData.name_ar}
-              onChange={(e) => handleChange('name_ar', e.target.value)}
-              dir="rtl"
-            />
-            <Input
-              label={t.products.slug}
-              required
-              value={formData.slug}
-              onChange={(e) => {
-                setFormData((p) => ({ ...p, slug: e.target.value, slugModified: true }));
-              }}
-              hint="Unique identifier used in URLs"
-            />
-            <Select
-              label={t.products.brand}
-              value={formData.brand_id}
-              onChange={(e) => handleChange('brand_id', e.target.value)}
-            >
-              <option value="">{language === 'ar' ? 'اختر البراند' : 'Select Brand'}</option>
-              {brands.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.name_en}
-                </option>
-              ))}
-            </Select>
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Input
+                label={t.products.nameEn}
+                required
+                value={formData.name_en}
+                onChange={(e) => handleChange('name_en', e.target.value)}
+              />
+              <Input
+                label={t.products.nameAr}
+                value={formData.name_ar}
+                onChange={(e) => handleChange('name_ar', e.target.value)}
+                dir="rtl"
+              />
+              <Input
+                label={t.products.slug}
+                required
+                value={formData.slug}
+                onChange={(e) => {
+                  setFormData((p) => ({ ...p, slug: e.target.value, slugModified: true }));
+                }}
+                hint="Unique identifier used in URLs"
+              />
+              <Select
+                label={t.products.brand}
+                value={formData.brand_id}
+                onChange={(e) => handleChange('brand_id', e.target.value)}
+              >
+                <option value="">{language === 'ar' ? 'اختر البراند' : 'Select Brand'}</option>
+                {brands.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name_en}
+                  </option>
+                ))}
+              </Select>
 
-            <Select
-              label={t.products.section}
-              value={formData.section_id}
-              onChange={(e) => handleChange('section_id', e.target.value)}
-            >
-              <option value="">{language === 'ar' ? 'اختر القسم' : 'Select Section'}</option>
-              {sections.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name_en}
-                </option>
-              ))}
-            </Select>
+              <Select
+                label={language === 'ar' ? 'التصنيف' : 'Category'}
+                value={formData.category_id}
+                onChange={(e) => handleChange('category_id', e.target.value)}
+              >
+                <option value="">{language === 'ar' ? 'اختر التصنيف' : 'Select Category'}</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name_en}
+                  </option>
+                ))}
+              </Select>
+            </div>
 
-            <Select
-              label={language === 'ar' ? 'التصنيف' : 'Category'}
-              value={formData.category_id}
-              onChange={(e) => handleChange('category_id', e.target.value)}
-            >
-              <option value="">{language === 'ar' ? 'اختر التصنيف' : 'Select Category'}</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name_en}
-                </option>
-              ))}
-            </Select>
+            {/* Multi-Section Selector */}
+            <div className="rounded-xl border border-neutral-200 bg-neutral-50/60 p-4 dark:border-neutral-800 dark:bg-neutral-900/60 space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-bold text-neutral-900 dark:text-white">
+                  {t.products.sections || (language === 'ar' ? 'أقسام العرض بالمتجر' : 'Store Sections')}
+                </label>
+                <span className="text-xs text-neutral-500">
+                  {selectedSectionIds.length} {language === 'ar' ? 'أقسام مختارة' : 'selected'}
+                </span>
+              </div>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                {t.products.sectionsHint ||
+                  (language === 'ar'
+                    ? 'يمكن للمنتج أن يظهر في قسم واحد أو أكثر (نسائي، رجالي، أصلي، إلخ)'
+                    : 'A product can belong to one or more sections (Women, Men, Original, etc.)')}
+              </p>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {sections.map((s) => {
+                  const isSelected = selectedSectionIds.includes(s.id);
+                  const label = language === 'ar' && s.name_ar ? s.name_ar : s.name_en;
+                  return (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() => toggleSection(s.id)}
+                      className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition border ${
+                        isSelected
+                          ? 'border-brand bg-brand text-white shadow-sm'
+                          : 'border-neutral-200 bg-white text-neutral-700 hover:border-brand/60 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300'
+                      }`}
+                    >
+                      {isSelected ? <FiCheck size={14} /> : <span className="h-3.5 w-3.5 rounded-full border border-neutral-400" />}
+                      <span>{label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         )}
 
@@ -370,19 +472,28 @@ export default function ProductFormPage() {
               />
               <p className="mt-1 text-xs text-neutral-400">
                 {language === 'ar'
-                  ? 'عند التفعيل، يباع المنتج بسعر ثابت واحد (بدون اختيار حجم 30/50/100 مل).'
+                  ? 'عند التفعيل، يباع المنتج بسعر أساسي موحد بدون الحاجة لاختيار حجم.'
                   : 'When active, the product is sold at a single fixed price without size choices.'}
               </p>
             </div>
 
             {formData.hide_sizes ? (
-              <div className="max-w-xs">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 max-w-xl">
                 <Input
-                  label={t.products.basePrice}
+                  label={t.products.price || (language === 'ar' ? 'السعر الأساسي (ج.م)' : 'Base Price (EGP)')}
                   type="number"
                   value={formData.base_price}
                   onChange={(e) => handleChange('base_price', e.target.value)}
                   placeholder="2300"
+                  required
+                />
+                <Input
+                  label={t.products.salePrice || (language === 'ar' ? 'سعر الخصم / العرض (اختياري)' : 'Sale Price (Optional)')}
+                  type="number"
+                  value={formData.sale_price}
+                  onChange={(e) => handleChange('sale_price', e.target.value)}
+                  placeholder="1950"
+                  hint={language === 'ar' ? 'إذا وُجد سعر خصم، سيظهر للمشتري بدلاً من الأساسي' : 'If set, storefront shows this discounted price'}
                 />
               </div>
             ) : (
@@ -423,22 +534,32 @@ export default function ProductFormPage() {
               </div>
             )}
 
-            <div className="grid max-w-xl grid-cols-1 gap-4 rounded-xl border border-dashed border-brand/40 p-4 sm:grid-cols-2">
+            {/* Offers & Discount Banner Information */}
+            <div className="grid max-w-xl grid-cols-1 gap-4 rounded-xl border border-dashed border-brand/40 bg-brand/5 p-4 sm:grid-cols-2">
               <Input
-                label={language === 'ar' ? 'الخصم (%)' : 'Discount (%)'}
+                label={t.products.discountPercent || (language === 'ar' ? 'نسبة الخصم (%)' : 'Discount (%)')}
                 type="number"
                 min="0"
                 max="100"
                 value={formData.discount_percent}
                 onChange={(e) => handleChange('discount_percent', e.target.value)}
-                hint={language === 'ar' ? 'يطبّق على كل الأحجام' : 'Applies to every size'}
+                hint={language === 'ar' ? 'نسبة إضافية تظهر كبادج' : 'Badge percentage'}
               />
               <Input
                 label={language === 'ar' ? 'عنوان العرض' : 'Offer label'}
                 value={formData.discount_label}
                 onChange={(e) => handleChange('discount_label', e.target.value)}
-                placeholder={language === 'ar' ? 'خصم لفترة محدودة' : 'Limited-time offer'}
+                placeholder={language === 'ar' ? 'عرض خاص' : 'Special Offer'}
               />
+              <div className="sm:col-span-2">
+                <Input
+                  label={t.products.offerLink || (language === 'ar' ? 'رابط العرض (اختياري)' : 'Offer Link (Optional)')}
+                  value={formData.offer_link}
+                  onChange={(e) => handleChange('offer_link', e.target.value)}
+                  placeholder="https://..."
+                  hint={language === 'ar' ? 'رابط مخصص للحملة الإعلانية أو العرض' : 'Custom landing or campaign link'}
+                />
+              </div>
             </div>
           </div>
         )}
@@ -463,13 +584,13 @@ export default function ProductFormPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input
-                label={t.products.ingEn}
+                label={t.products.ingEn || (language === 'ar' ? 'المكونات (EN)' : 'Ingredients (EN)')}
                 value={formData.ingredients_en}
                 onChange={(e) => handleChange('ingredients_en', e.target.value)}
                 hint="Vanilla, Rose, Musk"
               />
               <Input
-                label={t.products.ingAr}
+                label={t.products.ingAr || (language === 'ar' ? 'المكونات (AR)' : 'Ingredients (AR)')}
                 value={formData.ingredients_ar}
                 onChange={(e) => handleChange('ingredients_ar', e.target.value)}
                 dir="rtl"
@@ -479,13 +600,13 @@ export default function ProductFormPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input
-                label={t.products.benEn}
+                label={t.products.benEn || (language === 'ar' ? 'المميزات (EN)' : 'Benefits (EN)')}
                 value={formData.benefits_en}
                 onChange={(e) => handleChange('benefits_en', e.target.value)}
                 hint="Long lasting, High sillage"
               />
               <Input
-                label={t.products.benAr}
+                label={t.products.benAr || (language === 'ar' ? 'المميزات (AR)' : 'Benefits (AR)')}
                 value={formData.benefits_ar}
                 onChange={(e) => handleChange('benefits_ar', e.target.value)}
                 dir="rtl"
@@ -498,27 +619,25 @@ export default function ProductFormPage() {
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
               <ImageUploader
-                label={t.products.mainImage}
+                label={t.products.mainImage || (language === 'ar' ? 'الصورة الرئيسية' : 'Main Image')}
                 value={formData.image_url}
                 onChange={async (file, preview) => {
-                  if (file && isSupabaseConfigured) {
-                    const ext = file.name.split('.').pop();
-                    const path = `product-${Date.now()}.${ext}`;
-                    const { error } = await supabase.storage
-                      .from('product-images')
-                      .upload(path, file);
-                    if (!error) {
-                      const { data } = supabase.storage
-                        .from('product-images')
-                        .getPublicUrl(path);
-                      handleChange('image_url', data.publicUrl);
-                    } else {
-                      handleChange('image_url', preview);
+                  if (file) {
+                    try {
+                      const publicUrl = await uploadToStorage(file);
+                      if (publicUrl) {
+                        handleChange('image_url', publicUrl);
+                        toast({ message: language === 'ar' ? 'تم رفع الصورة بنجاح إلى Supabase products' : 'Image uploaded to Supabase products', type: 'success' });
+                        return;
+                      }
+                    } catch (uploadErr) {
+                      console.error('Storage upload error:', uploadErr);
+                      toast({ message: uploadErr.message, type: 'error' });
                     }
-                  } else {
-                    handleChange('image_url', preview);
                   }
+                  handleChange('image_url', preview || '');
                 }}
+                onDelete={() => handleChange('image_url', '')}
               />
               <Input
                 placeholder="Or paste image URL"
@@ -530,27 +649,23 @@ export default function ProductFormPage() {
 
             <div>
               <ImageUploader
-                label={t.products.hoverImage}
+                label={t.products.hoverImage || (language === 'ar' ? 'صورة التحويم (Hover)' : 'Hover Image')}
                 value={formData.image_hover_url}
                 onChange={async (file, preview) => {
-                  if (file && isSupabaseConfigured) {
-                    const ext = file.name.split('.').pop();
-                    const path = `product-hover-${Date.now()}.${ext}`;
-                    const { error } = await supabase.storage
-                      .from('product-images')
-                      .upload(path, file);
-                    if (!error) {
-                      const { data } = supabase.storage
-                        .from('product-images')
-                        .getPublicUrl(path);
-                      handleChange('image_hover_url', data.publicUrl);
-                    } else {
-                      handleChange('image_hover_url', preview);
+                  if (file) {
+                    try {
+                      const publicUrl = await uploadToStorage(file);
+                      if (publicUrl) {
+                        handleChange('image_hover_url', publicUrl);
+                        return;
+                      }
+                    } catch (uploadErr) {
+                      console.error('Storage upload error:', uploadErr);
                     }
-                  } else {
-                    handleChange('image_hover_url', preview);
                   }
+                  handleChange('image_hover_url', preview || '');
                 }}
+                onDelete={() => handleChange('image_hover_url', '')}
               />
               <Input
                 placeholder="Or paste hover image URL"
@@ -562,7 +677,7 @@ export default function ProductFormPage() {
 
             <div className="sm:col-span-2">
               <Textarea
-                label={t.products.gallery}
+                label={t.products.gallery || (language === 'ar' ? 'معرض الصور الإضافية' : 'Detail Gallery Images')}
                 rows={3}
                 value={formData.detail_images}
                 onChange={(e) => handleChange('detail_images', e.target.value)}
@@ -574,18 +689,23 @@ export default function ProductFormPage() {
 
         {activeTab === 'visibility' && (
           <div className="space-y-4 max-w-sm">
+            <Select
+              label={t.products.stockStatus || (language === 'ar' ? 'حالة المخزون' : 'Stock Status')}
+              value={formData.stock_status}
+              onChange={(e) => handleChange('stock_status', e.target.value)}
+            >
+              <option value="in_stock">{t.products.inStock || (language === 'ar' ? 'متوفر' : 'In Stock')}</option>
+              <option value="low_stock">{t.products.lowStock || (language === 'ar' ? 'كمية محدودة' : 'Low Stock')}</option>
+              <option value="out_of_stock">{t.products.outOfStock || (language === 'ar' ? 'نافد' : 'Out of Stock')}</option>
+            </Select>
+
             <Switch
-              label={t.products.stock}
-              checked={formData.in_stock}
-              onChange={(val) => handleChange('in_stock', val)}
-            />
-            <Switch
-              label={t.products.active}
+              label={t.products.active || (language === 'ar' ? 'نشط / ظاهر في المتجر' : 'Active / Visible in Store')}
               checked={formData.is_active}
               onChange={(val) => handleChange('is_active', val)}
             />
             <Switch
-              label={t.products.featured}
+              label={t.products.featured || (language === 'ar' ? 'منتج مميز' : 'Featured')}
               checked={formData.is_featured}
               onChange={(val) => handleChange('is_featured', val)}
             />
@@ -606,4 +726,3 @@ export default function ProductFormPage() {
     </form>
   );
 }
-

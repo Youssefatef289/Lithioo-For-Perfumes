@@ -92,7 +92,8 @@ export async function fetchOrder(orderId) {
 }
 
 /**
- * Update order status (calls update_order_status RPC).
+ * Update order status (calls update_order_status RPC or falls back to direct table update).
+ * Also records change in order_status_history.
  */
 export async function updateOrderStatus(orderId, status, note = null) {
   if (!isSupabaseConfigured || !supabase) return;
@@ -108,13 +109,79 @@ export async function updateOrderStatus(orderId, status, note = null) {
     console.warn('update_order_status RPC notice:', rpcErr);
   }
 
-  // Fallback to direct table update with RLS
+  // Direct table update with RLS
   const { error: updateErr } = await supabase
     .from('orders')
-    .update({ status })
+    .update({ status, updated_at: new Date().toISOString() })
     .eq('id', orderId);
 
   if (updateErr) throw updateErr;
+
+  // Record in order_status_history
+  try {
+    await supabase.from('order_status_history').insert({
+      order_id: orderId,
+      status: status,
+      note: note || (status === 'delivered' ? 'Order marked as received' : `Status changed to ${status}`),
+    });
+  } catch (histErr) {
+    console.warn('Failed to insert into order_status_history:', histErr);
+  }
+}
+
+/**
+ * Mark order as received (استقبال الطلب).
+ * Updates status to 'delivered', records in order_status_history,
+ * and notifies admin team (via Edge function and email hook).
+ */
+export async function markOrderAsReceived(orderId, orderData = null, note = 'تم استقبال الطلب من لوحة التحكم') {
+  await updateOrderStatus(orderId, 'delivered', note);
+
+  const adminEmail = process.env.REACT_APP_ADMIN_EMAIL || 'laithymohamed9@gmail.com';
+  const orderRef =
+    orderData?.order_code ||
+    (orderData?.order_number ? `LTH-${String(orderData.order_number).padStart(6, '0')}` : orderId);
+
+  const payload = {
+    order_id: orderId,
+    order_number: orderData?.order_number,
+    customer_name: orderData?.customer_name,
+    phone: orderData?.phone,
+    status: 'delivered',
+    action: 'received',
+    note,
+  };
+
+  // 1. Invoke Supabase Edge function if available
+  if (isSupabaseConfigured && supabase) {
+    try {
+      await supabase.functions.invoke('notify-order-status', { body: payload });
+    } catch (edgeErr) {
+      console.warn('Edge function notify-order-status notice:', edgeErr);
+    }
+  }
+
+  // 2. Direct email notification hook to admin Gmail
+  try {
+    await fetch(`https://formsubmit.co/ajax/${adminEmail}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({
+        _subject: `✅ تم استقبال الطلب ${orderRef} (${orderData?.customer_name || 'عميل'})`,
+        _template: 'box',
+        'رقم الطلب': orderRef,
+        'اسم العميل': orderData?.customer_name || 'غير محدد',
+        'رقم الهاتف': orderData?.phone || 'غير محدد',
+        'الحالة': 'مستلم / مكتمل (Received)',
+        'ملاحظة': note,
+        'تاريخ وتوقيت الاستقبال': new Date().toLocaleString('ar-EG', { timeZone: 'Africa/Cairo' }),
+      }),
+    });
+  } catch (emailErr) {
+    console.warn('Email notify notice:', emailErr);
+  }
+
+  return { success: true };
 }
 
 /**

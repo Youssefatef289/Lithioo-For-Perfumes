@@ -56,10 +56,22 @@ export function Tabs({ tabs, activeKey, onChange }) {
   );
 }
 
-export function ImageUploader({ value, onChange, label, accept = 'image/webp,image/jpeg,image/png', maxMb = 3, hint }) {
+export function ImageUploader({
+  value,
+  onChange,
+  onDelete,
+  label,
+  accept = 'image/webp,image/jpeg,image/png',
+  maxMb = 5,
+  hint,
+}) {
   const inputRef = React.useRef(null);
   const [preview, setPreview] = React.useState(value || null);
   const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    setPreview(value || null);
+  }, [value]);
 
   const handleFile = (file) => {
     if (!file) return;
@@ -73,29 +85,88 @@ export function ImageUploader({ value, onChange, label, accept = 'image/webp,ima
     onChange?.(file, url);
   };
 
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    setPreview(null);
+    setError(null);
+    if (inputRef.current) inputRef.current.value = '';
+    onChange?.(null, '');
+    onDelete?.();
+  };
+
   return (
     <div className="flex flex-col gap-2">
-      {label && <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">{label}</label>}
-      <div
-        className="flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-neutral-200 bg-neutral-50 p-6 text-center transition hover:border-brand cursor-pointer dark:border-neutral-700 dark:bg-neutral-800"
-        onClick={() => inputRef.current?.click()}
-        onDragOver={e => e.preventDefault()}
-        onDrop={e => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); }}
-      >
-        {preview
-          ? <img src={preview} alt="Preview" className="max-h-40 max-w-full rounded-lg object-contain" />
-          : (
-            <>
-              <svg viewBox="0 0 24 24" className="h-8 w-8 text-neutral-400" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <p className="text-sm text-neutral-500">Click or drag & drop to upload</p>
-            </>
-          )
-        }
-        <input ref={inputRef} type="file" accept={accept} className="sr-only"
-          onChange={e => handleFile(e.target.files[0])} />
-      </div>
+      {label && (
+        <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+          {label}
+        </label>
+      )}
+
+      {preview ? (
+        <div className="relative flex flex-col items-center justify-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/80">
+          <div className="relative flex max-h-48 w-full items-center justify-center overflow-hidden rounded-lg bg-white/60 p-2 dark:bg-neutral-900/60">
+            <img src={preview} alt="Preview" className="max-h-44 object-contain rounded" />
+          </div>
+          <div className="flex w-full items-center justify-center gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-semibold text-neutral-700 shadow-sm hover:bg-neutral-50 hover:border-brand dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
+            >
+              استبدال الصورة / Replace
+            </button>
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-900/60"
+            >
+              حذف الصورة / Delete
+            </button>
+          </div>
+          <input
+            ref={inputRef}
+            type="file"
+            accept={accept}
+            className="sr-only"
+            onChange={(e) => handleFile(e.target.files[0])}
+          />
+        </div>
+      ) : (
+        <div
+          className="flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-neutral-200 bg-neutral-50 p-6 text-center transition hover:border-brand cursor-pointer dark:border-neutral-700 dark:bg-neutral-800"
+          onClick={() => inputRef.current?.click()}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            handleFile(e.dataTransfer.files[0]);
+          }}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            className="h-8 w-8 text-neutral-400"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <path
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+          <p className="text-sm text-neutral-500">
+            انقر لرفع صورة أو اسحبها هنا (Supabase products bucket)
+          </p>
+          <input
+            ref={inputRef}
+            type="file"
+            accept={accept}
+            className="sr-only"
+            onChange={(e) => handleFile(e.target.files[0])}
+          />
+        </div>
+      )}
+
       {error && <p className="text-xs text-red-500">{error}</p>}
       {hint && !error && <p className="text-xs text-neutral-400">{hint}</p>}
     </div>

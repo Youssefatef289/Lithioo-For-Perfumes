@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useLanguage } from '../contexts/LanguageContext';
 import { allProducts } from '../data/products';
+import { fetchAllProducts, subscribeToProducts } from '../services/products';
 import { NEW_LUXURY_PRODUCTS } from '../data/newLuxuryProducts';
 import ProductCard from './ProductCard';
 
@@ -13,9 +14,35 @@ const OriginalProducts = () => {
   const scrollerRef = useRef(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
+  const [productsList, setProductsList] = useState(allProducts);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function sync() {
+      try {
+        const prods = await fetchAllProducts();
+        if (isMounted && prods && prods.length > 0) {
+          setProductsList(prods);
+        }
+      } catch (err) {
+        console.warn('OriginalProducts sync notice:', err);
+      }
+    }
+    sync();
+    const unsub = subscribeToProducts(() => sync());
+    return () => {
+      isMounted = false;
+      unsub();
+    };
+  }, []);
 
   const displayed = useMemo(() => {
-    const originals = allProducts.filter((p) => p.section === 'original');
+    const originals = productsList.filter((p) => {
+      if (Array.isArray(p.sections)) {
+        return p.sections.includes('original') || p.sections.includes('new-luxury');
+      }
+      return p.section === 'original' || p.section === 'new-luxury';
+    });
     const combined = [...NEW_LUXURY_PRODUCTS, ...originals];
     const seen = new Set();
     const unique = combined.filter((p) => {
@@ -24,7 +51,7 @@ const OriginalProducts = () => {
       return true;
     });
     return unique.slice(0, HOME_ORIGINALS_LIMIT);
-  }, []);
+  }, [productsList]);
 
   const updateArrows = useCallback(() => {
     const el = scrollerRef.current;
