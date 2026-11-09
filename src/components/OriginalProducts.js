@@ -29,10 +29,15 @@ const OriginalProducts = () => {
       }
     }
     sync();
-    const unsub = subscribeToProducts(() => sync());
+    let unsub = () => {};
+    try {
+      unsub = subscribeToProducts(() => sync());
+    } catch (e) {
+      console.warn('OriginalProducts subscribe notice:', e);
+    }
     return () => {
       isMounted = false;
-      unsub();
+      if (typeof unsub === 'function') unsub();
     };
   }, []);
 

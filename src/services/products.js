@@ -195,33 +195,62 @@ export async function searchProducts(query) {
   }
 }
 
+// Singleton Realtime Multiplexer for products, sections, and offers
+let activeProductsChannel = null;
+const productSubscribers = new Set();
+
 /**
  * Subscribe to realtime product changes across admin and storefront.
- * Uses a unique channel name per subscriber to prevent channel collision.
- * Listens to products, sections, and section_products tables.
+ * Uses a singleton channel multiplexer so multiple components can subscribe
+ * without colliding or triggering "cannot add callbacks after subscribe()" errors.
  */
 export function subscribeToProducts(callback) {
-  if (!isSupabaseConfigured || !supabase) return () => {};
-
-  try {
-    const channelName = `products-sync-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-    const channel = supabase
-      .channel(channelName)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, callback)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'sections' }, callback)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'section_products' }, callback)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, callback)
-      .subscribe();
-
-    return () => {
-      try {
-        supabase.removeChannel(channel);
-      } catch (err) {
-        // Safe unsubscribe
-      }
-    };
-  } catch (err) {
-    console.warn('subscribeToProducts error:', err);
+  if (!isSupabaseConfigured || !supabase || typeof callback !== 'function') {
     return () => {};
   }
+
+  productSubscribers.add(callback);
+
+  if (!activeProductsChannel) {
+    try {
+      const channelId = `products-global-sync-${Date.now()}`;
+      activeProductsChannel = supabase
+        .channel(channelId)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, (payload) => {
+          productSubscribers.forEach((cb) => {
+            try { cb(payload); } catch (e) { console.warn('Product subscriber callback error:', e); }
+          });
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'sections' }, (payload) => {
+          productSubscribers.forEach((cb) => {
+            try { cb(payload); } catch (e) { console.warn('Product subscriber callback error:', e); }
+          });
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'section_products' }, (payload) => {
+          productSubscribers.forEach((cb) => {
+            try { cb(payload); } catch (e) { console.warn('Product subscriber callback error:', e); }
+          });
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, (payload) => {
+          productSubscribers.forEach((cb) => {
+            try { cb(payload); } catch (e) { console.warn('Product subscriber callback error:', e); }
+          });
+        })
+        .subscribe();
+    } catch (err) {
+      console.warn('Realtime products channel setup notice:', err);
+    }
+  }
+
+  return () => {
+    productSubscribers.delete(callback);
+    if (productSubscribers.size === 0 && activeProductsChannel) {
+      try {
+        supabase.removeChannel(activeProductsChannel);
+      } catch (err) {
+        // Safe removal
+      }
+      activeProductsChannel = null;
+    }
+  };
 }

@@ -169,27 +169,53 @@ export async function setSectionProducts(sectionId, productIds = []) {
   return true;
 }
 
+// Singleton Realtime Multiplexer for sections and offers
+let activeSectionsChannel = null;
+const sectionSubscribers = new Set();
+
 /** Subscribe to realtime section changes */
 export function subscribeToSections(callback) {
-  if (!isSupabaseConfigured || !supabase) return () => {};
-  try {
-    const channelName = `sections-sync-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-    const channel = supabase
-      .channel(channelName)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'sections' }, callback)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'section_products' }, callback)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, callback)
-      .subscribe();
-
-    return () => {
-      try {
-        supabase.removeChannel(channel);
-      } catch (err) {
-        // Safe unsubscribe
-      }
-    };
-  } catch (err) {
-    console.warn('subscribeToSections error:', err);
+  if (!isSupabaseConfigured || !supabase || typeof callback !== 'function') {
     return () => {};
   }
+
+  sectionSubscribers.add(callback);
+
+  if (!activeSectionsChannel) {
+    try {
+      const channelId = `sections-global-sync-${Date.now()}`;
+      activeSectionsChannel = supabase
+        .channel(channelId)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'sections' }, (payload) => {
+          sectionSubscribers.forEach((cb) => {
+            try { cb(payload); } catch (e) { console.warn('Section subscriber callback error:', e); }
+          });
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'section_products' }, (payload) => {
+          sectionSubscribers.forEach((cb) => {
+            try { cb(payload); } catch (e) { console.warn('Section subscriber callback error:', e); }
+          });
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, (payload) => {
+          sectionSubscribers.forEach((cb) => {
+            try { cb(payload); } catch (e) { console.warn('Section subscriber callback error:', e); }
+          });
+        })
+        .subscribe();
+    } catch (err) {
+      console.warn('Realtime sections channel setup notice:', err);
+    }
+  }
+
+  return () => {
+    sectionSubscribers.delete(callback);
+    if (sectionSubscribers.size === 0 && activeSectionsChannel) {
+      try {
+        supabase.removeChannel(activeSectionsChannel);
+      } catch (err) {
+        // Safe removal
+      }
+      activeSectionsChannel = null;
+    }
+  };
 }

@@ -184,32 +184,49 @@ export async function markOrderAsReceived(orderId, orderData = null, note = 'ØªÙ
   return { success: true };
 }
 
+// Singleton Realtime Multiplexer for orders
+let activeOrdersChannel = null;
+const orderSubscribers = new Set();
+
 /**
  * Subscribe to realtime new orders (admin only).
- * Uses a unique channel name per subscriber to prevent "cannot add callbacks after subscribe()" errors.
+ * Uses a singleton multiplexer channel so AdminApp and OrdersPage share the single channel safely.
  * Returns an unsubscribe function.
  */
 export function subscribeToOrders(callback) {
-  if (!isSupabaseConfigured || !supabase) return () => {};
-
-  try {
-    const channelName = `orders-realtime-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
-    const channel = supabase
-      .channel(channelName)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, callback)
-      .subscribe();
-
-    return () => {
-      try {
-        supabase.removeChannel(channel);
-      } catch (err) {
-        // Safe unsubscribe
-      }
-    };
-  } catch (err) {
-    console.warn('subscribeToOrders error:', err);
+  if (!isSupabaseConfigured || !supabase || typeof callback !== 'function') {
     return () => {};
   }
+
+  orderSubscribers.add(callback);
+
+  if (!activeOrdersChannel) {
+    try {
+      const channelId = `orders-global-sync-${Date.now()}`;
+      activeOrdersChannel = supabase
+        .channel(channelId)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload) => {
+          orderSubscribers.forEach((cb) => {
+            try { cb(payload); } catch (e) { console.warn('Order subscriber callback error:', e); }
+          });
+        })
+        .subscribe();
+    } catch (err) {
+      console.warn('Realtime orders channel setup notice:', err);
+    }
+  }
+
+  return () => {
+    orderSubscribers.delete(callback);
+    if (orderSubscribers.size === 0 && activeOrdersChannel) {
+      try {
+        supabase.removeChannel(activeOrdersChannel);
+      } catch (err) {
+        // Safe removal
+      }
+      activeOrdersChannel = null;
+    }
+  };
 }
 
 

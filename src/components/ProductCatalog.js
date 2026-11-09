@@ -44,13 +44,18 @@ const ProductCatalog = () => {
     }
 
     syncData();
-    const unsub = subscribeToProducts(() => {
-      syncData();
-    });
+    let unsub = () => {};
+    try {
+      unsub = subscribeToProducts(() => {
+        syncData();
+      });
+    } catch (e) {
+      console.warn('ProductCatalog subscribe notice:', e);
+    }
 
     return () => {
       isMounted = false;
-      unsub();
+      if (typeof unsub === 'function') unsub();
     };
   }, []);
 
