@@ -39,6 +39,10 @@ const BRAND_BY_SLUG = {
   'tobacoo-body-oud': { name: 'Tobacco Body Oud', brand: 'Body Oud' },
   'vintage-tobacco': { name: 'Vintage Tobacco', brand: 'Arabian Oud' },
   'white-regent-diamond': { name: 'White Regent Diamond', brand: 'Diamond Collection' },
+  '9-pm-night-out': { name: '9 PM NIGHT OUT', brand: 'Afnan', notes: 'SPICY | AMBER | FRUITY' },
+  'raees-aurum': { name: 'RAEES AURUM', brand: 'Arabiyat Prestige', notes: 'AMBER | OUD | SPICY' },
+  'aqriz-100ml': { name: 'AQRIZ', brand: 'Arabiyat Prestige', notes: 'CITRUS | WOODY | FRESH' },
+  'kohl-100ml': { name: 'KOHL', brand: 'Arabiyat Prestige', notes: 'SMOKY | LEATHER | AMBER' },
 };
 
 export const ORIGINAL_IMAGE_CATALOG = [
@@ -195,6 +199,22 @@ export const ORIGINAL_IMAGE_CATALOG = [
       '/image/Perfume brands/Prestige/serious-5.jpg',
     ],
   },
+  {
+    slug: '9-pm-night-out',
+    images: ['/image/Perfume brands/Afnan/9PM Night Out by Afnan for Unisex - Extrait de Parfum - 100ml 1900.jpg'],
+  },
+  {
+    slug: 'raees-aurum',
+    images: ['/image/Perfume brands/arabiyat prestige/RAEES-AURUM_ 180مل  2300ج (1).jpg'],
+  },
+  {
+    slug: 'aqriz-100ml',
+    images: ['/image/Perfume brands/arabiyat prestige/aqriz 100ml 2300 (1).jpg'],
+  },
+  {
+    slug: 'kohl-100ml',
+    images: ['/image/Perfume brands/arabiyat prestige/kohl 100ml 2200 (1).jpg'],
+  },
 ];
 
 /** Fixed EGP prices for original products (no size variants) */
@@ -232,6 +252,10 @@ export const ORIGINAL_PRICES_BY_SLUG = {
   'lady-sukoon-perfume-100ml': 1800,
   'prestige-ruby': 2500,
   serious: 2500,
+  '9-pm-night-out': 2200,
+  'raees-aurum': 2300,
+  'aqriz-100ml': 2300,
+  'kohl-100ml': 2200,
 };
 
 export const getOriginalPrice = (slug) => ORIGINAL_PRICES_BY_SLUG[slug];

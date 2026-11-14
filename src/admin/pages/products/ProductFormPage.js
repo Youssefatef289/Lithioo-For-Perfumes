@@ -41,6 +41,7 @@ export default function ProductFormPage() {
     slug: '',
     name_en: '',
     name_ar: '',
+    notes: '',
     brand_id: '',
     section_id: '',
     category_id: '',
@@ -105,6 +106,7 @@ export default function ProductFormPage() {
               slug: prod.slug || '',
               name_en: prod.name_en || '',
               name_ar: prod.name_ar || '',
+              notes: prod.notes || '',
               brand_id: prod.brand_id || '',
               section_id: prod.section_id || '',
               category_id: prod.category_id || '',
@@ -235,6 +237,7 @@ export default function ProductFormPage() {
         slug: formData.slug || formData.name_en.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
         name_en: formData.name_en,
         name_ar: formData.name_ar || null,
+        notes: formData.notes?.trim() || null,
         brand_id: formData.brand_id || null,
         section_id: primarySectionId,
         category_id: formData.category_id || null,
@@ -384,6 +387,17 @@ export default function ProductFormPage() {
                 value={formData.name_ar}
                 onChange={(e) => handleChange('name_ar', e.target.value)}
                 dir="rtl"
+              />
+              <Input
+                label={language === 'ar' ? 'النوتات العطرية (Notes)' : 'Fragrance Notes'}
+                value={formData.notes || ''}
+                onChange={(e) => handleChange('notes', e.target.value)}
+                placeholder="SPICY | AMBER | FRUITY"
+                hint={
+                  language === 'ar'
+                    ? 'النوتات التي تظهر على كارت العطر بالمتجر مفصولة بـ |'
+                    : 'Notes line on the storefront product card, separated by |'
+                }
               />
               <Input
                 label={t.products.slug}

@@ -143,14 +143,57 @@ export default function BrandsPage() {
     }
   };
 
+  const isWebsiteBrand = (brand) => {
+    if (!brand) return false;
+    const brandSlug = String(brand.slug || brand.id || '').trim().toLowerCase();
+    const brandNameEn = String(brand.name_en || brand.name || '').trim().toLowerCase();
+    const brandNameAr = String(brand.name_ar || brand.nameAr || '').trim().toLowerCase();
+
+    return BRAND_LOGOS.some((wb) => {
+      const wbId = String(wb.id || '').trim().toLowerCase();
+      const wbNameEn = String(wb.name || '').trim().toLowerCase();
+      const wbNameAr = String(wb.nameAr || '').trim().toLowerCase();
+      return (
+        wbId === brandSlug ||
+        wbNameEn === brandNameEn ||
+        (wbNameAr && wbNameAr === brandNameAr)
+      );
+    });
+  };
+
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
+      if (isWebsiteBrand(deleteTarget)) {
+        toast({
+          message:
+            language === 'ar'
+              ? 'لا يمكن حذف هذا البراند لأنه معتمد ومعروض في واجهة الموقع'
+              : 'Cannot delete this brand because it is active on the website',
+          type: 'error',
+        });
+        setDeleteTarget(null);
+        return;
+      }
+
       if (isSupabaseConfigured) {
+        // 1. Unlink any products from this brand to preserve products
+        await supabase
+          .from('products')
+          .update({ brand_id: null })
+          .eq('brand_id', deleteTarget.id);
+
+        // 2. Delete the brand
         const { error } = await supabase.from('brands').delete().eq('id', deleteTarget.id);
         if (error) throw error;
       }
-      toast({ message: language === 'ar' ? 'تم الحذف' : 'Brand deleted', type: 'success' });
+      toast({
+        message:
+          language === 'ar'
+            ? 'تم حذف البراند وفك ارتباط منتجاته بأمان'
+            : 'Brand deleted and products preserved safely',
+        type: 'success',
+      });
       setDeleteTarget(null);
       loadBrands();
     } catch (err) {
@@ -246,17 +289,33 @@ export default function BrandsPage() {
                 >
                   <FiEdit2 size={15} />
                 </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDeleteTarget(b);
-                  }}
-                  className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-red-500 dark:hover:bg-neutral-800"
-                  title={t.brands.delete}
-                >
-                  <FiTrash2 size={15} />
-                </button>
+                {isWebsiteBrand(b) ? (
+                  <button
+                    type="button"
+                    disabled
+                    onClick={(e) => e.stopPropagation()}
+                    className="cursor-not-allowed rounded-lg p-1.5 text-neutral-300 dark:text-neutral-600 opacity-50"
+                    title={
+                      language === 'ar'
+                        ? 'هذا البراند معروض في الموقع الرئيسي ومحمي من الحذف'
+                        : 'This brand is featured on the website and protected from deletion'
+                    }
+                  >
+                    <FiTrash2 size={15} />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteTarget(b);
+                    }}
+                    className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-red-500 dark:hover:bg-neutral-800"
+                    title={t.brands.delete}
+                  >
+                    <FiTrash2 size={15} />
+                  </button>
+                )}
               </div>
             </div>
           </Card>
@@ -369,9 +428,13 @@ export default function BrandsPage() {
         open={Boolean(deleteTarget)}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title={t.products.delete}
-        message={language === 'ar' ? 'هل أنت متأكد من حذف هذا البراند؟' : 'Delete this brand permanently?'}
-        confirmLabel={t.common.delete}
+        title={language === 'ar' ? 'تأكيد حذف البراند' : 'Confirm Brand Deletion'}
+        message={
+          language === 'ar'
+            ? `هل أنت متأكد من حذف براند "${deleteTarget?.name_ar || deleteTarget?.name_en}"؟ لن يتم حذف أي منتج تابع له، وسيتم فك ارتباط المنتجات وإبقائها بأمان في المتجر.`
+            : `Are you sure you want to delete "${deleteTarget?.name_en}"? Products linked to this brand will not be deleted; they will be unlinked and preserved safely.`
+        }
+        confirmLabel={language === 'ar' ? 'نعم، حذف وفك الارتباط' : 'Yes, Delete & Unlink'}
         dangerous
       />
     </div>

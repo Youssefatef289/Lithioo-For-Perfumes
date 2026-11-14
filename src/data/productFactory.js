@@ -134,6 +134,7 @@ const buildProduct = (id, { name, brand }, section, imageOverrides = {}) => {
     imageHover,
     detailImages,
     description: `${meta.description} ${name} by ${brand}.`,
+    notes: ingredients.slice(0, 3).map((s) => String(s).trim().toUpperCase()).join(' | '),
     ingredients,
     benefits,
     rating: Math.round(rating * 10) / 10,
@@ -146,7 +147,8 @@ export const isOriginalProduct = (product) =>
   Boolean(product && (product.hideSizes || product.section === 'original'));
 
 const buildOriginalProduct = (id, entry) => {
-  const { name, brand } = getOriginalMeta(entry.slug);
+  const originalMeta = getOriginalMeta(entry.slug);
+  const { name, brand } = originalMeta;
   const [first, second] = entry.images;
   const base = buildProduct(
     id,
@@ -162,6 +164,7 @@ const buildOriginalProduct = (id, entry) => {
 
   return {
     ...base,
+    notes: originalMeta.notes || base.notes,
     hideSizes: true,
     sizes: [],
     price,

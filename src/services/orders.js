@@ -188,6 +188,30 @@ export async function markOrderAsReceived(orderId, orderData = null, note = 'ØªÙ
 let activeOrdersChannel = null;
 const orderSubscribers = new Set();
 
+function ensureOrdersChannel() {
+  if (activeOrdersChannel || !isSupabaseConfigured || !supabase) return;
+  try {
+    const channelId = `orders-sync-singleton-${Math.random().toString(36).slice(2, 8)}`;
+    activeOrdersChannel = supabase
+      .channel(channelId)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload) => {
+        orderSubscribers.forEach((cb) => {
+          try { cb(payload); } catch (e) { console.warn('Order subscriber callback error:', e); }
+        });
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, (payload) => {
+        orderSubscribers.forEach((cb) => {
+          try { cb(payload); } catch (e) { console.warn('Order subscriber callback error:', e); }
+        });
+      })
+      .subscribe((status, err) => {
+        if (err) console.warn('Orders realtime status notice:', status, err);
+      });
+  } catch (err) {
+    console.warn('Realtime orders channel setup notice:', err);
+  }
+}
+
 /**
  * Subscribe to realtime new orders (admin only).
  * Uses a singleton multiplexer channel so AdminApp and OrdersPage share the single channel safely.
@@ -199,33 +223,10 @@ export function subscribeToOrders(callback) {
   }
 
   orderSubscribers.add(callback);
-
-  if (!activeOrdersChannel) {
-    try {
-      const channelId = `orders-global-sync-${Date.now()}`;
-      activeOrdersChannel = supabase
-        .channel(channelId)
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload) => {
-          orderSubscribers.forEach((cb) => {
-            try { cb(payload); } catch (e) { console.warn('Order subscriber callback error:', e); }
-          });
-        })
-        .subscribe();
-    } catch (err) {
-      console.warn('Realtime orders channel setup notice:', err);
-    }
-  }
+  ensureOrdersChannel();
 
   return () => {
     orderSubscribers.delete(callback);
-    if (orderSubscribers.size === 0 && activeOrdersChannel) {
-      try {
-        supabase.removeChannel(activeOrdersChannel);
-      } catch (err) {
-        // Safe removal
-      }
-      activeOrdersChannel = null;
-    }
   };
 }
 

@@ -608,7 +608,7 @@ export default function OrderCheckoutPage() {
                         </>
                       ) : (
                         <>
-                          <span>{isRtl ? 'تأكيد واستقبال الطلب الآن' : 'Confirm & Receive Order Now'}</span>
+                          <span>{isRtl ? 'اطلب الان' : 'Order now'}</span>
                           <ArrowIcon />
                         </>
                       )}

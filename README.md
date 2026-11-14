@@ -327,6 +327,67 @@ scripts/
 
 ---
 
+---
+
+## Product Card Redesign, Checkout Flow & Brand Management (English & Arabic)
+
+### English: Key Updates & Features
+
+#### 1. Minimalist Product Card (Reference: 9 PM NIGHT OUT)
+- **Visual Design**: Perfume bottle centered on a soft, light background with generous padding (`bg-[#f5f5f5]`), matching modern luxury fragrance aesthetics.
+- **Typography & Details**: Product name in uppercase and letter-spaced; fragrance notes line (`SPICY | AMBER | FRUITY`) separated by `|`; price formatted via centralized `CURRENCY_LABEL` constant as `LE 2,200.00`.
+- **Two-Button Action Row**:
+  - **View Details** (`عرض التفاصيل`): Opens the quick view modal or details.
+  - **Add to Cart** (`أضف للسلة`): Features a subtle hover lift, rounded corners, and a micro-animation with scale pulse and cart checkmark confirmation on click, fully respecting `prefers-reduced-motion`.
+  - Floating WhatsApp and Wishlist icons have been removed from the card to keep the aesthetic minimal and uncluttered.
+- Applied uniformly across Women, Men, Original sections, and mobile devices.
+
+#### 2. Cart & 2-Step Checkout ("المرحلة القادمة" → "اطلب الان")
+- **Step 1 (Cart Items Review)**: Users inspect items, adjust quantities, and select products. The primary button is **"المرحلة القادمة"** (Next step).
+- **Step 2 (Customer Delivery Form & Summary)**:
+  - Form fields: Full Name, Egyptian Mobile Number (11-digit regex validation `01[0125]XXXXXXXX`), Governorate / City selection, Detailed Address, and optional Notes.
+  - Live summary of selected products and total price.
+  - Final action button is **"اطلب الان"** (Order now).
+  - Automatically records the order in Supabase `orders` and `order_items` tables, dispatches an admin notification email, and launches WhatsApp with a pre-formatted bilingual order message.
+
+#### 3. Admin Brand Management & Deletion Protection
+- **Website Brand Protection**: Brands active on the website (e.g. Afnan, Assaf, Reef, Arabian Oud, Laverne) are protected from deletion with disabled delete buttons and informative tooltips explaining their active status.
+- **Custom Brand Deletion**: Custom brands added via the dashboard can be deleted with a confirmation dialog. Linked products are safely preserved by unlinking them (`brand_id = null`) rather than deleting them.
+
+#### 4. New Brands & Migration 009
+- Added **Arabiyat Prestige** (`عربيات برستيج`) with logo and initial perfumes (`RAEES AURUM`, `AQRIZ`, `KOHL`, `REVOLT UNCAGED`).
+- Added `supabase/migrations/009_product_cards_and_new_brands.sql` adding `notes` column, new brands, and reference product catalog entries.
+
+---
+
+### بالعربية: تفاصيل التحديثات والتصميم الجديد
+
+#### 1. إعادة تصميم كارت المنتج (مطابق لمرجع 9 PM NIGHT OUT)
+- **تصميم عصري وفخم**: زجاجة العطر في المنتصف على خلفية ناعمة فاتحة (`#f5f5f5`) مع حواف متباعدة وأبعاد متناسقة.
+- **الخطوط والتفاصيل**: اسم العطر بأحرف كبيرة متباعدة (Uppercase & Letter-spaced)، سطر النوتات العطرية مفصول بعلامة `|` مثل `SPICY | AMBER | FRUITY`، والسعر بصيغة موحدة `LE 2,200.00` من خلال متغير مركزي `CURRENCY_LABEL`.
+- **صف الأزرار الثنائي**:
+  - **عرض التفاصيل**: يفتح نافذة المعاينة السريعة.
+  - **أضف للسلة**: زوايا دائرية، تأثير رفع خفيف عند التحويم (Hover Lift)، وأنيميشن نبض خفيف وأيقونة علامة صح (Checkmark) عند الضغط مع مراعاة `prefers-reduced-motion`.
+  - إزالة أيقونات الواتساب والقلب (قائمة الرغبات) العائمة لتوفير واجهة نظيفة وهادئة تحاكي المتاجر العالمية الفاخرة.
+- التصميم مطبق بالتساوي على أقسام الرجال، النساء، العطور الأصلية، والهواتف المحمولة.
+
+#### 2. السلة وتجربة الطلب بمرحلتين ("المرحلة القادمة" ← "اطلب الان")
+- **المرحلة الأولى (مراجعة السلة)**: مراجعة المنتجات والكميات وتحديد المنتجات، وزر الانتقال الأساسي بعنوان **"المرحلة القادمة"**.
+- **المرحلة الثانية (بيانات التوصيل وملخص الطلب)**:
+  - حقول بيانات العميل: الاسم الكامل، رقم هاتف مصري صحيح (11 رقم يبدأ بـ 01)، اختيار المحافظة والمدينة، العنوان بالتفصيل، وملاحظات التوصيل.
+  - ملخص كامل للمنتجات المختارة والإجمالي مع الشحن المجاني والدفع عند الاستلام.
+  - الزر النهائي بعنوان **"اطلب الان"** يقوم بحفظ الطلب في قاعدة بيانات Supabase (جداول `orders` و `order_items`)، إرسال إشعار فوري إلى بريد الإدارة، وفتح تطبيق واتساب بالرسالة الكاملة.
+
+#### 3. حماية البراندات في لوحة التحكم
+- **حماية براندات الموقع الرئيسي**: البراندات المعتمدة المعروضة في واجهة المتجر محمية من الحذف؛ حيث يظهر زر الحذف معطلاً مع تلميح توضيحي للمشرف.
+- **حذف البراندات المخصصة**: البراندات الجديدة المضافة عبر لوحة التحكم يمكن حذفها بعد تأكيد نافذة الحوار، ويتم فك ارتباط منتجاتها (`brand_id = null`) وإبقاؤها في المتجر دون حذف أي منتج.
+
+#### 4. ملف المايجريشن 009 والبراندات الجديدة
+- إضافة براند **عربيات برستيج** (Arabiyat Prestige) مع شعارها وعطورها المميزة.
+- إنشاء ملف المايجريشن [`supabase/migrations/009_product_cards_and_new_brands.sql`](supabase/migrations/009_product_cards_and_new_brands.sql) لإنشاء عمود النوتات `notes` وإدراج البراندات والمنتجات الجديدة.
+
+---
+
 ## Security Notes
 
 - The `service_role` key is **never** in the frontend or committed to the repo.

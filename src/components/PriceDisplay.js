@@ -1,6 +1,5 @@
 import React from 'react';
 import { formatEGP, parsePrice, getDiscountedPrice } from '../utils/price';
-import { localizeDigits } from '../utils/digits';
 
 const PriceDisplay = ({
   price,
@@ -20,16 +19,18 @@ const PriceDisplay = ({
     );
   }
 
-  const fmt = (amount) => localizeDigits(formatEGP(amount), language);
+  const fmt = (amount) => formatEGP(amount);
 
   const priceClass =
     size === 'lg'
-      ? 'text-2xl font-bold text-brand'
-      : 'text-sm font-bold text-brand';
+      ? 'text-2xl font-bold text-neutral-900 dark:text-white tracking-wide'
+      : 'text-sm font-semibold text-neutral-900 dark:text-neutral-100 tracking-wide';
 
   return (
-    <div className={`m-0 flex items-center gap-2 ${className}`} dir="ltr">
-      {discountPercent > 0 && <span className="text-xs text-neutral-400 line-through">{fmt(numericPrice)}</span>}
+    <div className={`m-0 flex items-center justify-center gap-2 ${className}`} dir="ltr">
+      {discountPercent > 0 && (
+        <span className="text-xs text-neutral-400 line-through">{fmt(numericPrice)}</span>
+      )}
       <p className={priceClass}>{fmt(discountedPrice)}</p>
     </div>
   );

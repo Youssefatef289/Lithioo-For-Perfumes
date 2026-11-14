@@ -7,7 +7,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { allProducts } from '../data/products';
 
 const PRODUCT_SELECT = `
-  id, slug, name_en, name_ar,
+  id, slug, name_en, name_ar, notes,
   description_en, description_ar,
   ingredients_en, ingredients_ar,
   benefits_en, benefits_ar,
@@ -45,6 +45,7 @@ export function normalizeProduct(row) {
     name:             row.name_en,
     nameEn:           row.name_en,
     nameAr:           row.name_ar,
+    notes:            row.notes || null,
     brand:            brand?.name_en ?? '',
     brandAr:          brand?.name_ar ?? '',
     brandId:          brand?.slug ?? null,
@@ -199,6 +200,40 @@ export async function searchProducts(query) {
 let activeProductsChannel = null;
 const productSubscribers = new Set();
 
+function ensureProductsChannel() {
+  if (activeProductsChannel || !isSupabaseConfigured || !supabase) return;
+  try {
+    const channelId = `products-sync-singleton-${Math.random().toString(36).slice(2, 8)}`;
+    activeProductsChannel = supabase
+      .channel(channelId)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, (payload) => {
+        productSubscribers.forEach((cb) => {
+          try { cb(payload); } catch (e) { console.warn('Product subscriber callback error:', e); }
+        });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sections' }, (payload) => {
+        productSubscribers.forEach((cb) => {
+          try { cb(payload); } catch (e) { console.warn('Product subscriber callback error:', e); }
+        });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'section_products' }, (payload) => {
+        productSubscribers.forEach((cb) => {
+          try { cb(payload); } catch (e) { console.warn('Product subscriber callback error:', e); }
+        });
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, (payload) => {
+        productSubscribers.forEach((cb) => {
+          try { cb(payload); } catch (e) { console.warn('Product subscriber callback error:', e); }
+        });
+      })
+      .subscribe((status, err) => {
+        if (err) console.warn('Products realtime status notice:', status, err);
+      });
+  } catch (err) {
+    console.warn('Realtime products channel setup error:', err);
+  }
+}
+
 /**
  * Subscribe to realtime product changes across admin and storefront.
  * Uses a singleton channel multiplexer so multiple components can subscribe
@@ -210,47 +245,9 @@ export function subscribeToProducts(callback) {
   }
 
   productSubscribers.add(callback);
-
-  if (!activeProductsChannel) {
-    try {
-      const channelId = `products-global-sync-${Date.now()}`;
-      activeProductsChannel = supabase
-        .channel(channelId)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, (payload) => {
-          productSubscribers.forEach((cb) => {
-            try { cb(payload); } catch (e) { console.warn('Product subscriber callback error:', e); }
-          });
-        })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'sections' }, (payload) => {
-          productSubscribers.forEach((cb) => {
-            try { cb(payload); } catch (e) { console.warn('Product subscriber callback error:', e); }
-          });
-        })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'section_products' }, (payload) => {
-          productSubscribers.forEach((cb) => {
-            try { cb(payload); } catch (e) { console.warn('Product subscriber callback error:', e); }
-          });
-        })
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, (payload) => {
-          productSubscribers.forEach((cb) => {
-            try { cb(payload); } catch (e) { console.warn('Product subscriber callback error:', e); }
-          });
-        })
-        .subscribe();
-    } catch (err) {
-      console.warn('Realtime products channel setup notice:', err);
-    }
-  }
+  ensureProductsChannel();
 
   return () => {
     productSubscribers.delete(callback);
-    if (productSubscribers.size === 0 && activeProductsChannel) {
-      try {
-        supabase.removeChannel(activeProductsChannel);
-      } catch (err) {
-        // Safe removal
-      }
-      activeProductsChannel = null;
-    }
   };
 }

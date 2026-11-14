@@ -1,18 +1,25 @@
-import { parsePrice, formatEGP } from '../price';
+import { parsePrice, formatPrice, formatEGP, CURRENCY_LABEL } from '../price';
 import { getProductSizePrice } from '../../data/sizes';
 
 describe('Price calculation and formatting utilities', () => {
   test('parsePrice parses numbers correctly', () => {
     expect(parsePrice(450)).toBe(450);
     expect(parsePrice('450 EGP')).toBe(450);
+    expect(parsePrice('LE 2,200.00')).toBe(2200);
     expect(parsePrice('EGP 1,200.50')).toBe(1200.5);
     expect(parsePrice('invalid')).toBe(0);
     expect(parsePrice(null)).toBe(0);
   });
 
-  test('formatEGP formats number with currency', () => {
+  test('formatPrice formats number with currency constant (LE 2,200.00)', () => {
+    expect(formatPrice(2200)).toBe('LE 2,200.00');
+    expect(formatPrice(300)).toContain('300.00');
+    expect(formatPrice(300)).toContain(CURRENCY_LABEL);
+  });
+
+  test('formatEGP uses CURRENCY_LABEL', () => {
     expect(formatEGP(300)).toContain('300');
-    expect(formatEGP(300)).toContain('EGP');
+    expect(formatEGP(300)).toContain(CURRENCY_LABEL);
   });
 
   test('getProductSizePrice respects default sizes and overrides', () => {
@@ -42,4 +49,3 @@ describe('Price calculation and formatting utilities', () => {
     expect(subtotal).toBe(1250);
   });
 });
-

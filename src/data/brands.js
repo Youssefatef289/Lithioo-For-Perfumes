@@ -111,6 +111,12 @@ export const BRAND_LOGOS = [
     nameAr: 'ليثيو',
     logo: '/image/brands/lithioo.png',
   },
+  {
+    id: 'arabiyat-prestige',
+    name: 'Arabiyat Prestige',
+    nameAr: 'عربيات برستيج',
+    logo: '/image/Perfume brands/arabiyat prestige/aqriz 100ml 2300 (1).jpg',
+  },
 ];
 
 export const FEATURED_BRAND_IDS = [
@@ -180,6 +186,7 @@ const BRAND_ALIASES = {
   afnan: ['afnan', 'أفنان', 'افنان'],
   rasasi: ['rasasi', 'رساسي'],
   reef: ['reef', 'ريف'],
+  'arabiyat-prestige': ['arabiyat prestige', 'arabiyat-prestige', 'arabiyat', 'عربيات برستيج', 'برستيج'],
 };
 
 export const getBrandIdByName = (brandName) => {
