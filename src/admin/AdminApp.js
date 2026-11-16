@@ -56,10 +56,17 @@ export default function AdminApp() {
 
   // Listen for realtime new orders
   useEffect(() => {
-    const unsub = subscribeToOrders(() => {
-      setNewOrders((n) => n + 1);
-    });
-    return unsub;
+    let unsub = () => {};
+    try {
+      unsub = subscribeToOrders(() => {
+        setNewOrders((n) => n + 1);
+      });
+    } catch (e) {
+      console.warn('AdminApp subscribe notice:', e);
+    }
+    return () => {
+      if (typeof unsub === 'function') unsub();
+    };
   }, []);
 
   const toggleTheme = () => {

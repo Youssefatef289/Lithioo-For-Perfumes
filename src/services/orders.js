@@ -222,11 +222,17 @@ export function subscribeToOrders(callback) {
     return () => {};
   }
 
-  orderSubscribers.add(callback);
-  ensureOrdersChannel();
+  try {
+    orderSubscribers.add(callback);
+    ensureOrdersChannel();
+  } catch (err) {
+    console.warn('subscribeToOrders error caught:', err);
+  }
 
   return () => {
-    orderSubscribers.delete(callback);
+    try {
+      orderSubscribers.delete(callback);
+    } catch (e) {}
   };
 }
 

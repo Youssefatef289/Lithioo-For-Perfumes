@@ -244,10 +244,16 @@ export function subscribeToProducts(callback) {
     return () => {};
   }
 
-  productSubscribers.add(callback);
-  ensureProductsChannel();
+  try {
+    productSubscribers.add(callback);
+    ensureProductsChannel();
+  } catch (err) {
+    console.warn('subscribeToProducts error caught:', err);
+  }
 
   return () => {
-    productSubscribers.delete(callback);
+    try {
+      productSubscribers.delete(callback);
+    } catch (e) {}
   };
 }

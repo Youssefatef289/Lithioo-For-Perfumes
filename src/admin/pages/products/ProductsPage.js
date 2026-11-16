@@ -195,10 +195,17 @@ export default function ProductsPage() {
 
   // Realtime synchronization: Listen to products, sections, offers
   useEffect(() => {
-    const unsub = subscribeToProducts(() => {
-      loadData();
-    });
-    return unsub;
+    let unsub = () => {};
+    try {
+      unsub = subscribeToProducts(() => {
+        loadData();
+      });
+    } catch (e) {
+      console.warn('ProductsPage subscribe notice:', e);
+    }
+    return () => {
+      if (typeof unsub === 'function') unsub();
+    };
   }, [loadData]);
 
   // Section Counts

@@ -76,25 +76,32 @@ export default function OrdersPage({ onRead }) {
 
   // Realtime subscription with sound and toast
   useEffect(() => {
-    const unsub = subscribeToOrders((payload) => {
-      // Play notification sound if supported
-      try {
-        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-        audio.play().catch(() => {});
-      } catch (e) {
-        // audio play ignored
-      }
+    let unsub = () => {};
+    try {
+      unsub = subscribeToOrders((payload) => {
+        // Play notification sound if supported
+        try {
+          const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+          audio.play().catch(() => {});
+        } catch (e) {
+          // audio play ignored
+        }
 
-      toast({
-        message:
-          language === 'ar'
-            ? '🔔 طلب جديد ورد الآن إلى لوحة التحكم!'
-            : '🔔 New order received in dashboard!',
-        type: 'info',
+        toast({
+          message:
+            language === 'ar'
+              ? '🔔 طلب جديد ورد الآن إلى لوحة التحكم!'
+              : '🔔 New order received in dashboard!',
+          type: 'info',
+        });
+        loadData();
       });
-      loadData();
-    });
-    return unsub;
+    } catch (e) {
+      console.warn('OrdersPage subscribe notice:', e);
+    }
+    return () => {
+      if (typeof unsub === 'function') unsub();
+    };
   }, [loadData, toast, language]);
 
   const handleTabChange = (key) => {

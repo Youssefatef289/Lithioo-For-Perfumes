@@ -208,10 +208,16 @@ export function subscribeToSections(callback) {
     return () => {};
   }
 
-  sectionSubscribers.add(callback);
-  ensureSectionsChannel();
+  try {
+    sectionSubscribers.add(callback);
+    ensureSectionsChannel();
+  } catch (err) {
+    console.warn('subscribeToSections error caught:', err);
+  }
 
   return () => {
-    sectionSubscribers.delete(callback);
+    try {
+      sectionSubscribers.delete(callback);
+    } catch (e) {}
   };
 }
