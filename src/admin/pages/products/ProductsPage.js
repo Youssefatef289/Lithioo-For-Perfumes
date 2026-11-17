@@ -126,7 +126,10 @@ export default function ProductsPage() {
         fetchOffers(),
       ]);
 
-      if (brandRes.data) setBrands(brandRes.data);
+      if (brandRes.data) {
+        const websiteSlugs = new Set(BRAND_LOGOS.map((b) => b.id.toLowerCase()));
+        setBrands(brandRes.data.filter((b) => websiteSlugs.has(b.slug?.toLowerCase())));
+      }
       if (sectionList) setSections(sectionList);
       if (offerList) setOffers(offerList);
 

@@ -35,6 +35,24 @@ export default function BrandsPage() {
     is_active: true,
   });
 
+  const isWebsiteBrand = useCallback((brand) => {
+    if (!brand) return false;
+    const brandSlug = String(brand.slug || brand.id || '').trim().toLowerCase();
+    const brandNameEn = String(brand.name_en || brand.name || '').trim().toLowerCase();
+    const brandNameAr = String(brand.name_ar || brand.nameAr || '').trim().toLowerCase();
+
+    return BRAND_LOGOS.some((wb) => {
+      const wbId = String(wb.id || '').trim().toLowerCase();
+      const wbNameEn = String(wb.name || '').trim().toLowerCase();
+      const wbNameAr = String(wb.nameAr || '').trim().toLowerCase();
+      return (
+        wbId === brandSlug ||
+        wbNameEn === brandNameEn ||
+        (wbNameAr && wbNameAr === brandNameAr)
+      );
+    });
+  }, []);
+
   const loadBrands = useCallback(async () => {
     if (!isSupabaseConfigured) {
       setBrands(
@@ -58,12 +76,27 @@ export default function BrandsPage() {
         .select('*')
         .order('sort_order', { ascending: true });
       if (error) throw error;
-      setBrands(data || []);
+
+      // Keep only approved website brand logos
+      const websiteBrands = (data || []).filter(isWebsiteBrand);
+      setBrands(websiteBrands);
+
+      // Clean up extra non-website brands in the database
+      const extraBrands = (data || []).filter((b) => !isWebsiteBrand(b));
+      if (extraBrands.length > 0) {
+        const extraIds = extraBrands.map((b) => b.id);
+        try {
+          await supabase.from('products').update({ brand_id: null }).in('brand_id', extraIds);
+          await supabase.from('brands').delete().in('id', extraIds);
+        } catch (cleanErr) {
+          console.warn('Brand cleanup notice:', cleanErr);
+        }
+      }
     } catch (err) {
       console.error(err);
       toast({ message: t.common.error, type: 'error' });
     }
-  }, [t.common.error, toast]);
+  }, [t.common.error, toast, isWebsiteBrand]);
 
   useEffect(() => {
     loadBrands();
@@ -143,23 +176,7 @@ export default function BrandsPage() {
     }
   };
 
-  const isWebsiteBrand = (brand) => {
-    if (!brand) return false;
-    const brandSlug = String(brand.slug || brand.id || '').trim().toLowerCase();
-    const brandNameEn = String(brand.name_en || brand.name || '').trim().toLowerCase();
-    const brandNameAr = String(brand.name_ar || brand.nameAr || '').trim().toLowerCase();
 
-    return BRAND_LOGOS.some((wb) => {
-      const wbId = String(wb.id || '').trim().toLowerCase();
-      const wbNameEn = String(wb.name || '').trim().toLowerCase();
-      const wbNameAr = String(wb.nameAr || '').trim().toLowerCase();
-      return (
-        wbId === brandSlug ||
-        wbNameEn === brandNameEn ||
-        (wbNameAr && wbNameAr === brandNameAr)
-      );
-    });
-  };
 
   const handleDelete = async () => {
     if (!deleteTarget) return;

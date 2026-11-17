@@ -95,11 +95,11 @@ const ProductCard = ({ product, className = '', animationClass = '', style }) =>
     <>
       <article
         onClick={openDetails}
-        className={`group relative flex flex-col justify-between rounded-2xl bg-white p-3.5 transition-all duration-300 hover:shadow-lg dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 cursor-pointer ${animationClass} ${className}`}
+        className={`group relative flex flex-col justify-between rounded-2xl bg-transparent hover:bg-white/60 dark:hover:bg-neutral-900/60 p-2.5 transition-all duration-300 hover:shadow-sm border border-transparent hover:border-neutral-100 dark:hover:border-neutral-800/60 cursor-pointer ${animationClass} ${className}`}
         style={style}
       >
-        {/* Top Product Image Container with soft light background & generous padding */}
-        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-[#f5f5f5] dark:bg-neutral-800/60 p-6 flex items-center justify-center transition-colors duration-300 group-hover:bg-[#f0f0f0] dark:group-hover:bg-neutral-800">
+        {/* Top Product Image Container without background */}
+        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-transparent p-4 flex items-center justify-center transition-colors duration-300">
           <img
             src={mainImage}
             alt={lp.name}

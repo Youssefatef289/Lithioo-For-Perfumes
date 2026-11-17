@@ -24,7 +24,8 @@ export async function fetchBrands() {
     .order('sort_order');
 
   if (error) throw error;
-  return data;
+  const websiteSlugs = new Set(BRAND_LOGOS.map((b) => b.id.toLowerCase()));
+  return (data || []).filter((row) => websiteSlugs.has(row.slug?.toLowerCase()));
 }
 
 /** Normalize a brand row to the legacy shape used by components */

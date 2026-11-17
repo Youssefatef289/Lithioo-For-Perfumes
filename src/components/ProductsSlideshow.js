@@ -5,18 +5,24 @@ import { useLanguage } from '../contexts/LanguageContext';
 const SLIDES = [
   {
     id: 1,
+    src: '/image/slider - section products/slide-4.webp',
+    alt: 'Afnan 9 PM & 9 AM Perfume Collection',
+    altAr: 'تشكيلة عطور 9 بي إم و 9 إيه إم الفاخرة',
+  },
+  {
+    id: 2,
     src: '/image/slider - section products/slide-1.webp',
     alt: 'Lithioo Perfumes Featured Collection',
     altAr: 'تشكيلة عطور ليثيو الحصرية',
   },
   {
-    id: 2,
+    id: 3,
     src: '/image/slider - section products/slide-2.webp',
     alt: 'Lithioo Luxury Perfumes',
     altAr: 'أرقى العطور الفاخرة من ليثيو',
   },
   {
-    id: 3,
+    id: 4,
     src: '/image/slider - section products/slide-3.webp',
     alt: 'Lithioo Fragrance Selection',
     altAr: 'مختارات ليثيو المميزة',

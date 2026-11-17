@@ -25,7 +25,7 @@ export const BRAND_LOGOS = [
     id: 'reef',
     name: 'Reef',
     nameAr: 'ريف',
-    logo: '/image/brands/reef.png',
+    logo: '/image/brands/reef.webp',
   },
   {
     id: 'arabian-oud',
@@ -115,7 +115,7 @@ export const BRAND_LOGOS = [
     id: 'arabiyat-prestige',
     name: 'Arabiyat Prestige',
     nameAr: 'عربيات برستيج',
-    logo: '/image/Perfume brands/arabiyat prestige/aqriz 100ml 2300 (1).jpg',
+    logo: '/image/brands/arabiyat-prestige.webp',
   },
 ];
 

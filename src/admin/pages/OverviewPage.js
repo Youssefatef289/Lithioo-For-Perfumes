@@ -80,15 +80,12 @@ export default function OverviewPage() {
       }
 
       try {
-        // Fetch products count and brands count
-        const [prodRes, brandRes] = await Promise.all([
-          supabase.from('products').select('id', { count: 'exact', head: true }),
-          supabase.from('brands').select('id', { count: 'exact', head: true }),
-        ]);
+        // Fetch products count
+        const prodRes = await supabase.from('products').select('id', { count: 'exact', head: true });
 
         if (isMounted) {
           setProductsCount(prodRes.count ?? allProducts?.length ?? 0);
-          setBrandsCount(brandRes.count ?? BRAND_LOGOS?.length ?? 0);
+          setBrandsCount(BRAND_LOGOS?.length || 18);
         }
 
         // 1. Try to call admin_dashboard_stats RPC
