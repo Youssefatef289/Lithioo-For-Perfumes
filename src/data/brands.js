@@ -16,7 +16,7 @@ export const BRAND_LOGOS = [
     id: 'reef',
     name: 'Reef',
     nameAr: 'ريف',
-    logo: '/image/brands/reef.webp',
+    logo: '/image/brands/reef.png',
   },
   {
     id: 'arabian-oud',
@@ -55,12 +55,6 @@ export const BRAND_LOGOS = [
     logo: '/image/brands/al-qurashi.png',
   },
   {
-    id: 'al-mas',
-    name: 'Al Mas Perfumes',
-    nameAr: 'المس للعطور',
-    logo: '/image/brands/al-mas-perfumes.png',
-  },
-  {
     id: 'dkhoon-emirates',
     name: 'Dkhoon Emirates',
     nameAr: 'دخون الإمارات',
@@ -97,18 +91,14 @@ export const BRAND_LOGOS = [
     logo: '/image/brands/armaf.png',
   },
   {
-    id: 'lithioo',
-    name: 'Lithioo',
-    nameAr: 'ليثيو',
-    logo: '/image/brands/lithioo.png',
-  },
-  {
     id: 'arabiyat-prestige',
     name: 'Arabiyat Prestige',
     nameAr: 'عربيات برستيج',
     logo: '/image/brands/arabiyat-prestige.webp',
   },
 ];
+  
+
 
 export const FEATURED_BRAND_IDS = [
   'assaf',
@@ -121,6 +111,7 @@ export const FEATURED_BRAND_IDS = [
   'al-majed-oud',
   'Laverne',
   'jean-antoine',
+  'arabiyat-prestige',
   'reef',
 ];
 
