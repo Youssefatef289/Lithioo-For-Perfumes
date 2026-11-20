@@ -3,8 +3,6 @@ const BRAND_BY_SLUG = {
   'al-khitam-musk': { name: 'Al Khitam Musk', brand: 'Al Khitam' },
   'black-star': { name: 'Black Star', brand: 'IBRAQ' },
   'blue-diamond-aqua-eau-de-perfume-150ml': { name: 'Blue Diamond Aqua', brand: 'Diamond Collection' },
-  'body-musk-arabic-collection': { name: 'Body Musk Arabic Collection', brand: 'Arabian Oud' },
-  'body-oud-cardamom': { name: 'Body Oud Cardamom', brand: 'Arabian Oud' },
   'candy-musk-al-majed-oud-150': { name: 'Candy Musk', brand: 'Al Majed Oud' },
   'cedar-of-lebanon': { name: 'Cedar of Lebanon', brand: 'Diamond Collection' },
   'emerald-soul': { name: 'Emerald Soul', brand: 'Diamond Collection' },
@@ -21,7 +19,6 @@ const BRAND_BY_SLUG = {
   'irth-collection-100-ml': { name: 'Irth Collection', brand: 'Irth' },
   'jadayel-hair-length-oil-130ml': { name: 'Hair Length Oil', brand: 'Jadayel' },
   'lady-sukoon-perfume-100ml': { name: 'Lady Sukoon', brand: 'Lady Sukoon' },
-  'musk-collection': { name: 'Musk Collection', brand: 'Arabian Oud' },
   'nude-coral-diamond': { name: 'Nude Coral Diamond', brand: 'Diamond Collection' },
   'prestige-black-perfume': { name: 'Prestige Black', brand: 'Prestige' },
   'prestige-ruby': { name: 'Prestige Ruby', brand: 'Prestige' },
@@ -35,9 +32,7 @@ const BRAND_BY_SLUG = {
   'shahra-for-men-eau-de-parfum-by-rasasi-90ml': { name: 'Shahra', brand: 'Rasasi' },
   'spanish-tobacco-100-ml': { name: 'Spanish Tobacco', brand: 'Ibrahim Al Qurashi' },
   'summer-collection-ibraq': { name: 'Summer Collection', brand: 'IBRAQ' },
-  'tobacco-collection': { name: 'Tobacco Collection', brand: 'Arabian Oud' },
   'tobacoo-body-oud': { name: 'Tobacco Body Oud', brand: 'Body Oud' },
-  'vintage-tobacco': { name: 'Vintage Tobacco', brand: 'Arabian Oud' },
   'white-regent-diamond': { name: 'White Regent Diamond', brand: 'Diamond Collection' },
   '9-pm-night-out': { name: '9 PM NIGHT OUT', brand: 'Afnan', notes: 'SPICY | AMBER | FRUITY' },
   'raees-aurum': { name: 'RAEES AURUM', brand: 'Arabiyat Prestige', notes: 'AMBER | OUD | SPICY' },
@@ -57,10 +52,6 @@ export const ORIGINAL_IMAGE_CATALOG = [
   { slug: 'al-khitam-musk', images: ['/image/Perfume brands/Al Khitam/al-khitam-musk-1.jpg', '/image/Perfume brands/Al Khitam/al-khitam-musk-2.jpg'] },
   { slug: 'black-star', images: ['/image/Perfume brands/Ibraq/black-star-1.webp'] },
   { slug: 'blue-diamond-aqua-eau-de-perfume-150ml', images: ['/image/Perfume brands/Ibraq/blue-diamond-aqua-eau-de-perfume-150ml-1.jpg'] },
-  {
-    slug: 'body-musk-arabic-collection', images: ['/image/Perfume brands/Arabian Oud/body-musk-arabic-collection-1.jpg', '/image/Perfume brands/Arabian Oud/body-musk-arabic-collection-2.jpg'],
-  },
-  { slug: 'body-oud-cardamom', images: ['/image/Perfume brands/Arabian Oud/body-oud-cardamom-1.webp', '/image/Perfume brands/Arabian Oud/body-oud-cardamom-2.webp'] },
   {
     slug: 'candy-musk-al-majed-oud-150', images: [
       '/image/Perfume brands/Al Majed Oud/candy-musk-al-majed-oud-150-1.png',
@@ -117,7 +108,6 @@ export const ORIGINAL_IMAGE_CATALOG = [
       '/image/Perfume brands/Lady Sukoon/lady-sukoon-perfume-100ml-4.jpg',
     ],
   },
-  { slug: 'musk-collection', images: ['/image/Perfume brands/Arabian Oud/musk-collection-1.jpg', '/image/Perfume brands/Arabian Oud/musk-collection-2.jpg'] },
   { slug: 'nude-coral-diamond', images: ['/image/Perfume brands/Ibraq/nude-coral-diamond-1.jpg', '/image/Perfume brands/Ibraq/nude-coral-diamond-2.jpg'] },
   {
     slug: 'prestige-black-perfume', images: [
@@ -167,27 +157,7 @@ export const ORIGINAL_IMAGE_CATALOG = [
       '/image/Perfume brands/Ibraq/summer-collection-ibraq-3.jpg',
     ],
   },
-  {
-    slug: 'tobacco-collection', images: [
-      '/image/Perfume brands/Arabian Oud/tobacco-collection-1.jpg',
-      '/image/Perfume brands/Arabian Oud/tobacco-collection-2.jpg',
-      '/image/Perfume brands/Arabian Oud/tobacco-collection-3.jpg',
-      '/image/Perfume brands/Arabian Oud/tobacco-collection-4.jpg',
-      '/image/Perfume brands/Arabian Oud/tobacco-collection-5.jpg',
-    ],
-  },
   { slug: 'tobacoo-body-oud', images: ['/image/Perfume brands/Ibraq/tobacoo-body-oud-1.webp', '/image/Perfume brands/Ibraq/tobacoo-body-oud-2.webp'] },
-  {
-    slug: 'vintage-tobacco', images: [
-      '/image/Perfume brands/Arabian Oud/vintage-tobacco-1.jpg',
-      '/image/Perfume brands/Arabian Oud/vintage-tobacco-2.jpg',
-      '/image/Perfume brands/Arabian Oud/vintage-tobacco-3.jpg',
-      '/image/Perfume brands/Arabian Oud/vintage-tobacco-4.jpg',
-      '/image/Perfume brands/Arabian Oud/vintage-tobacco-5.jpg',
-      '/image/Perfume brands/Arabian Oud/vintage-tobacco-6.jpg',
-      '/image/Perfume brands/Arabian Oud/vintage-tobacco-7.jpg',
-    ],
-  },
   {
     slug: 'white-regent-diamond', images: ['/image/Perfume brands/Ibraq/white-regent-diamond-1.webp', '/image/Perfume brands/Ibraq/white-regent-diamond-2.webp'],
   },
@@ -259,22 +229,18 @@ export const ORIGINAL_IMAGE_CATALOG = [
 
 /** Fixed EGP prices for original products (no size variants) */
 export const ORIGINAL_PRICES_BY_SLUG = {
-  'vintage-tobacco': 3500,
   'blue-diamond-aqua-eau-de-perfume-150ml': 2300,
   'emerald-soul': 2300,
   'ibrahim-al-qurashi-perfume-black-carbon-diamond-200ml-edp-lu': 2300,
   'nude-coral-diamond': 2300,
   'white-regent-diamond': 2300,
-  'body-oud-cardamom': 2500,
   'satin-body-oud': 2500,
   'tobacoo-body-oud': 2500,
   'ibraq-diamond-collection-new-collection-mini-10-ml-10-in-1': 3500,
   'jadayel-hair-length-oil-130ml': 1500,
-  'musk-collection': 4000,
   'ranet-khalkhal': 2000,
   'summer-collection-ibraq': 1800,
   'irth-collection-100-ml': 3500,
-  'tobacco-collection': 4500,
   'spanish-tobacco-100-ml': 2500,
   'ibraheem-al-qurashi-brazilian-tobacco-100-ml': 2300,
   'royale-eau-de-toilette-pour-home': 1500,
@@ -288,7 +254,6 @@ export const ORIGINAL_PRICES_BY_SLUG = {
   'ibraq-ibrahim-al-qurashi-al-shams-musk-edp75-ml-75': 1500,
   'candy-musk-al-majed-oud-150': 2500,
   'cedar-of-lebanon': 2000,
-  'body-musk-arabic-collection': 2000,
   'lady-sukoon-perfume-100ml': 1800,
   'prestige-ruby': 2500,
   serious: 2500,

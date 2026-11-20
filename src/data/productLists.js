@@ -75,7 +75,7 @@ Voce Viva|Valentino
 
 export const SPECIAL_LINES = `
 Xerjoff|Xerjoff
-Maghnawi|Arabian Oud
+Maghnawi|Lithioo
 She Oud|Lithioo
 Mukhalaat Maa El Thahab|Lithioo
 Amber Desire|Lithioo
@@ -85,7 +85,7 @@ Black Afgano|Nasomatto
 Seqmesk|Lithioo
 Al Fares Al Asmar|Lithioo
 Silk Musk|Lithioo
-Kalemat|Arabian Oud
+Kalemat|Lithioo
 Black Orchid|Tom Ford
 Strawberry Musk|Lithioo
 Al Ghareeb|Lithioo
