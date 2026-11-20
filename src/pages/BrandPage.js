@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FiArrowLeft, FiPackage } from 'react-icons/fi';
 import { useLanguage } from '../contexts/LanguageContext';
 import { BRAND_LOGOS, getBrandById, getBrandLabel, getBrandIdByName } from '../data/brands';
 import { allProducts } from '../data/products';
+import { fetchAllProducts } from '../services/products';
 import { getBrandGalleryProducts } from '../data/brandPrices';
 import { resolveGalleryProductNames } from '../data/productArabic';
 import ProductCard from '../components/ProductCard';
@@ -26,6 +27,22 @@ const BrandPage = () => {
     );
   }, [brandId]);
 
+  const [productsList, setProductsList] = useState(allProducts);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetchAllProducts()
+      .then((data) => {
+        if (isMounted && data && data.length > 0) {
+          setProductsList(data);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const brandProducts = useMemo(() => {
     if (!brand) return [];
     const brandIdNorm = brand.id.toLowerCase();
@@ -33,7 +50,7 @@ const BrandPage = () => {
     const brandArLower = (brand.nameAr || '').trim().toLowerCase();
 
     // 1. Catalog products matching this brand
-    const catalogMatches = allProducts.filter((product) => {
+    const catalogMatches = productsList.filter((product) => {
       const pBrandId = (product.brandId || getBrandIdByName(product.brand) || '').toLowerCase();
       if (pBrandId === brandIdNorm) return true;
       if (!product.brand) return false;
@@ -134,7 +151,7 @@ const BrandPage = () => {
     });
 
     return [...enhancedCatalogMatches, ...extraGalleryCards];
-  }, [brand]);
+  }, [brand, productsList]);
 
   const displayName = brand ? getBrandLabel(brand, language) : '';
   const secondaryName = isRtl ? brand?.name : brand?.nameAr;

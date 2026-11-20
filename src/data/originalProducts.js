@@ -43,6 +43,14 @@ const BRAND_BY_SLUG = {
   'raees-aurum': { name: 'RAEES AURUM', brand: 'Arabiyat Prestige', notes: 'AMBER | OUD | SPICY' },
   'aqriz-100ml': { name: 'AQRIZ', brand: 'Arabiyat Prestige', notes: 'CITRUS | WOODY | FRESH' },
   'kohl-100ml': { name: 'KOHL', brand: 'Arabiyat Prestige', notes: 'SMOKY | LEATHER | AMBER' },
+  'asrar-100ml': { name: 'Asrar', brand: 'Arabian Oud', notes: 'OUD | AMBER | SPICY' },
+  'ehsas-100ml': { name: 'Ehsas', brand: 'Arabian Oud', notes: 'FLORAL | WOODY | MUSK' },
+  'ehsas-khas-100ml': { name: 'Ehsas Khas', brand: 'Arabian Oud', notes: 'AMBER | ROSE | OUD' },
+  'titanium-100ml': { name: 'Titanium', brand: 'Arabian Oud', notes: 'CITRUS | LEATHER | WOODY' },
+  'tuwaiq-100ml': { name: 'Tuwaiq', brand: 'Arabian Oud', notes: 'OUD | AMBER | SPICE' },
+  'faris-al-arabiya-100ml': { name: 'Faris Al Arabiya', brand: 'Arabian Oud', notes: 'SPICY | LEATHER | ORIENTAL' },
+  'kalemat-100ml': { name: 'Kalemat', brand: 'Arabian Oud', notes: 'AMBER | HONEY | ANISE' },
+  'madera-100ml': { name: 'Madera', brand: 'Arabian Oud', notes: 'VANILLA | CARAMEL | WOODY' },
 };
 
 export const ORIGINAL_IMAGE_CATALOG = [
@@ -215,6 +223,38 @@ export const ORIGINAL_IMAGE_CATALOG = [
     slug: 'kohl-100ml',
     images: ['/image/Perfume brands/arabiyat prestige/kohl 100ml 2200 (1).jpg'],
   },
+  {
+    slug: 'asrar-100ml',
+    images: ['/image/Perfume brands/Arabian Oud/Asrar 100 ml 3200.png', '/image/Perfume brands/Arabian Oud/Asrar 100 ml 3200.jpg'],
+  },
+  {
+    slug: 'ehsas-100ml',
+    images: ['/image/Perfume brands/Arabian Oud/Ehsas 100 ml 3000ح (1).png', '/image/Perfume brands/Arabian Oud/Ehsas 100 ml 3000ح (2).png'],
+  },
+  {
+    slug: 'ehsas-khas-100ml',
+    images: ['/image/Perfume brands/Arabian Oud/Ehsas Khas 100 ml 4200 (1).jpg', '/image/Perfume brands/Arabian Oud/Ehsas Khas 100 ml 4200 (2).jpg'],
+  },
+  {
+    slug: 'titanium-100ml',
+    images: ['/image/Perfume brands/Arabian Oud/Titanium 100 ml3200ج (1).png', '/image/Perfume brands/Arabian Oud/Titanium 100 ml3200ج (2).png'],
+  },
+  {
+    slug: 'tuwaiq-100ml',
+    images: ['/image/Perfume brands/Arabian Oud/طويق 100 مل 3200ج  (1).png', '/image/Perfume brands/Arabian Oud/طويق 100 مل 3200ج  (2).png'],
+  },
+  {
+    slug: 'faris-al-arabiya-100ml',
+    images: ['/image/Perfume brands/Arabian Oud/فارس العربية 100 مل 3000ج (1).png', '/image/Perfume brands/Arabian Oud/فارس العربية 100 مل 3000ج (1).jpg'],
+  },
+  {
+    slug: 'kalemat-100ml',
+    images: ['/image/Perfume brands/Arabian Oud/كلمات 100 مل 4200 (1).png', '/image/Perfume brands/Arabian Oud/كلمات 100 مل 4200 (1).jpg'],
+  },
+  {
+    slug: 'madera-100ml',
+    images: ['/image/Perfume brands/Arabian Oud/ماديرا ١٠٠ مل 4200ج (1).jpg', '/image/Perfume brands/Arabian Oud/ماديرا ١٠٠ مل 4200ج (2).jpg'],
+  },
 ];
 
 /** Fixed EGP prices for original products (no size variants) */
@@ -256,6 +296,14 @@ export const ORIGINAL_PRICES_BY_SLUG = {
   'raees-aurum': 2300,
   'aqriz-100ml': 2300,
   'kohl-100ml': 2200,
+  'asrar-100ml': 3200,
+  'ehsas-100ml': 3000,
+  'ehsas-khas-100ml': 4200,
+  'titanium-100ml': 3200,
+  'tuwaiq-100ml': 3200,
+  'faris-al-arabiya-100ml': 3000,
+  'kalemat-100ml': 4200,
+  'madera-100ml': 4200,
 };
 
 export const getOriginalPrice = (slug) => ORIGINAL_PRICES_BY_SLUG[slug];

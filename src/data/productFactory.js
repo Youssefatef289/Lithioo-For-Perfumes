@@ -144,7 +144,14 @@ const buildProduct = (id, { name, brand }, section, imageOverrides = {}) => {
 };
 
 export const isOriginalProduct = (product) =>
-  Boolean(product && (product.hideSizes || product.section === 'original'));
+  Boolean(
+    product &&
+      (product.hideSizes ||
+        product.section === 'original' ||
+        product.section === 'new-luxury' ||
+        (Array.isArray(product.sections) &&
+          (product.sections.includes('original') || product.sections.includes('new-luxury'))))
+  );
 
 const buildOriginalProduct = (id, entry) => {
   const originalMeta = getOriginalMeta(entry.slug);

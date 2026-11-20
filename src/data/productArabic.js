@@ -483,6 +483,38 @@ export const GALLERY_NAMES_TRANSLATION = {
     nameEn: 'Candy Musk Al Majed Oud (150ml)',
     nameAr: 'كاندي مسك من الماجد للعود (150 مل)',
   },
+  'Asrar 100 ml 3200': {
+    nameEn: 'Asrar (100ml)',
+    nameAr: 'أسرار (100 مل)',
+  },
+  'Ehsas 100 ml 3000ح': {
+    nameEn: 'Ehsas (100ml)',
+    nameAr: 'إحساس (100 مل)',
+  },
+  'Ehsas Khas 100 ml 4200': {
+    nameEn: 'Ehsas Khas (100ml)',
+    nameAr: 'إحساس خاص (100 مل)',
+  },
+  'Titanium 100 ml3200ج': {
+    nameEn: 'Titanium (100ml)',
+    nameAr: 'تيتانيوم (100 مل)',
+  },
+  'طويق 100 مل 3200ج': {
+    nameEn: 'Tuwaiq (100ml)',
+    nameAr: 'طويق (100 مل)',
+  },
+  'فارس العربية 100 مل 3000ج': {
+    nameEn: 'Faris Al Arabiya (100ml)',
+    nameAr: 'فارس العربية (100 مل)',
+  },
+  'كلمات 100 مل 4200': {
+    nameEn: 'Kalemat (100ml)',
+    nameAr: 'كلمات (100 مل)',
+  },
+  'ماديرا ١٠٠ مل 4200ج': {
+    nameEn: 'Madera (100ml)',
+    nameAr: 'ماديرا (100 مل)',
+  },
   'ASSAF Lip Stick - 150ml  عساف عطر لب ستيك للنساء - 150مل2700EGP': {
     nameEn: 'Assaf Lip Stick (150ml)',
     nameAr: 'عساف عطر لب ستيك للنساء (150 مل)',

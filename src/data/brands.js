@@ -1,13 +1,4 @@
-/**
- * Brand logos for the homepage carousel.
- * Add or remove entries here - no component changes needed.
- *
- * Optional per-brand fields:
- *  - startingPrice: manual "starting from" EGP price override shown on brand
- *    cards. When omitted, the price is computed automatically from the
- *    cheapest catalog/gallery product for the brand
- *    (see src/data/brandPrices.js).
- */
+
 export const BRAND_LOGOS = [
   {
     id: 'afnan',
