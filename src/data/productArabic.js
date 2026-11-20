@@ -483,6 +483,26 @@ export const GALLERY_NAMES_TRANSLATION = {
     nameEn: 'Candy Musk Al Majed Oud (150ml)',
     nameAr: 'كاندي مسك من الماجد للعود (150 مل)',
   },
+  'ASSAF Lip Stick - 150ml  عساف عطر لب ستيك للنساء - 150مل2700EGP': {
+    nameEn: 'Assaf Lip Stick (150ml)',
+    nameAr: 'عساف عطر لب ستيك للنساء (150 مل)',
+  },
+  'RAEES-AURUM_ 180مل  2300ج': {
+    nameEn: 'Raees Aurum (180ml)',
+    nameAr: 'رئيس أوروم (180 مل)',
+  },
+  'Extrait de parfum Marmara 100 ml - French Avenue 2500ج': {
+    nameEn: 'Marmara Extrait de Parfum - French Avenue (100ml)',
+    nameAr: 'مرمرة إكستري دو بارفان (100 مل)',
+  },
+  'IBRAQ Ibrahim Al-Qurashi Al Shams musk EDP75 ml  ابراهيم القرشي عطر مسك الشمس للنساء - 75 مل': {
+    nameEn: 'Al Shams Musk EDP by Ibrahim Al-Qurashi (75ml)',
+    nameAr: 'عطر مسك الشمس من إبراهيم القرشي (75 مل)',
+  },
+  'IBRAQ Ibrahim Al-Qurashi Sunrise Melody 100 ML  إبراهيم القرشي عطر صن رايز ميلودي - 100مل 1900': {
+    nameEn: 'Sunrise Melody by Ibrahim Al-Qurashi (100ml)',
+    nameAr: 'عطر صن رايز ميلودي من إبراهيم القرشي (100 مل)',
+  },
   'Asrar 100 ml 3200': {
     nameEn: 'Asrar (100ml)',
     nameAr: 'أسرار (100 مل)',
@@ -515,25 +535,9 @@ export const GALLERY_NAMES_TRANSLATION = {
     nameEn: 'Madera (100ml)',
     nameAr: 'ماديرا (100 مل)',
   },
-  'ASSAF Lip Stick - 150ml  عساف عطر لب ستيك للنساء - 150مل2700EGP': {
-    nameEn: 'Assaf Lip Stick (150ml)',
-    nameAr: 'عساف عطر لب ستيك للنساء (150 مل)',
-  },
-  'RAEES-AURUM_ 180مل  2300ج': {
-    nameEn: 'Raees Aurum (180ml)',
-    nameAr: 'رئيس أوروم (180 مل)',
-  },
-  'Extrait de parfum Marmara 100 ml - French Avenue 2500ج': {
-    nameEn: 'Marmara Extrait de Parfum - French Avenue (100ml)',
-    nameAr: 'مرمرة إكستري دو بارفان (100 مل)',
-  },
-  'IBRAQ Ibrahim Al-Qurashi Al Shams musk EDP75 ml  ابراهيم القرشي عطر مسك الشمس للنساء - 75 مل': {
-    nameEn: 'Al Shams Musk EDP by Ibrahim Al-Qurashi (75ml)',
-    nameAr: 'عطر مسك الشمس من إبراهيم القرشي (75 مل)',
-  },
-  'IBRAQ Ibrahim Al-Qurashi Sunrise Melody 100 ML  إبراهيم القرشي عطر صن رايز ميلودي - 100مل 1900': {
-    nameEn: 'Sunrise Melody by Ibrahim Al-Qurashi (100ml)',
-    nameAr: 'عطر صن رايز ميلودي من إبراهيم القرشي (100 مل)',
+  'maghnawi-1': {
+    nameEn: 'Maghnawi (100ml)',
+    nameAr: 'مغناوي (100 مل)',
   },
 };
 

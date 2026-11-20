@@ -113,6 +113,7 @@ export const FEATURED_BRAND_IDS = [
   'jean-antoine',
   'arabiyat-prestige',
   'reef',
+  'arabian-oud',
 ];
 
 export const FEATURED_BRANDS = FEATURED_BRAND_IDS.map((id) =>

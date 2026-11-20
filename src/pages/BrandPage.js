@@ -9,16 +9,6 @@ import { getBrandGalleryProducts } from '../data/brandPrices';
 import { resolveGalleryProductNames } from '../data/productArabic';
 import ProductCard from '../components/ProductCard';
 
-const EXCLUDED_LEGACY_KEYS = new Set([
-  'body-musk-arabic-collection',
-  'body-oud-cardamom',
-  'musk-collection',
-  'tobacco-collection',
-  'vintage-tobacco',
-  'special-70',
-  'special-80',
-]);
-
 const BrandPage = () => {
   const { brandId } = useParams();
   const { language, isRtl } = useLanguage();
@@ -61,8 +51,6 @@ const BrandPage = () => {
 
     // 1. Catalog products matching this brand
     const catalogMatches = productsList.filter((product) => {
-      const pid = String(product.id || product.slug || '').toLowerCase();
-      if (EXCLUDED_LEGACY_KEYS.has(pid)) return false;
       const pBrandId = (product.brandId || getBrandIdByName(product.brand) || '').toLowerCase();
       if (pBrandId === brandIdNorm) return true;
       if (!product.brand) return false;
@@ -71,10 +59,7 @@ const BrandPage = () => {
     });
 
     // 2. Gallery products for this brand
-    const galleryMatches = (getBrandGalleryProducts(brand.id) || []).filter((gp) => {
-      const key = cleanKey(gp.name);
-      return !EXCLUDED_LEGACY_KEYS.has(key);
-    });
+    const galleryMatches = getBrandGalleryProducts(brand.id) || [];
 
     // Helper for normalizing product titles (strips size, brand suffix, trailing numbers/symbols/parentheses)
     const cleanKey = (str) =>
