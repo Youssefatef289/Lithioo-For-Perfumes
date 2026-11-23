@@ -11,6 +11,8 @@ import {
   FiTag,
   FiPause,
   FiPlay,
+  FiCheck,
+  FiX,
 } from 'react-icons/fi';
 import { useAdminLang } from '../../contexts/AdminLangContext';
 import { useToast } from '../../components/ui/Toast';
@@ -39,6 +41,109 @@ import {
   Modal,
   ImageUploader,
 } from '../../components/ui';
+
+function InlinePriceCell({ product, currencyLabel, language, toast, onUpdated }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [priceVal, setPriceVal] = useState(product.base_price ?? '');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setPriceVal(product.base_price ?? '');
+  }, [product.base_price]);
+
+  const handleSave = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const num = Number(priceVal);
+    if (isNaN(num) || num < 0) return;
+    setSaving(true);
+    try {
+      if (isSupabaseConfigured) {
+        const { error } = await supabase
+          .from('products')
+          .update({ base_price: num })
+          .eq('id', product.id);
+        if (error) throw error;
+      }
+      onUpdated({ ...product, base_price: num });
+      setIsEditing(false);
+      toast?.({
+        message: language === 'ar' ? 'تم تحديث السعر بنجاح' : 'Price updated successfully',
+        type: 'success',
+      });
+    } catch (err) {
+      console.error('Quick price update error:', err);
+      toast?.({ message: err.message || 'Error updating price', type: 'error' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (isEditing) {
+    return (
+      <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+        <input
+          type="number"
+          value={priceVal}
+          onChange={(e) => setPriceVal(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSave(e);
+            if (e.key === 'Escape') setIsEditing(false);
+          }}
+          autoFocus
+          className="w-20 rounded border border-brand px-1.5 py-0.5 text-xs font-semibold text-neutral-900 focus:outline-none dark:bg-neutral-800 dark:text-white"
+        />
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving}
+          className="rounded bg-brand p-1 text-white hover:bg-brand-dark"
+          title={language === 'ar' ? 'حفظ السعر' : 'Save Price'}
+        >
+          <FiCheck size={12} />
+        </button>
+        <button
+          type="button"
+          onClick={() => setIsEditing(false)}
+          className="rounded bg-neutral-200 p-1 text-neutral-600 hover:bg-neutral-300 dark:bg-neutral-700 dark:text-neutral-300"
+          title={language === 'ar' ? 'إلغاء' : 'Cancel'}
+        >
+          <FiX size={12} />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="group flex cursor-pointer items-center gap-1.5"
+      onClick={() => setIsEditing(true)}
+      title={language === 'ar' ? 'انقر لتعديل السعر مباشرة' : 'Click to edit price directly'}
+    >
+      <div className="flex flex-col">
+        {product.sale_price ? (
+          <div className="flex items-center gap-1.5">
+            <span className="font-bold text-brand">
+              {Number(product.sale_price).toLocaleString()} {currencyLabel}
+            </span>
+            <span className="text-xs text-neutral-400 line-through">
+              {Number(product.base_price).toLocaleString()}
+            </span>
+          </div>
+        ) : (
+          <span className="font-semibold text-neutral-900 dark:text-white">
+            {product.base_price ? `${Number(product.base_price).toLocaleString()} ${currencyLabel}` : '—'}
+          </span>
+        )}
+      </div>
+      <span className="text-neutral-400 opacity-0 transition-opacity group-hover:opacity-100">
+        <FiEdit2 size={12} />
+      </span>
+    </div>
+  );
+}
 
 export default function ProductsPage() {
   const { t, language, isRTL } = useAdminLang();
@@ -518,22 +623,17 @@ export default function ProductsPage() {
       key: 'base_price',
       label: t.products.price,
       render: (val, row) => (
-        <div className="flex flex-col">
-          {row.sale_price ? (
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-brand">
-                {Number(row.sale_price).toLocaleString()} {t.common.egp}
-              </span>
-              <span className="text-xs text-neutral-400 line-through">
-                {Number(val).toLocaleString()}
-              </span>
-            </div>
-          ) : (
-            <span className="font-semibold text-neutral-900 dark:text-white">
-              {val ? `${Number(val).toLocaleString()} ${t.common.egp}` : '—'}
-            </span>
-          )}
-        </div>
+        <InlinePriceCell
+          product={row}
+          currencyLabel={t.common.egp}
+          language={language}
+          toast={toast}
+          onUpdated={(updatedProd) => {
+            setProducts((prev) =>
+              prev.map((p) => (p.id === updatedProd.id ? { ...p, ...updatedProd } : p))
+            );
+          }}
+        />
       ),
     },
     {

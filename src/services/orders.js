@@ -191,9 +191,11 @@ const orderSubscribers = new Set();
 function ensureOrdersChannel() {
   if (activeOrdersChannel || !isSupabaseConfigured || !supabase) return;
   try {
-    const channelId = `orders-sync-singleton-${Math.random().toString(36).slice(2, 8)}`;
-    activeOrdersChannel = supabase
-      .channel(channelId)
+    const channelId = `orders-sync-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const channel = supabase.channel(channelId);
+    if (!channel || typeof channel.on !== 'function') return;
+
+    activeOrdersChannel = channel
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload) => {
         orderSubscribers.forEach((cb) => {
           try { cb(payload); } catch (e) { console.warn('Order subscriber callback error:', e); }
@@ -203,12 +205,14 @@ function ensureOrdersChannel() {
         orderSubscribers.forEach((cb) => {
           try { cb(payload); } catch (e) { console.warn('Order subscriber callback error:', e); }
         });
-      })
-      .subscribe((status, err) => {
-        if (err) console.warn('Orders realtime status notice:', status, err);
       });
+
+    activeOrdersChannel.subscribe((status, err) => {
+      if (err) console.warn('Orders realtime status notice:', status, err);
+    });
   } catch (err) {
     console.warn('Realtime orders channel setup notice:', err);
+    activeOrdersChannel = null;
   }
 }
 
@@ -232,6 +236,12 @@ export function subscribeToOrders(callback) {
   return () => {
     try {
       orderSubscribers.delete(callback);
+      if (orderSubscribers.size === 0 && activeOrdersChannel) {
+        try {
+          supabase.removeChannel(activeOrdersChannel);
+        } catch (e) {}
+        activeOrdersChannel = null;
+      }
     } catch (e) {}
   };
 }

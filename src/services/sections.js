@@ -176,9 +176,11 @@ const sectionSubscribers = new Set();
 function ensureSectionsChannel() {
   if (activeSectionsChannel || !isSupabaseConfigured || !supabase) return;
   try {
-    const channelId = `sections-sync-singleton-${Math.random().toString(36).slice(2, 8)}`;
-    activeSectionsChannel = supabase
-      .channel(channelId)
+    const channelId = `sections-sync-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const channel = supabase.channel(channelId);
+    if (!channel || typeof channel.on !== 'function') return;
+
+    activeSectionsChannel = channel
       .on('postgres_changes', { event: '*', schema: 'public', table: 'sections' }, (payload) => {
         sectionSubscribers.forEach((cb) => {
           try { cb(payload); } catch (e) { console.warn('Section subscriber callback error:', e); }
@@ -193,12 +195,14 @@ function ensureSectionsChannel() {
         sectionSubscribers.forEach((cb) => {
           try { cb(payload); } catch (e) { console.warn('Section subscriber callback error:', e); }
         });
-      })
-      .subscribe((status, err) => {
-        if (err) console.warn('Sections realtime status notice:', status, err);
       });
+
+    activeSectionsChannel.subscribe((status, err) => {
+      if (err) console.warn('Sections realtime status notice:', status, err);
+    });
   } catch (err) {
     console.warn('Realtime sections channel setup notice:', err);
+    activeSectionsChannel = null;
   }
 }
 
@@ -218,6 +222,12 @@ export function subscribeToSections(callback) {
   return () => {
     try {
       sectionSubscribers.delete(callback);
+      if (sectionSubscribers.size === 0 && activeSectionsChannel) {
+        try {
+          supabase.removeChannel(activeSectionsChannel);
+        } catch (e) {}
+        activeSectionsChannel = null;
+      }
     } catch (e) {}
   };
 }

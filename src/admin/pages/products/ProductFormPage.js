@@ -212,8 +212,10 @@ export default function ProductFormPage() {
     return data?.publicUrl;
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
+  const handleSave = async (e, shouldExit = false) => {
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+    }
     if (!formData.name_en) {
       toast({ message: language === 'ar' ? 'اسم المنتج بالإنجليزي مطلوب' : 'Name (EN) is required', type: 'warning' });
       return;
@@ -226,7 +228,9 @@ export default function ProductFormPage() {
           message: language === 'ar' ? 'تم الحفظ محلياً' : 'Saved (offline mode)',
           type: 'success',
         });
-        navigate('/admin/products');
+        if (shouldExit || !isEditing) {
+          navigate('/admin/products');
+        }
         return;
       }
 
@@ -316,8 +320,14 @@ export default function ProductFormPage() {
         await supabase.from('product_sizes').insert(sizesToInsert);
       }
 
-      toast({ message: t.products.save + ' ' + (language === 'ar' ? 'بنجاح' : 'successfully'), type: 'success' });
-      navigate('/admin/products');
+      toast({
+        message: language === 'ar' ? 'تم حفظ التعديلات بنجاح' : 'Changes saved successfully',
+        type: 'success',
+      });
+
+      if (shouldExit || !isEditing) {
+        navigate('/admin/products');
+      }
     } catch (err) {
       console.error('Failed to save product:', err);
       toast({ message: err.message || t.common.error, type: 'error' });
@@ -344,7 +354,15 @@ export default function ProductFormPage() {
   }
 
   return (
-    <form onSubmit={handleSave} className="space-y-6">
+    <form
+      onSubmit={(e) => handleSave(e, false)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+          e.preventDefault();
+        }
+      }}
+      className="space-y-6"
+    >
       {/* Top Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
@@ -362,10 +380,26 @@ export default function ProductFormPage() {
           </div>
         </div>
 
-        <Button type="submit" loading={saving} variant="primary">
-          <FiSave size={16} />
-          {t.products.save}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            loading={saving}
+            variant="primary"
+            onClick={(e) => handleSave(e, false)}
+          >
+            <FiSave size={16} />
+            {language === 'ar' ? 'حفظ التعديلات' : 'Save Changes'}
+          </Button>
+
+          <Button
+            type="button"
+            loading={saving}
+            variant="outline"
+            onClick={(e) => handleSave(e, true)}
+          >
+            {language === 'ar' ? 'حفظ وخروج' : 'Save & Exit'}
+          </Button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -737,6 +771,35 @@ export default function ProductFormPage() {
           </div>
         )}
       </Card>
+
+      {/* Bottom Sticky Action Bar */}
+      <div className="sticky bottom-4 z-20 flex items-center justify-between rounded-2xl border border-neutral-200/80 bg-white/95 p-4 shadow-lg backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/95">
+        <Link
+          to="/admin/products"
+          className="rounded-xl border border-neutral-200 px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:border-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-800"
+        >
+          {language === 'ar' ? 'إلغاء ورجوع' : 'Cancel & Back'}
+        </Link>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            loading={saving}
+            variant="primary"
+            onClick={(e) => handleSave(e, false)}
+          >
+            <FiSave size={16} />
+            {language === 'ar' ? 'حفظ التعديلات' : 'Save Changes'}
+          </Button>
+          <Button
+            type="button"
+            loading={saving}
+            variant="outline"
+            onClick={(e) => handleSave(e, true)}
+          >
+            {language === 'ar' ? 'حفظ وخروج' : 'Save & Exit'}
+          </Button>
+        </div>
+      </div>
     </form>
   );
 }

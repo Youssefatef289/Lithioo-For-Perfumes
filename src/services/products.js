@@ -203,9 +203,11 @@ const productSubscribers = new Set();
 function ensureProductsChannel() {
   if (activeProductsChannel || !isSupabaseConfigured || !supabase) return;
   try {
-    const channelId = `products-sync-singleton-${Math.random().toString(36).slice(2, 8)}`;
-    activeProductsChannel = supabase
-      .channel(channelId)
+    const channelId = `products-sync-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const channel = supabase.channel(channelId);
+    if (!channel || typeof channel.on !== 'function') return;
+
+    activeProductsChannel = channel
       .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, (payload) => {
         productSubscribers.forEach((cb) => {
           try { cb(payload); } catch (e) { console.warn('Product subscriber callback error:', e); }
@@ -225,12 +227,14 @@ function ensureProductsChannel() {
         productSubscribers.forEach((cb) => {
           try { cb(payload); } catch (e) { console.warn('Product subscriber callback error:', e); }
         });
-      })
-      .subscribe((status, err) => {
-        if (err) console.warn('Products realtime status notice:', status, err);
       });
+
+    activeProductsChannel.subscribe((status, err) => {
+      if (err) console.warn('Products realtime status notice:', status, err);
+    });
   } catch (err) {
     console.warn('Realtime products channel setup error:', err);
+    activeProductsChannel = null;
   }
 }
 
@@ -254,6 +258,12 @@ export function subscribeToProducts(callback) {
   return () => {
     try {
       productSubscribers.delete(callback);
+      if (productSubscribers.size === 0 && activeProductsChannel) {
+        try {
+          supabase.removeChannel(activeProductsChannel);
+        } catch (e) {}
+        activeProductsChannel = null;
+      }
     } catch (e) {}
   };
 }
