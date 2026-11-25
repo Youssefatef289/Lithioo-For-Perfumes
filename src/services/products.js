@@ -203,7 +203,19 @@ const productSubscribers = new Set();
 function ensureProductsChannel() {
   if (activeProductsChannel || !isSupabaseConfigured || !supabase) return;
   try {
-    const channelId = `products-sync-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const channelId = 'products-sync-singleton';
+    
+    // Check if channel already exists in supabase client
+    if (typeof supabase.getChannels === 'function') {
+      const existing = supabase.getChannels().find(
+        (ch) => ch.topic === `realtime:${channelId}` || ch.topic === channelId
+      );
+      if (existing) {
+        activeProductsChannel = existing;
+        return;
+      }
+    }
+
     const channel = supabase.channel(channelId);
     if (!channel || typeof channel.on !== 'function') return;
 
@@ -234,7 +246,6 @@ function ensureProductsChannel() {
     });
   } catch (err) {
     console.warn('Realtime products channel setup error:', err);
-    activeProductsChannel = null;
   }
 }
 
@@ -258,12 +269,6 @@ export function subscribeToProducts(callback) {
   return () => {
     try {
       productSubscribers.delete(callback);
-      if (productSubscribers.size === 0 && activeProductsChannel) {
-        try {
-          supabase.removeChannel(activeProductsChannel);
-        } catch (e) {}
-        activeProductsChannel = null;
-      }
     } catch (e) {}
   };
 }

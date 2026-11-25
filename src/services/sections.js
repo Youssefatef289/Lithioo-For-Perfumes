@@ -184,7 +184,18 @@ const sectionSubscribers = new Set();
 function ensureSectionsChannel() {
   if (activeSectionsChannel || !isSupabaseConfigured || !supabase) return;
   try {
-    const channelId = `sections-sync-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const channelId = 'sections-sync-singleton';
+
+    if (typeof supabase.getChannels === 'function') {
+      const existing = supabase.getChannels().find(
+        (ch) => ch.topic === `realtime:${channelId}` || ch.topic === channelId
+      );
+      if (existing) {
+        activeSectionsChannel = existing;
+        return;
+      }
+    }
+
     const channel = supabase.channel(channelId);
     if (!channel || typeof channel.on !== 'function') return;
 
@@ -210,7 +221,6 @@ function ensureSectionsChannel() {
     });
   } catch (err) {
     console.warn('Realtime sections channel setup notice:', err);
-    activeSectionsChannel = null;
   }
 }
 
@@ -230,12 +240,6 @@ export function subscribeToSections(callback) {
   return () => {
     try {
       sectionSubscribers.delete(callback);
-      if (sectionSubscribers.size === 0 && activeSectionsChannel) {
-        try {
-          supabase.removeChannel(activeSectionsChannel);
-        } catch (e) {}
-        activeSectionsChannel = null;
-      }
     } catch (e) {}
   };
 }

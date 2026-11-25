@@ -191,7 +191,18 @@ const orderSubscribers = new Set();
 function ensureOrdersChannel() {
   if (activeOrdersChannel || !isSupabaseConfigured || !supabase) return;
   try {
-    const channelId = `orders-sync-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const channelId = 'orders-sync-singleton';
+
+    if (typeof supabase.getChannels === 'function') {
+      const existing = supabase.getChannels().find(
+        (ch) => ch.topic === `realtime:${channelId}` || ch.topic === channelId
+      );
+      if (existing) {
+        activeOrdersChannel = existing;
+        return;
+      }
+    }
+
     const channel = supabase.channel(channelId);
     if (!channel || typeof channel.on !== 'function') return;
 
@@ -212,7 +223,6 @@ function ensureOrdersChannel() {
     });
   } catch (err) {
     console.warn('Realtime orders channel setup notice:', err);
-    activeOrdersChannel = null;
   }
 }
 
@@ -236,12 +246,6 @@ export function subscribeToOrders(callback) {
   return () => {
     try {
       orderSubscribers.delete(callback);
-      if (orderSubscribers.size === 0 && activeOrdersChannel) {
-        try {
-          supabase.removeChannel(activeOrdersChannel);
-        } catch (e) {}
-        activeOrdersChannel = null;
-      }
     } catch (e) {}
   };
 }

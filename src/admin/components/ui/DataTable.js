@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
 
 /**
@@ -14,7 +14,7 @@ export function DataTable({
   data = [],
   loading = false,
   totalCount,
-  page = 1,
+  page: controlledPage,
   perPage = 20,
   onPageChange,
   onSort,
@@ -26,13 +26,37 @@ export function DataTable({
   actions,
   emptyMessage = 'No data found.',
 }) {
+  const [internalPage, setInternalPage] = useState(1);
+  const isControlled = controlledPage !== undefined;
+  const page = isControlled ? controlledPage : internalPage;
+
   const totalPages = totalCount !== undefined
     ? Math.max(1, Math.ceil(totalCount / perPage))
     : Math.max(1, Math.ceil(data.length / perPage));
 
-  const displayData = (onPageChange || totalCount !== undefined)
+  // If data length shrinks or changes, keep internal page within bounds
+  useEffect(() => {
+    if (!isControlled && internalPage > totalPages) {
+      setInternalPage(Math.max(1, totalPages));
+    }
+  }, [data.length, isControlled, internalPage, totalPages]);
+
+  const isServerSide = totalCount !== undefined;
+  const displayData = isServerSide
     ? data  // server-side: already paginated
     : data.slice((page - 1) * perPage, page * perPage);
+
+  const handlePageChange = (newPage) => {
+    const clamped = Math.max(1, Math.min(newPage, totalPages));
+    if (onPageChange) {
+      onPageChange(clamped);
+    }
+    if (!isControlled) {
+      setInternalPage(clamped);
+    }
+  };
+
+  const isRtl = typeof document !== 'undefined' && document.documentElement.getAttribute('data-admin-dir') === 'rtl';
 
   const allSelected = selected.length > 0 && selected.length === displayData.length;
 
@@ -145,16 +169,54 @@ export function DataTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-sm text-neutral-500">
-            Page {page} of {totalPages}
-            {totalCount !== undefined && ` · ${totalCount} total`}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-3">
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+            {isRtl ? `صفحة ${page} من ${totalPages}` : `Page ${page} of ${totalPages}`}
+            {totalCount !== undefined
+              ? ` · ${totalCount} ${isRtl ? 'إجمالي' : 'total'}`
+              : ` · ${data.length} ${isRtl ? 'عنصر' : 'items'}`}
           </p>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" disabled={page <= 1}
-              onClick={() => onPageChange?.(page - 1)}>← Prev</Button>
-            <Button variant="outline" size="sm" disabled={page >= totalPages}
-              onClick={() => onPageChange?.(page + 1)}>Next →</Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => handlePageChange(page - 1)}
+            >
+              {isRtl ? 'السابق →' : '← Prev'}
+            </Button>
+
+            <div className="hidden sm:flex items-center gap-1">
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 2)
+                .map((p, idx, arr) => (
+                  <React.Fragment key={p}>
+                    {idx > 0 && arr[idx - 1] !== p - 1 && (
+                      <span className="px-1 text-xs text-neutral-400">…</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => handlePageChange(p)}
+                      className={`h-8 min-w-[2rem] rounded-lg px-2 text-xs font-semibold transition ${
+                        p === page
+                          ? 'bg-brand text-white shadow-sm'
+                          : 'border border-neutral-200 text-neutral-600 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800'
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  </React.Fragment>
+                ))}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => handlePageChange(page + 1)}
+            >
+              {isRtl ? '← التالي' : 'Next →'}
+            </Button>
           </div>
         </div>
       )}

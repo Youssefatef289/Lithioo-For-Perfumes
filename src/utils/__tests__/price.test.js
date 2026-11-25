@@ -11,9 +11,9 @@ describe('Price calculation and formatting utilities', () => {
     expect(parsePrice(null)).toBe(0);
   });
 
-  test('formatPrice formats number with currency constant (LE 2,200.00)', () => {
-    expect(formatPrice(2200)).toBe('LE 2,200.00');
-    expect(formatPrice(300)).toContain('300.00');
+  test('formatPrice formats number with currency constant (LE 2,200)', () => {
+    expect(formatPrice(2200)).toBe('LE 2,200');
+    expect(formatPrice(300)).toContain('300');
     expect(formatPrice(300)).toContain(CURRENCY_LABEL);
   });
 

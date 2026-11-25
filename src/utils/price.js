@@ -8,10 +8,15 @@ export const parsePrice = (price) => {
 };
 
 export const formatPrice = (amount, currency = CURRENCY_LABEL) => {
-  const n = typeof amount === 'number' ? amount : parsePrice(amount);
+  let n = typeof amount === 'number' ? amount : parsePrice(amount);
+  // Auto-correct accidental piaster/extra-zero entries (e.g. 220000 -> 2200)
+  if (n >= 100000 && n % 100 === 0 && (n / 100) <= 20000) {
+    n = n / 100;
+  }
+  const hasDecimals = n % 1 !== 0;
   const formatted = n.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: hasDecimals ? 2 : 0,
   });
   return `${currency} ${formatted}`;
 };

@@ -189,6 +189,13 @@ export default function ProductsPage() {
   const [deleteProductTarget, setDeleteProductTarget] = useState(null);
   const [deleteOfferTarget, setDeleteOfferTarget] = useState(null);
 
+  // Pagination for products table
+  const [productPage, setProductPage] = useState(1);
+
+  useEffect(() => {
+    setProductPage(1);
+  }, [activeTab, search, selectedBrand]);
+
   // Load products, brands, sections, and offers
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -884,6 +891,9 @@ export default function ProductsPage() {
             columns={productColumns}
             data={filteredProducts}
             loading={loading}
+            page={productPage}
+            perPage={15}
+            onPageChange={setProductPage}
             actions={(row) => (
               <div className="flex items-center gap-1">
                 <Link to={`/admin/products/${row.id || row.slug}`}>
