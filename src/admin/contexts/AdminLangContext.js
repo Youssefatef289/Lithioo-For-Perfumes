@@ -35,6 +35,7 @@ export function AdminLangProvider({ children }) {
     } catch {}
     // Apply dir only on admin routes
     document.documentElement.setAttribute('data-admin-dir', isRTL ? 'rtl' : 'ltr');
+    document.documentElement.setAttribute('data-admin-lang', language);
   }, [language, isRTL]);
 
   return (

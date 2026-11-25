@@ -24,8 +24,13 @@ html[lang='en']:not([data-lang]) h6 {
 
 /* Arabic UI — Cairo */
 html[data-lang='ar'],
-html[lang='ar'] {
-  font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+html[lang='ar'],
+html[data-admin-dir='rtl'],
+[data-admin-dir='rtl'],
+[dir='rtl'],
+.font-arabic,
+.direction-rtl {
+  font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif !important;
   letter-spacing: 0;
 }
 
@@ -40,10 +45,29 @@ html[lang='ar'] h2,
 html[lang='ar'] h3,
 html[lang='ar'] h4,
 html[lang='ar'] h5,
-html[lang='ar'] h6 {
-  font-family: 'Cairo', sans-serif;
+html[lang='ar'] h6,
+[data-admin-dir='rtl'] h1,
+[data-admin-dir='rtl'] h2,
+[data-admin-dir='rtl'] h3,
+[data-admin-dir='rtl'] h4,
+[data-admin-dir='rtl'] h5,
+[data-admin-dir='rtl'] h6 {
+  font-family: 'Cairo', sans-serif !important;
   font-weight: 700;
   letter-spacing: 0;
+}
+
+[data-admin-dir='rtl'] input,
+[data-admin-dir='rtl'] button,
+[data-admin-dir='rtl'] select,
+[data-admin-dir='rtl'] textarea,
+[data-admin-dir='rtl'] table,
+[dir='rtl'] input,
+[dir='rtl'] button,
+[dir='rtl'] select,
+[dir='rtl'] textarea,
+[dir='rtl'] table {
+  font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif !important;
 }
 
 html[data-lang='ar'] p,

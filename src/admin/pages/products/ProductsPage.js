@@ -320,28 +320,34 @@ export default function ProductsPage() {
   const counts = useMemo(() => {
     const res = {
       all: products.length,
-      women: 0,
       men: 0,
+      women: 0,
       original: 0,
+      oriental: 0,
+      variety: 0,
       offers: offers.length,
     };
 
     products.forEach((p) => {
       const secs = p.all_sections || [p.section_slug];
-      if (secs.includes('women')) res.women += 1;
       if (secs.includes('men')) res.men += 1;
+      if (secs.includes('women')) res.women += 1;
       if (secs.includes('original') || secs.includes('new-luxury')) res.original += 1;
+      if (secs.includes('oriental') || secs.includes('eastern')) res.oriental += 1;
+      if (secs.includes('variety') || secs.includes('miscellaneous') || secs.includes('new-diverse')) res.variety += 1;
     });
 
     return res;
   }, [products, offers]);
 
-  // Tabs Definition
+  // Tabs Definition (رجالي، حريمي، أصلي، شرقي، منتجات متنوعة، عروض وأقسام)
   const sectionTabs = [
     { key: 'all',      label: t.products.tabAll || (language === 'ar' ? 'الكل' : 'All'), count: counts.all },
-    { key: 'women',    label: t.products.tabWomen || (language === 'ar' ? 'نسائي' : 'Women'), count: counts.women },
-    { key: 'men',      label: t.products.tabMen || (language === 'ar' ? 'رجالي' : 'Men'), count: counts.men },
-    { key: 'original', label: t.products.tabOriginal || (language === 'ar' ? 'أصلي' : 'Original'), count: counts.original },
+    { key: 'men',      label: language === 'ar' ? 'رجالي' : 'Men', count: counts.men },
+    { key: 'women',    label: language === 'ar' ? 'حريمي' : 'Women', count: counts.women },
+    { key: 'original', label: language === 'ar' ? 'أصلي' : 'Original', count: counts.original },
+    { key: 'oriental', label: language === 'ar' ? 'شرقي' : 'Oriental', count: counts.oriental },
+    { key: 'variety',  label: language === 'ar' ? 'منتجات متنوعة' : 'Various Products', count: counts.variety },
     { key: 'offers',   label: t.products.tabOffers || (language === 'ar' ? 'العروض والأقسام' : 'Offers & Sections'), count: counts.offers },
   ];
 
@@ -355,6 +361,10 @@ export default function ProductsPage() {
         const secs = p.all_sections || [p.section_slug];
         if (activeTab === 'original') {
           if (!secs.includes('original') && !secs.includes('new-luxury')) return false;
+        } else if (activeTab === 'oriental') {
+          if (!secs.includes('oriental') && !secs.includes('eastern')) return false;
+        } else if (activeTab === 'variety') {
+          if (!secs.includes('variety') && !secs.includes('miscellaneous') && !secs.includes('new-diverse')) return false;
         } else if (!secs.includes(activeTab)) {
           return false;
         }
@@ -415,12 +425,21 @@ export default function ProductsPage() {
     setProducts((prev) => prev.filter((p) => p.id !== target.id));
 
     if (isSupabaseConfigured) {
-      const { error } = await supabase.from('products').delete().eq('id', target.id);
-      if (error) {
-        toast({ message: t.common.error, type: 'error' });
+      try {
+        await supabase.from('section_products').delete().eq('product_id', target.id);
+        await supabase.from('product_sizes').delete().eq('product_id', target.id);
+        const { error } = await supabase.from('products').delete().eq('id', target.id);
+        if (error) {
+          console.error('Delete product error:', error);
+          toast({ message: error.message || t.common.error, type: 'error' });
+          loadData();
+        } else {
+          toast({ message: language === 'ar' ? 'تم حذف المنتج بنجاح' : 'Product deleted', type: 'success' });
+        }
+      } catch (err) {
+        console.error('Delete product catch:', err);
+        toast({ message: err.message || t.common.error, type: 'error' });
         loadData();
-      } else {
-        toast({ message: language === 'ar' ? 'تم حذف المنتج بنجاح' : 'Product deleted', type: 'success' });
       }
     }
   };
@@ -610,11 +629,27 @@ export default function ProductsPage() {
         const secs = row.all_sections || [row.section_slug];
         return (
           <div className="flex flex-wrap gap-1">
-            {secs.map((s) => (
-              <Badge key={s} color={s === 'women' ? 'pink' : s === 'men' ? 'blue' : s === 'original' ? 'purple' : 'gray'}>
-                {s}
-              </Badge>
-            ))}
+            {secs.map((s) => {
+              const color =
+                s === 'women' ? 'pink' :
+                s === 'men' ? 'blue' :
+                s === 'original' || s === 'new-luxury' ? 'purple' :
+                s === 'oriental' || s === 'eastern' ? 'amber' :
+                s === 'variety' || s === 'new-diverse' ? 'emerald' : 'gray';
+
+              const label =
+                s === 'women' ? (language === 'ar' ? 'حريمي' : 'Women') :
+                s === 'men' ? (language === 'ar' ? 'رجالي' : 'Men') :
+                s === 'original' ? (language === 'ar' ? 'أصلي' : 'Original') :
+                s === 'oriental' ? (language === 'ar' ? 'شرقي' : 'Oriental') :
+                s === 'variety' ? (language === 'ar' ? 'منتجات متنوعة' : 'Various') : s;
+
+              return (
+                <Badge key={s} color={color}>
+                  {label}
+                </Badge>
+              );
+            })}
           </div>
         );
       },
@@ -1054,22 +1089,26 @@ export default function ProductsPage() {
 
       {/* Product Delete Confirm */}
       <ConfirmDialog
+        open={Boolean(deleteProductTarget)}
         isOpen={Boolean(deleteProductTarget)}
         title={t.common.delete}
         message={t.products.deleteConfirm}
         confirmLabel={t.common.delete}
         cancelLabel={t.common.cancel}
+        dangerous
         onConfirm={handleDeleteProduct}
         onClose={() => setDeleteProductTarget(null)}
       />
 
       {/* Offer Delete Confirm */}
       <ConfirmDialog
+        open={Boolean(deleteOfferTarget)}
         isOpen={Boolean(deleteOfferTarget)}
         title={t.products.deleteOffer || 'Delete Offer'}
         message={language === 'ar' ? 'هل أنت متأكد من حذف هذا العرض الترويجي؟' : 'Are you sure you want to delete this offer section?'}
         confirmLabel={t.common.delete}
         cancelLabel={t.common.cancel}
+        dangerous
         onConfirm={handleDeleteOffer}
         onClose={() => setDeleteOfferTarget(null)}
       />

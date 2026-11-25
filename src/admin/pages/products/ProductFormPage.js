@@ -36,6 +36,10 @@ export default function ProductFormPage() {
   // Multi-section selection
   const [selectedSectionIds, setSelectedSectionIds] = useState([]);
 
+  // Custom typed brand state
+  const [customBrandMode, setCustomBrandMode] = useState(false);
+  const [customBrandName, setCustomBrandName] = useState('');
+
   // Form State
   const [formData, setFormData] = useState({
     slug: '',
@@ -132,6 +136,13 @@ export default function ProductFormPage() {
               is_active: prod.is_active !== false,
               sort_order: prod.sort_order || 0,
             });
+
+            if (prod.brand_id && brandRes.data) {
+              const matchedBrand = brandRes.data.find((b) => b.id === prod.brand_id);
+              if (matchedBrand) {
+                setCustomBrandName(matchedBrand.name_en);
+              }
+            }
 
             // Fetch joined sections from section_products
             const { data: sps } = await supabase
@@ -237,12 +248,48 @@ export default function ProductFormPage() {
       const primarySectionId = selectedSectionIds[0] || formData.section_id || null;
       const inStockValue = formData.stock_status !== 'out_of_stock';
 
+      // Resolve brand: either selected ID or typed brand name
+      let finalBrandId = formData.brand_id || null;
+      if (customBrandMode && customBrandName.trim()) {
+        const trimmed = customBrandName.trim();
+        const existing = brands.find(
+          (b) =>
+            b.name_en?.toLowerCase() === trimmed.toLowerCase() ||
+            b.name_ar?.toLowerCase() === trimmed.toLowerCase() ||
+            b.slug?.toLowerCase() === trimmed.toLowerCase()
+        );
+        if (existing) {
+          finalBrandId = existing.id;
+        } else if (isSupabaseConfigured) {
+          const brandSlug =
+            trimmed
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-|-$/g, '') || `brand-${Date.now()}`;
+          const { data: newBrand, error: brandErr } = await supabase
+            .from('brands')
+            .insert({
+              name_en: trimmed,
+              name_ar: trimmed,
+              slug: brandSlug,
+              is_active: true,
+            })
+            .select('id, slug, name_en')
+            .single();
+
+          if (!brandErr && newBrand) {
+            finalBrandId = newBrand.id;
+            setBrands((prev) => [...prev, newBrand]);
+          }
+        }
+      }
+
       const payload = {
         slug: formData.slug || formData.name_en.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
         name_en: formData.name_en,
         name_ar: formData.name_ar || null,
         notes: formData.notes?.trim() || null,
-        brand_id: formData.brand_id || null,
+        brand_id: finalBrandId,
         section_id: primarySectionId,
         category_id: formData.category_id || null,
         base_price: formData.base_price !== '' ? Number(formData.base_price) : null,
@@ -442,18 +489,74 @@ export default function ProductFormPage() {
                 }}
                 hint="Unique identifier used in URLs"
               />
-              <Select
-                label={t.products.brand}
-                value={formData.brand_id}
-                onChange={(e) => handleChange('brand_id', e.target.value)}
-              >
-                <option value="">{language === 'ar' ? 'اختر البراند' : 'Select Brand'}</option>
-                {brands.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.name_en}
-                  </option>
-                ))}
-              </Select>
+              <div className="flex flex-col gap-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">
+                    {t.products.brand}
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nextMode = !customBrandMode;
+                      setCustomBrandMode(nextMode);
+                      if (nextMode) {
+                        const currentBrand = brands.find((b) => b.id === formData.brand_id);
+                        if (currentBrand) setCustomBrandName(currentBrand.name_en);
+                      }
+                    }}
+                    className="text-xs font-semibold text-brand hover:underline"
+                  >
+                    {customBrandMode
+                      ? (language === 'ar' ? '← اختيار من القائمة' : '← Select from list')
+                      : (language === 'ar' ? '+ كتابة براند بالاسم' : '+ Type brand name')}
+                  </button>
+                </div>
+                {customBrandMode ? (
+                  <div>
+                    <Input
+                      placeholder={language === 'ar' ? 'اكتب اسم البراند هنا (مثلاً: Dior, Lattafa...)' : 'Type brand name (e.g. Dior, Lattafa...)'}
+                      value={customBrandName}
+                      onChange={(e) => setCustomBrandName(e.target.value)}
+                      list="brand-datalist-suggestions"
+                      autoFocus
+                    />
+                    <datalist id="brand-datalist-suggestions">
+                      {brands.map((b) => (
+                        <option key={b.id} value={b.name_en}>
+                          {b.name_ar ? `${b.name_en} (${b.name_ar})` : b.name_en}
+                        </option>
+                      ))}
+                    </datalist>
+                    <p className="mt-1 text-xs text-neutral-400">
+                      {language === 'ar'
+                        ? 'يمكنك كتابة أي براند جديد أو اختياره من الاقتراحات.'
+                        : 'Type any brand name or pick from suggestions.'}
+                    </p>
+                  </div>
+                ) : (
+                  <Select
+                    value={formData.brand_id}
+                    onChange={(e) => {
+                      if (e.target.value === '__NEW__') {
+                        setCustomBrandMode(true);
+                        setCustomBrandName('');
+                      } else {
+                        handleChange('brand_id', e.target.value);
+                      }
+                    }}
+                  >
+                    <option value="">{language === 'ar' ? 'اختر البراند' : 'Select Brand'}</option>
+                    {brands.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name_en} {b.name_ar ? `(${b.name_ar})` : ''}
+                      </option>
+                    ))}
+                    <option value="__NEW__">
+                      {language === 'ar' ? '➕ كتابة اسم براند جديد...' : '➕ Type new brand...'}
+                    </option>
+                  </Select>
+                )}
+              </div>
 
               <Select
                 label={language === 'ar' ? 'التصنيف' : 'Category'}

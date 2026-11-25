@@ -76,27 +76,12 @@ export default function BrandsPage() {
         .select('*')
         .order('sort_order', { ascending: true });
       if (error) throw error;
-
-      // Keep only approved website brand logos
-      const websiteBrands = (data || []).filter(isWebsiteBrand);
-      setBrands(websiteBrands);
-
-      // Clean up extra non-website brands in the database
-      const extraBrands = (data || []).filter((b) => !isWebsiteBrand(b));
-      if (extraBrands.length > 0) {
-        const extraIds = extraBrands.map((b) => b.id);
-        try {
-          await supabase.from('products').update({ brand_id: null }).in('brand_id', extraIds);
-          await supabase.from('brands').delete().in('id', extraIds);
-        } catch (cleanErr) {
-          console.warn('Brand cleanup notice:', cleanErr);
-        }
-      }
+      setBrands(data || []);
     } catch (err) {
       console.error(err);
       toast({ message: t.common.error, type: 'error' });
     }
-  }, [t.common.error, toast, isWebsiteBrand]);
+  }, [t.common.error, toast]);
 
   useEffect(() => {
     loadBrands();
@@ -181,18 +166,6 @@ export default function BrandsPage() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
-      if (isWebsiteBrand(deleteTarget)) {
-        toast({
-          message:
-            language === 'ar'
-              ? 'لا يمكن حذف هذا البراند لأنه معتمد ومعروض في واجهة الموقع'
-              : 'Cannot delete this brand because it is active on the website',
-          type: 'error',
-        });
-        setDeleteTarget(null);
-        return;
-      }
-
       if (isSupabaseConfigured) {
         // 1. Unlink any products from this brand to preserve products
         await supabase
@@ -286,13 +259,20 @@ export default function BrandsPage() {
             </div>
 
             <div className="mt-4 flex items-center justify-between border-t border-neutral-100 pt-3 dark:border-neutral-800">
-              <span
-                className={`text-[10px] font-bold uppercase ${
-                  b.is_active ? 'text-emerald-600' : 'text-neutral-400'
-                }`}
-              >
-                {b.is_active ? t.products.active : 'Inactive'}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span
+                  className={`text-[10px] font-bold uppercase ${
+                    b.is_active ? 'text-emerald-600' : 'text-neutral-400'
+                  }`}
+                >
+                  {b.is_active ? t.products.active : 'Inactive'}
+                </span>
+                {isWebsiteBrand(b) && (
+                  <span className="rounded bg-brand/10 px-1 py-0.5 text-[10px] font-medium text-brand">
+                    {language === 'ar' ? 'معتمد' : 'Featured'}
+                  </span>
+                )}
+              </div>
 
               <div className="flex items-center gap-1">
                 <button
@@ -306,33 +286,17 @@ export default function BrandsPage() {
                 >
                   <FiEdit2 size={15} />
                 </button>
-                {isWebsiteBrand(b) ? (
-                  <button
-                    type="button"
-                    disabled
-                    onClick={(e) => e.stopPropagation()}
-                    className="cursor-not-allowed rounded-lg p-1.5 text-neutral-300 dark:text-neutral-600 opacity-50"
-                    title={
-                      language === 'ar'
-                        ? 'هذا البراند معروض في الموقع الرئيسي ومحمي من الحذف'
-                        : 'This brand is featured on the website and protected from deletion'
-                    }
-                  >
-                    <FiTrash2 size={15} />
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDeleteTarget(b);
-                    }}
-                    className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-red-500 dark:hover:bg-neutral-800"
-                    title={t.brands.delete}
-                  >
-                    <FiTrash2 size={15} />
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDeleteTarget(b);
+                  }}
+                  className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-red-500 dark:hover:bg-neutral-800"
+                  title={t.brands.delete || (language === 'ar' ? 'حذف البراند' : 'Delete Brand')}
+                >
+                  <FiTrash2 size={15} />
+                </button>
               </div>
             </div>
           </Card>
@@ -452,6 +416,7 @@ export default function BrandsPage() {
             : `Are you sure you want to delete "${deleteTarget?.name_en}"? Products linked to this brand will not be deleted; they will be unlinked and preserved safely.`
         }
         confirmLabel={language === 'ar' ? 'نعم، حذف وفك الارتباط' : 'Yes, Delete & Unlink'}
+        cancelLabel={t.common.cancel || (language === 'ar' ? 'إلغاء' : 'Cancel')}
         dangerous
       />
     </div>

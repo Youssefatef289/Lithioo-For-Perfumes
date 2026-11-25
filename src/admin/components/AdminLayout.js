@@ -162,10 +162,11 @@ export function AdminLayout({ children, newOrders = 0, onThemeToggle, isDark }) 
 
   return (
     <div
-      className={`flex h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950 font-sans ${
-        isRTL ? 'direction-rtl' : ''
+      className={`flex h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950 ${
+        isRTL ? 'font-arabic direction-rtl' : 'font-sans'
       }`}
       dir={isRTL ? 'rtl' : 'ltr'}
+      style={isRTL ? { fontFamily: "'Cairo', 'Segoe UI', Tahoma, sans-serif" } : undefined}
     >
       {/* Mobile Drawer Overlay */}
       {mobileOpen && (

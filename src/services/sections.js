@@ -6,12 +6,14 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 export const STATIC_SECTIONS = [
-  { id: 'women', slug: 'women', name_en: 'Women', name_ar: 'نسائي', position: 1, is_active: true },
-  { id: 'men', slug: 'men', name_en: 'Men', name_ar: 'رجالي', position: 2, is_active: true },
+  { id: 'men', slug: 'men', name_en: 'Men', name_ar: 'رجالي', position: 1, is_active: true },
+  { id: 'women', slug: 'women', name_en: 'Women', name_ar: 'حريمي', position: 2, is_active: true },
   { id: 'original', slug: 'original', name_en: 'Original', name_ar: 'أصلي', position: 3, is_active: true },
-  { id: 'special', slug: 'special', name_en: 'Special', name_ar: 'مميز', position: 4, is_active: true },
-  { id: 'new-luxury', slug: 'new-luxury', name_en: 'New Luxury', name_ar: 'فاخر جديد', position: 5, is_active: true },
-  { id: 'new-diverse', slug: 'new-diverse', name_en: 'New Collection', name_ar: 'تشكيلة جديدة', position: 6, is_active: true },
+  { id: 'oriental', slug: 'oriental', name_en: 'Oriental', name_ar: 'شرقي', position: 4, is_active: true },
+  { id: 'variety', slug: 'variety', name_en: 'Various Products', name_ar: 'منتجات متنوعة', position: 5, is_active: true },
+  { id: 'special', slug: 'special', name_en: 'Special', name_ar: 'مميز', position: 6, is_active: true },
+  { id: 'new-luxury', slug: 'new-luxury', name_en: 'New Luxury', name_ar: 'فاخر جديد', position: 7, is_active: true },
+  { id: 'new-diverse', slug: 'new-diverse', name_en: 'New Collection', name_ar: 'تشكيلة جديدة', position: 8, is_active: true },
 ];
 
 /** Fetch all sections */
@@ -26,7 +28,13 @@ export async function fetchSections() {
 
     if (error) throw error;
     if (!data || data.length === 0) return STATIC_SECTIONS;
-    return data;
+    // Map Arabic label for women to حريمي if desired
+    return data.map((s) => {
+      if (s.slug === 'women' && s.name_ar === 'نسائي') {
+        return { ...s, name_ar: 'حريمي' };
+      }
+      return s;
+    });
   } catch (err) {
     console.warn('Failed to fetch sections from Supabase, using fallback:', err);
     return STATIC_SECTIONS;

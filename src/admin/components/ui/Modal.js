@@ -51,13 +51,40 @@ export function Modal({ open, onClose, title, children, size = 'md', footer }) {
   );
 }
 
-export function ConfirmDialog({ open, onClose, onConfirm, title, message, confirmLabel = 'Confirm', dangerous = false }) {
+export function ConfirmDialog({
+  open,
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmLabel = 'Confirm',
+  cancelLabel = 'Cancel',
+  dangerous = true,
+}) {
+  const isDialogVisible = open !== undefined ? Boolean(open) : Boolean(isOpen);
   return (
-    <Modal open={open} onClose={onClose} title={title} size="sm"
+    <Modal
+      open={isDialogVisible}
+      onClose={onClose}
+      title={title}
+      size="sm"
       footer={
         <div className="flex justify-end gap-3">
-          <Button variant="ghost" size="sm" onClick={onClose}>Cancel</Button>
-          <Button variant={dangerous ? 'danger' : 'primary'} size="sm" onClick={() => { onConfirm(); onClose(); }}>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            {cancelLabel}
+          </Button>
+          <Button
+            variant={dangerous ? 'danger' : 'primary'}
+            size="sm"
+            onClick={() => {
+              try {
+                onConfirm?.();
+              } finally {
+                onClose?.();
+              }
+            }}
+          >
             {confirmLabel}
           </Button>
         </div>
