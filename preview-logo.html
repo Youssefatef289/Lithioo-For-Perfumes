@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lithio Perfumes - Logo Animation Preview</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+      background: #0f0f11;
+      color: #e5e5e5;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    h1 {
+      color: #e2b359;
+      font-size: 26px;
+      margin-bottom: 8px;
+    }
+    p.subtitle {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button {
+      background: #1f1f23;
+      color: #e2b359;
+      border: 1px solid #e2b359;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    button:hover {
+      background: #e2b359;
+      color: #0f0f11;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 24px;
+      width: 100%;
+      max-width: 1100px;
+    }
+    .card {
+      background: #17171a;
+      border: 1px solid #2a2a2e;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .card.light-mode {
+      background: #ffffff;
+      border-color: #e5e5e5;
+    }
+    .card.light-mode h3 {
+      color: #111;
+    }
+    .card.light-mode .badge {
+      background: #eee;
+      color: #666;
+    }
+    .card h3 {
+      font-size: 16px;
+      color: #e2b359;
+      margin-bottom: 6px;
+    }
+    .badge {
+      font-size: 12px;
+      background: #232328;
+      color: #aaa;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+    .preview-box {
+      width: 100%;
+      height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-radius: 8px;
+      background: transparent;
+    }
+    .preview-box object, .preview-box img {
+      width: 100%;
+      max-height: 240px;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>معاينة أنيميشن لوجو Lithio Perfumes</h1>
+  <p class="subtitle">أنيميشن فيكتور أصلي بالـ Stroke والـ Gradient Reveal (3 ثوانٍ)</p>
+
+  <div class="controls">
+    <button onclick="replayAnimations()">🔄 إعادة تشغيل الأنيميشن (Replay)</button>
+    <button onclick="toggleBackground()">🌓 تبديل الخلفية (داكنة / فاتحة)</button>
+  </div>
+
+  <div class="grid">
+    <!-- Horizontal Animated -->
+    <div class="card" id="card1">
+      <h3>النسخة المتحركة الأفقية (المطلوبة كمرجع)</h3>
+      <span class="badge">lithio-logo-animated.svg</span>
+      <div class="preview-box">
+        <object id="anim1" type="image/svg+xml" data="lithio-logo-animated.svg"></object>
+      </div>
+    </div>
+
+    <!-- Vertical Animated -->
+    <div class="card" id="card2">
+      <h3>النسخة المتحركة الرأسية (هوية الموقع / Splash)</h3>
+      <span class="badge">lithio-logo-animated-vertical.svg</span>
+      <div class="preview-box">
+        <object id="anim2" type="image/svg+xml" data="lithio-logo-animated-vertical.svg"></object>
+      </div>
+    </div>
+
+    <!-- Static Version -->
+    <div class="card" id="card3">
+      <h3>النسخة الثابتة (Final Static State)</h3>
+      <span class="badge">lithio-logo-static.svg</span>
+      <div class="preview-box">
+        <img src="lithio-logo-static.svg" alt="Lithio Static">
+      </div>
+    </div>
+
+    <!-- Original Reference -->
+    <div class="card" id="card4">
+      <h3>المرجع الأصلي (PNG)</h3>
+      <span class="badge">Leithioo logo black (1).png</span>
+      <div class="preview-box">
+        <img src="image/logo/Leithioo logo black  (1).png" alt="Original Reference">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function replayAnimations() {
+      const o1 = document.getElementById('anim1');
+      const o2 = document.getElementById('anim2');
+      if (o1) o1.data = 'lithio-logo-animated.svg?t=' + Date.now();
+      if (o2) o2.data = 'lithio-logo-animated-vertical.svg?t=' + Date.now();
+    }
+
+    function toggleBackground() {
+      const cards = document.querySelectorAll('.card');
+      cards.forEach(c => c.classList.toggle('light-mode'));
+    }
+  </script>
+</body>
+</html>
